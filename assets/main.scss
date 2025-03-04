@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+// Heading Styles
+$h1-font-size: 3rem;
+$h2-font-size: 2rem;
+$h3-font-size: 1.85rem;
+$h4-font-size: 1.55rem;
+$h5-font-size: 1.25rem;
+$h6-font-size: 1rem;
+
+html, body, div, span,
+h1, h2, h3, h4, h5, h6,
+p, img, sub, sup,
+b, u, i, ol, ul, li,
+fieldset, form, label,
+article, aside, footer,
+header, nav, section {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+body {
+    background-color: #FEFCFB;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, footer,
+header, nav, section {
+    display: block;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: "Ubuntu", serif;
+	font-weight: 100;
+	font-style: normal;
+}
+
+h1 {
+    font-size: $h1-font-size;
+
+    @media (max-width: 600px) {
+        font-size: $h2-font-size;
+    }
+}
+
+h2 {
+    font-size: $h2-font-size;
+
+    @media (max-width: 600px) {
+        font-size: $h3-font-size;
+    }
+}
+
+h3 {
+    font-size: $h3-font-size;
+
+    @media (max-width: 600px) {
+        font-size: $h4-font-size;
+    }
+}
+
+h4 {
+    font-size: $h4-font-size;
+}
+
+h5 {
+    font-size: $h5-font-size;
+}
+
+h6 {
+    font-size: $h6-font-size;
+}
+
+p,
+button {
+	font-family: "Montserrat", serif;
+	font-optical-sizing: auto;
+	font-style: normal;
+}
+
+.caption {
+    font-size: .75rem;
+}
+
+.dark {
+    background-color: #3d3d3d;
+    color: #e2e2e2;
+}
