@@ -15,7 +15,7 @@
 			<div v-if="guesses.length > 0" class="guesses-display">
 				<h3>Guesses:</h3>
 				<ul>
-					<li v-for="(guess, index) in guesses" :key="index">{{ guess }}</li>
+					<li v-for="(guess, index) in guesses" :key="index">{{ guess }}</li> 
 				</ul>
 			</div>
 
