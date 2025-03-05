@@ -31,66 +31,71 @@
 </template>
   
 <script setup>
-	import { ref, onMounted } from 'vue';
-	import Game from '../components/Game.vue';
-	import StatsModal from '../components/StatsModal.vue';
-	import InfoModal from '../components/InfoModal.vue';
-	import Header from '../components/Header.vue';
-	
-	const stats = ref({
-		gamesPlayed: 0,
-		gamesWon: 0,
-		winStreak: 0,
-		maxWinStreak: 0,
-	});
-  
-	const isStatsOpen = ref(false);
-	const isInfoModalOpen = ref(false);
-	const isDarkMode = ref(false);
-  
-	const loadStats = () => {
-		const storedStats = JSON.parse(localStorage.getItem('stats'));
-		if (storedStats) {
-		stats.value = storedStats;
-		}
-	};
-  
-	onMounted(() => {
-		loadStats();
-		const storedDarkMode = localStorage.getItem('darkMode');
-		if (storedDarkMode === 'true') {
-			isDarkMode.value = true;
-		}
-	});
-  
-	const openStats = () => {
-		isStatsOpen.value = true;
-	};
-	
-	const closeStats = () => {
-		isStatsOpen.value = false;
-	};
+    import { ref, onMounted } from 'vue';
+    import Game from '../components/Game.vue';
+    import StatsModal from '../components/StatsModal.vue';
+    import InfoModal from '../components/InfoModal.vue';
+    import Header from '../components/Header.vue';
 
-	const openInfo = () => {
-	isInfoModalOpen.value = !isInfoModalOpen.value;
-	};
+    const stats = ref({
+        gamesPlayed: 0,
+        gamesWon: 0,
+        gamesLost: 0,
+        winStreak: 0,
+        maxWinStreak: 0,
+        lossStreak: 0,
+        maxLossStreak: 0,
+        guessesPerWin: [], // Add this line
+        mostGuessedPlayer: {} // Add this line
+    });
 
-	const closeInfoModal = () => {
-	isInfoModalOpen.value = false;
-	};
+    const isStatsOpen = ref(false);
+    const isInfoModalOpen = ref(false);
+    const isDarkMode = ref(false);
 
-	const toggleDarkMode = () => {
-		isDarkMode.value = !isDarkMode.value;
-		localStorage.setItem('darkMode', String(isDarkMode.value));
-	};
-  </script>
-  
+    const loadStats = () => {
+        const storedStats = JSON.parse(localStorage.getItem('stats'));
+        if (storedStats) {
+            stats.value = storedStats;
+        }
+    };
+
+    onMounted(() => {
+        loadStats();
+        const storedDarkMode = localStorage.getItem('darkMode');
+        if (storedDarkMode === 'true') {
+            isDarkMode.value = true;
+        }
+    });
+
+    const openStats = () => {
+        isStatsOpen.value = true;
+    };
+
+    const closeStats = () => {
+        isStatsOpen.value = false;
+    };
+
+    const openInfo = () => {
+        isInfoModalOpen.value = !isInfoModalOpen.value;
+    };
+
+    const closeInfoModal = () => {
+        isInfoModalOpen.value = false;
+    };
+
+    const toggleDarkMode = () => {
+        isDarkMode.value = !isDarkMode.value;
+        localStorage.setItem('darkMode', String(isDarkMode.value));
+    };
+</script>
+
 <style lang="scss" scoped>
-	.container {
-		align-items: center;
-		display: flex;
-		flex-direction: column;
-		height: 100dvh;
-		transition: background-color 0.3s, color 0.3s;
-	}
+    .container {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        transition: background-color 0.3s, color 0.3s;
+    }
 </style>

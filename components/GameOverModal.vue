@@ -1,208 +1,186 @@
 <template>
-	<div 
-		v-if="isOpen" 
-		:class="{ 'dark': isDarkMode }"
-		class="game-over-modal"
-	>
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2 v-if="won">
-					{{ winMessage }}
-				</h2>
-				<h2 v-else-if="alreadyPlayed">
-					{{ alreadyPlayedMessage }}
-				</h2>
-				<h2 v-else>
-					{{ loseMessage }}
-				</h2>
-					
-				<Icon 
-					class="close-button"
-					name="carbon:close-filled" 
-					@click="closeModal"
-				/>
-			</div>
+    <div v-if="isOpen" :class="{ 'dark': darkMode }" class="game-over-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 v-if="won">
+                    {{ winMessage }}
+                </h2>
+                <h2 v-else-if="alreadyPlayed">
+                    {{ alreadyPlayedMessage }}
+                </h2>
+                <h2 v-else>
+                    {{ loseMessage }}
+                </h2>
+                <p v-if="alreadyPlayed && gameOver">
+                    You have reached your daily play limit.
+                </p>
 
-			<div class="guesses">
-				<p v-if="guesses.length < 3">Damn, got it in {{ guesses.length }}! Champions league incoming!</p>
-				<p v-else-if="guesses.length < 5">Not too shabby, {{ guesses.length }}/6 isn't the worst!</p>
-				<p v-else-if="guesses.length === 5">Wow, got it in {{ guesses.length }}? Relegation prending...</p>
-				<p v-else>{{ guesses.length }}... Need I say anything?</p>
-			</div>
+                <Icon class="close-button" name="carbon:close-filled" @click="closeModal" />
+            </div>
 
-			<div class="modal-body">
-				<div v-if="won || !won">
-					<div 
-						v-if="playerStats"
-						class="stats"
-					>
-						<span>
-							<img 
-								:src="playerStats.photo"
-							/>
-						</span>
-						<span class="stat-item">
-							<p>Name: </p>
+            <div class="guesses">
+                <p v-if="won">
+                    You guessed the player in {{ guesses.length }} guesses.
+                </p>
+                <p v-else-if="targetPlayer">
+                    The player was {{ targetPlayer.name }}.
+                </p>
+            </div>
 
-							<p>{{ playerStats.name }}</p>
-						</span>
-						<span class="stat-item">
-							<p>Age: </p>
-
-							<p>{{ playerStats.age }}</p>
-						</span>
-						<span class="stat-item">
-							<p>Nationality: </p>
-
-							<p>{{ playerStats.nationality }}</p>
-						</span>
-					</div>
-					
-					<p v-else>Loading player stats...</p>
-				</div>
-			</div>
-		</div>
-	</div>
+            <div class="modal-body">
+                <div class="player-details" v-if="targetPlayer">
+                    <div class="detail-item">
+                        <strong>Name:</strong> {{ targetPlayer.name }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Age:</strong> {{ targetPlayer.age }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Nationality:</strong> {{ targetPlayer.nationality }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Career Club Goals:</strong> {{ targetPlayer.careerClubGoals }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Position:</strong> {{ targetPlayer.position }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>League:</strong> {{ targetPlayer.league }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Club:</strong> {{ targetPlayer.club }}
+                    </div>
+                </div>
+                <div v-if="alreadyPlayed && gameOver && gameSummaries.length > 0">
+                    <h3>Last 3 Games:</h3>
+                    <div v-for="(summary, index) in gameSummaries" :key="index">
+                        <p v-if="summary.won">Won: {{ summary.targetPlayer.name }}</p>
+                        <p v-else>Lost: {{ summary.targetPlayer.name }}</p>
+                        <p>Guesses: {{ summary.guesses.join(', ') }}</p>
+                    </div>
+                </div>
+            </div>
+            <button @click="resetPlays">Reset Plays (Testing Only)</button>
+        </div>
+    </div>
 </template>
-  
+
 <script setup>
-	import { defineProps, defineEmits, computed, ref, onMounted } from 'vue';
-	import { winMessages, loseMessages, alreadyPlayedMessages } from '~/stores/messages';
-	import axios from 'axios'; // Import axios
-  
-	const props = defineProps({
-		isOpen: Boolean,
-		won: Boolean,
-		targetPlayer: String,
-		playerDetails: Object,
-		guesses: Array,
-		alreadyPlayed: Boolean,
-	});
-  
-	const emit = defineEmits(['close']);
+import { defineProps, defineEmits, computed } from 'vue';
+import { winMessages, loseMessages, alreadyPlayedMessages } from '~/stores/messages';
+import { ref, onMounted } from 'vue';
 
-	const isDarkMode = ref(false);
-	
-	const closeModal = () => {
-		emit('close');
-	};
-  
-	const winMessage = computed(() => {
-		return winMessages[Math.floor(Math.random() * winMessages.length)];
-	});
-  
-	const loseMessage = computed(() => {
-		return loseMessages[Math.floor(Math.random() * loseMessages.length)];
-	});
-  
-	const alreadyPlayedMessage = computed(() => {
-		return alreadyPlayedMessages[Math.floor(Math.random() * alreadyPlayedMessages.length)];
-	});
-  
-	const playerStats = ref(null);
-  
-	onMounted(async () => {
-		try {
-			const playerName = props.targetPlayer; // Use the target player name
-			const apiKey = '0981ac1cc5bffb4fa9188196532df9b5';
-			const response = await axios.get('https://v3.football.api-sports.io/players/profiles', {
-				headers: {
-				'x-rapidapi-key': apiKey,
-				'x-rapidapi-host': 'v3.football.api-sports.io',
-				},
-				params: {
-				search: playerName,
-				},
-			});
+const props = defineProps({
+    isOpen: Boolean,
+    won: Boolean,
+    targetPlayer: Object,
+    guesses: Array,
+    alreadyPlayed: Boolean,
+    darkMode: Boolean,
+});
 
-			console.log("details........", response);
-		
-			if (response.data.response && response.data.response.length > 0) {
-				playerStats.value = response.data.response[0].player;
+const emit = defineEmits(['close']);
 
-				console.log("player........", playerStats.value);
-			} else {
-				console.error('Player stats not found.');
-			}
-		} catch (error) {
-			console.error('Error fetching player stats:', error);
-		}
+const closeModal = () => {
+    emit('close');
+};
 
-		const storedDarkMode = localStorage.getItem('darkMode');
-		if (storedDarkMode === 'true') {
-			isDarkMode.value = true;
-		}
-	});
+const winMessage = computed(() => {
+    return winMessages[Math.floor(Math.random() * winMessages.length)];
+});
+
+const loseMessage = computed(() => {
+    return loseMessages[Math.floor(Math.random() * loseMessages.length)];
+});
+
+const alreadyPlayedMessage = computed(() => {
+    return alreadyPlayedMessages[Math.floor(Math.random() * alreadyPlayedMessages.length)];
+});
+
+const gameSummaries = ref([]);
+
+onMounted(() => {
+    if (props.alreadyPlayed && props.gameOver) {
+        gameSummaries.value = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
+    }
+});
+
+const resetPlays = () => {
+    localStorage.setItem('playsToday', '0');
+    checkDailyPlay();
+};
 </script>
-  
+
 <style lang="scss" scoped>
-	.game-over-modal {
-		align-items: center;
-		background-color: rgba(0, 0, 0, 0.5);
-		display: flex;
-		height: 100%;
-		justify-content: center;
-		left: 0;
-		position: fixed;
-		top: 0;
-		width: 100%;
-		z-index: 1000;
+.game-over-modal {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 
-		&.dark {
-			background-color: rgba(50, 50, 50, 0.5);
+    &.dark {
+        background-color: rgba(50, 50, 50, 0.5);
 
-			.modal-content {
-				background-color: #1f1f1f;
+        .modal-content {
+            background-color: #1f1f1f;
+            color: #e2e2e2;
 
-				.modal-header{
-					.close-button {
-						color: #aeaeae;
-					}
-				}
-			}
-		}
+            .modal-header {
+                .close-button {
+                    color: #aeaeae;
+                }
+            }
+        }
+    }
 
-		.modal-content {
-			background-color: white;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-			padding: 1.25rem;
-			width: 100%;
+    .modal-content {
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem;
+        width: 100%;
 
-			.modal-header {
-				align-items: center;
-				display: flex;
-				justify-content: space-between;
+        .modal-header {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
 
-				.close-button {
-					border: none;
-					color: #292929;
-					cursor: pointer;
-					font-size: 1.75rem;
-				}
-			}
+            .close-button {
+                border: none;
+                color: #292929;
+                cursor: pointer;
+                font-size: 1.75rem;
+            }
+        }
 
-			.guesses {
-				text-align: left;
-			}
+        .guesses {
+            text-align: center;
+        }
 
-			.modal-body {
-				text-align: center;
+        .modal-body {
+            text-align: left;
 
-				.stats {
-					display: flex;
-					flex-direction: column;
-					gap: .5rem;
+            .player-details {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
 
-					.stat-item {
-						display: flex;
-						justify-content: space-between;
-						width: 100%;
-					}
-				}
-			}
-		}
-	}
+                .detail-item {
+                    display: flex;
+                    justify-content: space-between;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 0.5rem;
+                }
+            }
+        }
+    }
+}
 </style>
