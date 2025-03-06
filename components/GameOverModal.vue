@@ -33,22 +33,46 @@
                         <strong>Name:</strong> {{ targetPlayer.name }}
                     </div>
                     <div class="detail-item">
-                        <strong>Age:</strong> {{ targetPlayer.age }}
-                    </div>
-                    <div class="detail-item">
                         <strong>Nationality:</strong> {{ targetPlayer.nationality }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Career Club Goals:</strong> {{ targetPlayer.careerClubGoals }}
                     </div>
                     <div class="detail-item">
                         <strong>Position:</strong> {{ targetPlayer.position }}
                     </div>
                     <div class="detail-item">
-                        <strong>League:</strong> {{ targetPlayer.league }}
+                        <strong>Team:</strong> {{ targetPlayer.team }}
                     </div>
                     <div class="detail-item">
-                        <strong>Club:</strong> {{ targetPlayer.club }}
+                        <strong>Age:</strong> {{ targetPlayer.age }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Year Born:</strong> {{ targetPlayer.yearBorn }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Matches Played:</strong> {{ targetPlayer.matchesPlayed }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Matches Started:</strong> {{ targetPlayer.matchesStarted }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Minutes Played:</strong> {{ targetPlayer.minutesPlayed }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Goals Scored:</strong> {{ targetPlayer.goalsScored }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Assists:</strong> {{ targetPlayer.assists }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Goals + Assists:</strong> {{ targetPlayer.goalsAndAssists }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Yellow Cards:</strong> {{ targetPlayer.yellowCards }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Red Cards:</strong> {{ targetPlayer.redCards }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Expected Goals:</strong> {{ targetPlayer.expectedGoals }}
                     </div>
                 </div>
                 <div v-if="alreadyPlayed && gameOver && gameSummaries.length > 0">

@@ -6,7 +6,7 @@
 	>
 		<div class="modal-content">
 			<div class="modal-header">
-				<h2>How to Play</h2>
+				<h2>Footballdle</h2>
 					
 				<Icon 
 					class="close-button"
@@ -16,64 +16,29 @@
 			</div>
 
 			<div class="modal-body">
-				<p class="description">You have 6 tries to guess the Premier League Footballer. The tiles will change colour to show you how close you get.</p>
-				
-				<div class="example">
-					<div class="letter-box correct">
-						<p>S</p>
-					</div>
-					<div class="letter-box">
-						<p>A</p>
-					</div>
-					<div class="letter-box">
-						<p>L</p>
-					</div>
-					<div class="letter-box">
-						<p>A</p>
-					</div>
-					<div class="letter-box">
-						<p>H</p>
-					</div>
-				</div>
-				<p class="caption">The letter S is in the correct spot.</p>
+				<p class="description">
+					You have 6 tries to guess the Premier League Footballer.
+				</p>
 
-				<div class="example">
-					<div class="letter-box">
-						<p>B</p>
-					</div>
-					<div class="letter-box">
-						<p>O</p>
-					</div>
-					<div class="letter-box">
-						<p>W</p>
-					</div>
-					<div class="letter-box present">
-						<p>E</p>
-					</div>
-					<div class="letter-box">
-						<p>N</p>
-					</div>
-				</div>
-				<p class="caption">The letter E is in the player name but in the wrong spot.</p>
+				<p class="description">
+					You will receive a new clue after every guess. These clues are not aimed to give you the answer, but to guide you in the right direction.
+				</p>
 
-				<div class="example">
-					<div class="letter-box">
-						<p>V</p>
-					</div>
-					<div class="letter-box absent">
-						<p>A</p>
-					</div>
-					<div class="letter-box">
-						<p>R</p>
-					</div>
-					<div class="letter-box">
-						<p>D</p>
-					</div>
-					<div class="letter-box">
-						<p>Y</p>
-					</div>
-				</div>
-				<p class="caption">The letter A is not in the player name in any spot.</p>
+				<p class="descriptive-list">
+					Clues will vary from:
+
+					<ul>
+						<li>Age</li>
+						<li>Position</li>
+						<li>Goals + Assists combined this season</li>
+					</ul>
+
+					<span>plus others...</span>
+				</p>
+
+				<p class="description">
+					You get 3 plays per day. Check on your stats each day to see how you're getting on!
+				</p>
 			</div>
 		</div>
 	</div>
@@ -121,30 +86,6 @@
 						color: #aeaeae;
 					}
 				}
-
-				.modal-body {
-					.example {
-						.letter-box {
-							background-color: #818080;
-							border: 1px solid #000000;
-
-							&.correct {
-								background-color: #79a375;
-								border-color: #000000;
-							}
-
-							&.present {
-								background-color: #afa163;
-								border-color: #000000;
-							}
-
-							&.absent {
-								background-color: #535758;
-								border-color: #000000;
-							}
-						}
-					}
-				}
 			}
 		}
 	
@@ -179,40 +120,8 @@
 					padding-bottom: 1rem;
 				}
 
-				.example {
-					align-items: center;
-					display: flex;
-					flex-direction: row;
-
-					.letter-box {
-						align-items: center;
-						border: 1px solid #aaaaaa;
-						border-radius: .25rem;
-						display: flex;
-						font-size: 1.2rem;
-						justify-content: center;
-						height: 3.5rem;
-						text-transform: uppercase;
-						width: 3.5rem;
-
-						&.correct {
-							background-color: #6aaa64;
-							border-color: #6aaa64;
-							color: white;
-						}
-
-						&.present {
-							background-color: #c9b458;
-							border-color: #c9b458;
-							color: white;
-						}
-
-						&.absent {
-							background-color: #787c7e;
-							border-color: #787c7e;
-							color: white;
-						}
-					}
+				ul {
+					padding-left: 1rem;
 				}
 			}
 		}

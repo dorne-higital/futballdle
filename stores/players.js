@@ -1,74 +1,44 @@
 // stores/players.js
 import { defineStore } from 'pinia';
+import { collection, getDocs } from 'firebase/firestore';
 
-export const usePlayerStore = defineStore('players', {
-  state: () => ({
-    players: [
-      {
-        name: 'Salah',
-        age: 31,
-        nationality: 'Egypt',
-        careerClubGoals: 230,
-        position: 'Forward',
-        league: 'Premier League',
-        club: 'Liverpool',
-      },
-      {
-        name: 'James',
-        age: 23,
-        nationality: 'England',
-        careerClubGoals: 10,
-        position: 'Defender',
-        league: 'Premier League',
-        club: 'Chelsea',
-      },
-      {
-        name: 'Vardy',
-        age: 36,
-        nationality: 'England',
-        careerClubGoals: 170,
-        position: 'Forward',
-        league: 'Premier League',
-        club: 'Leicester City',
-      },
-      {
-        name: 'Bowen',
-        age: 26,
-        nationality: 'England',
-        careerClubGoals: 80,
-        position: 'Forward',
-        league: 'Premier League',
-        club: 'West Ham United',
-      },
-      {
-        name: 'Toney',
-        age: 27,
-        nationality: 'England',
-        careerClubGoals: 150,
-        position: 'Forward',
-        league: 'Premier League',
-        club: 'Brentford',
-      },
-      {
-        name: 'Gakpo',
-        age: 24,
-        nationality: 'Netherlands',
-        careerClubGoals: 60,
-        position: 'Forward',
-        league: 'Premier League',
-        club: 'Liverpool',
-      },
-    ],
-  }),
-  getters: {
-    getRandomPlayer: (state) => () => { // Convert to function that returns a function
-      const randomIndex = Math.floor(Math.random() * state.players.length);
-      console.log("Random index generated:", randomIndex);
-      console.log("Player selected:", state.players[randomIndex]);
-      return state.players[randomIndex];
-    },
-    getPlayerDetails: (state) => (playerName) => {
-      return state.players.find((player) => player.name === playerName) || {};
-    },
-  },
+export const usePlayerStore = defineStore('players', () => {
+    const players = ref([]);
+    const { $firestore } = useNuxtApp();
+
+	async function fetchPlayers() {
+		try {
+			console.log('Fetching players...'); // Add this line
+			const querySnapshot = await getDocs(collection($firestore, 'players'));
+			console.log('Query snapshot:', querySnapshot); // Add this line
+			players.value = querySnapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			}));
+			console.log('Players fetched:', players.value); // Add this line
+		} catch (error) {
+			console.error('Error fetching players:', error);
+		}
+	}
+
+    function getRandomPlayer() {
+        if (players.value.length === 0) {
+            return null;
+        }
+        const randomIndex = Math.floor(Math.random() * players.value.length);
+        console.log('Random index generated:', randomIndex);
+        console.log('Player selected:', players.value[randomIndex]);
+        return players.value[randomIndex];
+    }
+
+    function getPlayerDetails(playerName) {
+        return players.value.find((player) => player.name === playerName) || {};
+    }
+
+    return {
+        players,
+        fetchPlayers,
+        getRandomPlayer,
+        getPlayerDetails,
+    };
 });

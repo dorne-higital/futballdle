@@ -1,29 +1,75 @@
 <template>
     <div :class="{ 'dark': darkMode }" class="game">
-        <p v-if="gamesRemaining > 0">Games remaining: {{ gamesRemaining }}</p>
+        <p v-if="guessesRemaining > 0">Guesses remaining: {{ guessesRemaining }}</p>
         <p v-else-if="alreadyPlayed">You have reached your daily play limit.</p>
 
 		<template v-if="!alreadyPlayed">
-			<input v-model="currentGuess" placeholder="Enter player name" :disabled="gameOver" />
-			<button @click="handleGuess" :disabled="gameOver">Guess</button>
+			<div class="guesses-input-container">
+				<span v-for="(guessObj, index) in guesses" :key="index" class="previous-guess" :class="{ 'correct-guess': guessObj.correct }">
+					{{index + 1}}. {{ guessObj.guess }}
+
+					<Icon 
+						v-if="guessObj.correct"
+						class="guessed-indicator"
+						name="carbon:checkmark"
+					/>
+
+					<Icon 
+						v-else
+						class="guessed-indicator"
+						name="carbon:close"
+					/>
+				</span>
+
+				<div class="guess-container">
+					<input v-if="!won && !gameOver" v-model="currentGuess" placeholder="Enter player name" :disabled="gameOver" />
+					<ul v-if="filteredSuggestions.length > 0" class="suggestions">
+						<li v-for="suggestion in filteredSuggestions" :key="suggestion.name" class="player-suggestion" @click="selectSuggestion(suggestion.name)">
+							{{ suggestion.name }}
+
+							<Icon 
+								v-if="suggestion.guessed"
+								class="guessed-indicator"
+								name="carbon:close-outline"
+							/>
+						</li>
+					</ul>
+					<!-- <button @click="handleGuess" :disabled="gameOver">Guess</button> -->
+				</div>
+			</div>
 
 			<div v-if="won" class="win-message">
-				<h2>Congratulations! You guessed correctly!</h2>
-				<button v-if="gameOver" @click="startNewGame">New Game</button>
+				<h4>Easy, right!</h4>
+
+				<p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
+
+				<p v-if="gamesRemainingToday === 0">Come back tomorrow for another try</p>
+
+				<button v-else @click="startNewGame">New Game</button>
 			</div>
 
-			<div v-if="guesses.length > 0" class="guesses-display">
-				<h3>Guesses:</h3>
-				<ul>
-					<li v-for="(guess, index) in guesses" :key="index">{{ guess }}</li> 
-				</ul>
-			</div>
+            <div v-if="gameOver && !won" class="lose-message">
+                <h4>Better luck next time!</h4>
+                <p>The correct player was: {{ targetPlayer.name }}</p>
+                <p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
+                <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try</p>
+                <button v-else @click="startNewGame">New Game</button>
+            </div>
 
-			<div v-if="clues.length > 0" class="clues">
-				<h3>Clues:</h3>
-				<ul>
-					<li v-for="(clue, index) in clues" :key="index">{{ clue }}</li>
-				</ul>
+			<div class="clues">
+				<h6>Hints</h6>
+
+				<div v-if="clues.length > 0" class="clues-grid">
+					<div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
+						<div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
+							<Icon v-if="rowIndex * 3 + colIndex >= clues.length" :name="clueIcons[rowIndex * 3 + colIndex]" class="clue-icon" />
+							<template v-else>
+								<span class="clue">{{ clue }}</span>
+								<span class="clue-title">{{ clueTitles[rowIndex * 3 + colIndex] }}</span>
+							</template>
+						</div>
+					</div>
+				</div>
 			</div>
 		</template>
 
@@ -36,9 +82,6 @@
 				<p>Guesses: {{ summary.guesses.length }} / 6</p>
 			</div>
 		</div>
-
-        <Keyboard :darkMode="darkMode" :disabledKeys="disabledKeys" :letterStates="letterStates"
-            @key-press="handleKeyboardKeyPress" />
 
         <GameOverModal :darkMode="darkMode" :isOpen="isGameOverModalOpen" :won="won" :targetPlayer="targetPlayer"
             :guesses="guesses" :alreadyPlayed="alreadyPlayed"
@@ -68,10 +111,26 @@ const playerStore = usePlayerStore();
 const targetPlayer = ref(null); // Initialize to null
 
 const playerDetails = computed(() => {
-    if (targetPlayer.value) {
-        return playerStore.getPlayerDetails(targetPlayer.value.name);
-    }
-    return null; // Return null if targetPlayer is null
+  if (targetPlayer.value) {
+    return {
+      name: targetPlayer.value.name,
+      nationality: targetPlayer.value.nationality,
+      position: targetPlayer.value.position,
+      team: targetPlayer.value.team,
+      age: targetPlayer.value.age,
+      yearBorn: targetPlayer.value.yearBorn,
+      matchesPlayed: targetPlayer.value.matchesPlayed,
+      matchesStarted: targetPlayer.value.matchesStarted,
+      minutesPlayed: targetPlayer.value.minutesPlayed,
+      goalsScored: targetPlayer.value.goalsScored,
+      assists: targetPlayer.value.assists,
+      goalsAndAssists: targetPlayer.value.goalsAndAssists,
+      yellowCards: targetPlayer.value.yellowCards,
+      redCards: targetPlayer.value.redCards,
+      expectedGoals: targetPlayer.value.expectedGoals,
+    };
+  }
+  return null;
 });
 
 const guesses = ref([]);
@@ -94,24 +153,78 @@ const letterStates = ref({});
 
 const isGameOverModalOpen = ref(false);
 const alreadyPlayed = ref(false);
-const isInfoModalOpen = ref(false);
 const clues = ref([]);
 const gameSummaries = ref([]);
+const isInfoModalOpen = ref(true);
 
-onMounted(() => {
+const suggestions = ref([]);
+
+const filteredSuggestions = computed(() => {
+    if (!currentGuess.value) {
+        return [];
+    }
+    return playerStore.players
+        .filter((player) =>
+            player.name.toLowerCase().includes(currentGuess.value.toLowerCase())
+        )
+        .map((player) => ({
+            ...player,
+            guessed: guesses.value.includes(player.name),
+        }));
+});
+
+const selectSuggestion = (playerName) => {
+    currentGuess.value = playerName;
+    filteredSuggestions.value = []; // Clear suggestions
+    handleGuess(); // Submit the guess immediately
+};
+
+onMounted(async () => {
+    await playerStore.fetchPlayers(); // Fetch players from Firestore
     loadStats();
     checkDailyPlay();
     window.addEventListener('keydown', handleDesktopKeyPress);
-    if (!gameOver.value) {
-        targetPlayer.value = playerStore.getRandomPlayer(); // Call the getter once
-        console.log("Target player on mount:", targetPlayer.value);
-	}
 
-	gameSummaries.value = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
+    // Ensure players are fetched before trying to get a random player
+    if (!gameOver.value && playerStore.players && playerStore.players.length > 0) {
+        targetPlayer.value = playerStore.getRandomPlayer();
+        console.log("Target player on mount:", targetPlayer.value);
+        clues.value.push(generateClues(targetPlayer.value)[0]);
+    } else {
+        console.log("Players not loaded or game over.");
+    }
+
+    gameSummaries.value = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
 });
+
 
 onUnmounted(() => {
     window.removeEventListener('keydown', handleDesktopKeyPress);
+});
+
+const gamesRemainingToday = computed(() => {
+    const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+    return Math.max(0, 3 - playsToday);
+});
+
+const cluesGrid = computed(() => {
+    const grid = [[], []];
+    for (let i = 0; i < 6; i++) {
+        const row = Math.floor(i / 3);
+        grid[row].push(clues.value[i] || null);
+    }
+    return grid;
+});
+
+const clueIcons = computed(() => {
+    return [
+        'carbon:number-1',
+        'carbon:number-2',
+        'carbon:number-3',
+        'carbon:number-4',
+        'carbon:number-5',
+        'carbon:number-6',
+    ];
 });
 
 const checkDailyPlay = () => {
@@ -177,30 +290,45 @@ const saveGameData = () => {
     localStorage.setItem('clues', JSON.stringify(clues.value));
 };
 
+const clueTitles = [
+    'Age',
+    'Position',
+    'Matches Played',
+    'Nationality',
+    'Club',
+    'Goals + Assists',
+];
+
+
 const generateClues = (player) => {
-    return [
-        `Age: ${player.age}`,
-        `Nationality: ${player.nationality}`,
-        `Career Club Goals: ${player.careerClubGoals}`,
-        `Position: ${player.position}`,
-        `League: ${player.league}`,
-        `Club: ${player.club}`,
-    ];
+  return [
+    `${player.age}`,
+    `${player.position}`,
+    `${player.matchesPlayed}`,
+    `${player.nationality}`,
+    `${player.team}`,
+    `${player.goalsAndAssists}`,
+  ];
 };
 
-const gamesRemaining = computed(() => {
-    const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-    return Math.max(0, 3 - playsToday);
+const guessesRemaining = computed(() => {
+    return Math.max(0, 6 - guesses.value.length);
 });
 
 const handleGuess = () => {
     if (gameOver.value) return;
 
     const guess = currentGuess.value;
-    guesses.value.push(guess);
+    const isCorrectGuess = guess.toLowerCase() === targetPlayer.value.name.toLowerCase();
+
+    guesses.value.push({
+        guess: guess,
+        correct: isCorrectGuess,
+    });
+
     currentGuess.value = '';
 
-    if (guess.toLowerCase() === targetPlayer.value.name.toLowerCase()) {
+    if (isCorrectGuess) {
         won.value = true;
         gameOver.value = true;
         isGameOverModalOpen.value = true;
@@ -210,7 +338,7 @@ const handleGuess = () => {
         isGameOverModalOpen.value = true;
         updateStats(false);
     } else {
-        clues.value.push(generateClues(targetPlayer.value)[guesses.value.length - 1]);
+        clues.value.push(generateClues(targetPlayer.value)[guesses.value.length]);
     }
 
     saveGameData();
@@ -358,14 +486,113 @@ const startNewGame = () => {
     flex-direction: column;
     align-items: center;
     padding: 2rem;
+	width: 100vw;
 
-    input {
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 1rem;
+	.guesses-input-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
     }
+
+    .previous-guess {
+        background-color: #ffe5e5;
+		border-bottom: 1px solid #d24f4f;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+        padding: 0.75rem;
+        text-transform: uppercase;
+        font-size: .65rem;
+        letter-spacing: .1rem;
+
+		&:nth-child(even) {
+			background-color: #ffefef;
+		}
+
+		span {
+			background-color: #d24f4f;
+		}
+
+		&.correct-guess {
+			background-color: #d6fad7;
+			border-bottom: 1px solid #88bd8a;
+			font-weight: 500;
+
+			span {
+				background-color: #527454;
+			}
+		}
+    }
+
+	.guess-container {
+		margin-top: .4rem;
+		position: relative;
+		width: 100%;
+
+		input {
+			background-color: #f3f7ff;
+			border: none;
+			border-bottom: 2px solid #3f50e9;
+			font-size: 1rem;
+			letter-spacing: .1rem;
+			padding: .75rem;
+			text-transform: uppercase;
+			width: 100%;
+
+			&:focus {
+				outline: none;
+			}
+		}
+
+		.suggestions {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			border: none;
+			border-radius: 4px;
+			background-color: #f3f7ff;
+			font-size: .8rem;
+			max-height: 200px;
+			overflow-y: auto;
+			text-transform: uppercase;
+			position: absolute;
+			left: 0;
+			top: 100%;
+			width: 100%;
+			z-index: 10;
+
+			&:focus {
+				outline: none;
+			}
+			
+			li {
+				border-bottom: 1px solid #e3e6ff;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				letter-spacing: .1rem;
+				padding: .5rem .75rem;
+				cursor: pointer;
+
+				&:hover {
+					background-color: #c8d2f0;
+				}
+
+				&:nth-child(even) {
+					background-color: #edf2fa;
+
+					&:hover {
+						background-color: #c8d2f0;
+					}
+				}
+
+				span {
+					background-color: #d24f4f;
+				}
+			}
+		}
+	}
+
 
     button {
         padding: 0.5rem 1rem;
@@ -378,15 +605,46 @@ const startNewGame = () => {
     }
 
     .win-message {
-        background-color: #66bb6a;
-        color: white;
-        padding: 1rem;
-        border-radius: 4px;
-        margin-bottom: 1rem;
-        text-align: center;
+        background-color: #d6fad7;
+		border: 1px solid #88bd8a;
+		margin-top: 1rem;
+        padding: .75rem;
+		width: 100%;
+
+		h4 {
+			padding-bottom: 1rem;
+		}
+
+		p {
+			padding-bottom: .5rem;
+		}
+        button {
+			margin-bottom: 0;
+            margin-top: .5rem;
+			width: 100%;
+        }
+    }
+
+	.lose-message {
+        background-color: #ffe5e5;
+        border: 1px solid #d24f4f;
+		margin-top: 1rem;
+        padding: .75rem;
+        width: 100%;
+
+        h4 {
+            padding-bottom: 1rem;
+        }
+
+        p {
+            padding-bottom: .5rem;
+        }
 
         button {
-            margin-top: 1rem;
+			background-color: #d24f4f;
+            margin-bottom: 0;
+            margin-top: .5rem;
+            width: 100%;
         }
     }
 
@@ -413,27 +671,57 @@ const startNewGame = () => {
         }
     }
 
-    .clues {
-        margin-top: 1rem;
+	.clues {
+		background-color: #f0f0f0;
+		border: 1px solid #cfcfcf;
+		bottom: 5rem;
+		margin: 0 2rem;
+		padding: .5rem;
+		position: absolute;
+		text-align: center;
+		width: calc(100% - 4rem);
+
+		h6 {
+			padding-bottom: .5rem;
+		}
+	}
+
+	.clues-grid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .clues-row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .clue-item {
+		align-items: center;
+		background-color: #f7f7f7;
         border: 1px solid #ddd;
+		display: flex;
+		flex-direction: column;
+		gap: .5rem;
+		height: 6rem;
+		justify-content: space-between;
         padding: 1rem;
-        border-radius: 4px;
-        width: 80%;
-        text-align: left;
+        text-align: center;
+    	width: 33%;
 
-        h3 {
-            margin-bottom: 0.5rem;
+        .clue-icon {
+            font-size: 3.5rem;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+		.clue {
+			font-size: 1.2rem;
+		}
 
-        li {
-            padding: 0.25rem 0;
-        }
+		.clue-title {
+			font-size: .75rem;
+		}
     }
 
     &.dark {
