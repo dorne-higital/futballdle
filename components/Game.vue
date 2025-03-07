@@ -38,28 +38,27 @@
 				</div>
 			</div>
 
-			<div v-if="won" class="win-message">
-				<h4>Easy, right!</h4>
-
-				<p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
-
-				<p v-if="gamesRemainingToday === 0">Come back tomorrow for another try</p>
-
-				<button v-else @click="startNewGame">New Game</button>
-			</div>
-
-            <div v-if="gameOver && !won" class="lose-message">
-                <h4>Better luck next time!</h4>
-                <p>The correct player was: {{ targetPlayer.name }}</p>
-                <p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
-                <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try</p>
-                <button v-else @click="startNewGame">New Game</button>
-            </div>
-
 			<div class="clues">
-				<h6>Hints</h6>
+				<div v-if="won" class="win-message">
+					<h4>Easy, right!</h4>
 
-				<div v-if="clues.length > 0" class="clues-grid">
+					<p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
+
+					<p v-if="gamesRemainingToday === 0">Come back tomorrow for another try</p>
+
+					<button v-else @click="startNewGame">New Game</button>
+				</div>
+
+				<div v-else-if="gameOver && !won" class="lose-message">
+					<h4>Better luck next time!</h4>
+					<p>The correct player was: {{ targetPlayer.name }}</p>
+					<p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
+					<p v-if="gamesRemainingToday === 0">Come back tomorrow for another try</p>
+					<button v-else @click="startNewGame">New Game</button>
+				</div>
+
+				<div v-else class="clues-grid">
+					<h6>Hints</h6>
 					<div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
 						<div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
 							<Icon v-if="rowIndex * 3 + colIndex >= clues.length" :name="clueIcons[rowIndex * 3 + colIndex]" class="clue-icon" />
@@ -476,7 +475,9 @@ const startNewGame = () => {
     targetPlayer.value = playerStore.getRandomPlayer();
     console.log("New targetPlayer after:", targetPlayer.value);
     isGameOverModalOpen.value = false;
-    saveGameData();
+	saveGameData();
+	
+    clues.value.push(generateClues(targetPlayer.value)[0]);
 };
 </script>
 
@@ -607,7 +608,6 @@ const startNewGame = () => {
     .win-message {
         background-color: #d6fad7;
 		border: 1px solid #88bd8a;
-		margin-top: 1rem;
         padding: .75rem;
 		width: 100%;
 
@@ -628,7 +628,6 @@ const startNewGame = () => {
 	.lose-message {
         background-color: #ffe5e5;
         border: 1px solid #d24f4f;
-		margin-top: 1rem;
         padding: .75rem;
         width: 100%;
 
