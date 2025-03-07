@@ -6,41 +6,98 @@
                 <button @click="closeModal" class="close-button">×</button>
             </div>
             <div class="modal-body">
-                <div class="stat-item">
-                    <p>Total Games Played: {{ stats.gamesPlayed }}</p>
+                <div class="stat-section">
+                    <div class="stat-type">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ maxGames }}</span>
+                        </div>
+
+                        <p class="stat-label">Games played</p>
+                    </div>
+                    
+                    <div class="stat-type">
+                        <div class="pie-chart-container">
+                            <div class="pie-chart" :style="{ background: `conic-gradient(#88bd8a ${winPercentage}%, transparent ${winPercentage}%)` }">
+                                <div class="pie-chart-inner"></div>
+
+                                <span class="stat-value">{{ winPercentage }}%</span>
+                            </div>
+                        </div>
+
+                        <p class="stat-label">Win percentage</p>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <p>Total Games Won: {{ stats.gamesWon }}</p>
+
+                <div class="stat-bar center">
+                    <p class="stat-label">Won / Lost</p>
+
+                    <div class="progress-section">
+                        <p>{{ stats.gamesWon }}</p>
+
+                        <div class="bar-container">
+                            <div class="bar-fill" :style="{ width: winPercentageSplit + '%' }"/>
+                        </div>
+
+                        <p>{{ stats.gamesLost }}</p>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <p>Total Games Lost: {{ stats.gamesLost }}</p>
+
+                <div class="stat-section">
+                    <div v-if="stats.winStreak > 0" class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ stats.winStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Winning run</p>
+                    </div>
+
+                    <div v-else class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ stats.lossStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Losing streak</p>
+                    </div>
+
+                    <div class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ stats.maxWinStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Biggest win streak</p>
+                    </div>
+
+                    <div class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ stats.maxLossStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Longest losing streak</p>
+                    </div>
+
+                    <div class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ averageGuessesPerWin }}</span>
+                        </div>
+
+                        <p class="stat-label">Avg. guesses per win</p>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <p>Win Percentage: {{ winPercentage }}%</p>
-                </div>
-                <div class="stat-item">
-                    <p>Average Guesses Per Win: {{ averageGuessesPerWin }}</p>
-                </div>
-                <div class="stat-item">
-                    <p>Win Streak: {{ stats.winStreak }}</p>
-                </div>
-                <div class="stat-item">
-                    <p>Max Win Streak: {{ stats.maxWinStreak }}</p>
-                </div>
-                <div class="stat-item">
-                    <p>Loss Streak: {{ stats.lossStreak }}</p>
-                </div>
-                <div class="stat-item">
-                    <p>Max Loss Streak: {{ stats.maxLossStreak }}</p>
-                </div>
-                <div class="stat-item" v-if="stats.gamesPlayed >= 10">
-                    <p>Most Guessed Player: {{ stats.mostGuessedPlayer.name }} ({{ stats.mostGuessedPlayer.count }} times)</p>
+
+                <div class="stat-bar" v-if="stats.gamesPlayed >= 10">
+                    <span class="stat-label">Most Guessed Player (Times)</span>
+                    <div class="bar-container">
+                        <div class="bar-fill" :style="{ width: (stats.mostGuessedPlayer.count / maxGuessedCount) * 100 + '%' }">
+                            <span class="stat-value">{{ stats.mostGuessedPlayer.count }}</span>
+                        </div>
+                        <span class="max-value">{{ maxGuessedCount }}</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
-  
+
 <script setup>
 import { defineProps, defineEmits, computed } from 'vue';
 
@@ -66,10 +123,34 @@ const averageGuessesPerWin = computed(() => {
     const totalGuesses = props.stats.guessesPerWin.reduce((sum, guesses) => sum + guesses, 0);
     return (totalGuesses / props.stats.guessesPerWin.length).toFixed(1);
 });
+
+const maxGames = computed(() => {
+    return Math.max(props.stats.gamesPlayed, 1); // Ensure it's not zero
+});
+
+const maxStreak = computed(() => {
+    return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1); // Ensure it's not zero
+});
+
+const maxGuessedCount = computed(() => {
+    if (props.stats.gamesPlayed < 10) return 1;
+    return Math.max(props.stats.mostGuessedPlayer.count, 1); // Ensure it's not zero
+});
+
+const winPercentageSplit = computed(() => {
+    const total = props.stats.gamesWon + props.stats.gamesLost;
+    if (total === 0) return 0;
+    return (props.stats.gamesWon / total) * 100;
+});
+
+const lossPercentageSplit = computed(() => {
+    const total = props.stats.gamesWon + props.stats.gamesLost;
+    if (total === 0) return 0;
+    return (props.stats.gamesLost / total) * 100;
+});
 </script>
-  
+
 <style lang="scss" scoped>
-/* StatsModal.vue styles */
 .stats-modal {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
@@ -105,6 +186,7 @@ const averageGuessesPerWin = computed(() => {
         gap: 1rem;
         padding: 1.25rem;
         width: 100%;
+        max-width: 600px;
 
         .modal-header {
             align-items: center;
@@ -120,12 +202,137 @@ const averageGuessesPerWin = computed(() => {
         }
 
         .modal-body {
-            text-align: left;
+            .stat-section {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: .5rem;
 
-            .stat-item {
-                margin-bottom: 0.5rem;
+                .stat-type {
+                    background-color: #f0f0f0;
+                    border: 1px solid #cfcfcf;
+                    padding: .5rem;
+                    text-align: center;
+                    width: calc(50% - .25rem);
+
+                    &.minimal {
+                        width: calc(25% - .375rem);
+
+                        .stat-value {
+                            font-size: 2rem !important;
+                        }
+                    }
+
+                    .stat-container {
+                        align-items: center;
+                        aspect-ratio: 1 / 1;
+                        display: flex;
+                        justify-content: center;
+                        width: 100%;
+
+                        .stat-value {
+                            font-size: 3rem;
+                            font-weight: 300;
+                        }
+                    }
+
+                    .pie-chart-container {
+                        width: 100%;
+                        position: relative;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .pie-chart {
+                        aspect-ratio: 1 / 1;
+                        width: 100%;
+                        border-radius: 50%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        .pie-chart-inner {
+                            position: absolute;
+                            width: 70%;
+                            height: 70%;
+                            background-color: #f0f0f0;
+                            border-radius: 50%;
+                        }
+
+                        .stat-value {
+                            font-size: 3rem;
+                            font-weight: 300;
+                            z-index: 10;
+                        }
+                    }
+
+                    p {
+                        border-top: 1px solid #cfcfcf;
+                        font-size: .75rem;
+                        padding-top: .5rem;
+                    }
+                }
+            }
+
+            .stat-bar {
+                align-items: center;
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 0.75rem;
+
+                &.center {
+                    flex-direction: column;
+                    margin-top: .75rem;
+                }
+
+                .stat-label {
+                    margin-right: 1rem;
+                }
+
+                .progress-section {
+                    display: flex;
+                    flex-direction: row;
+                    gap: .5rem;
+                    margin-top: .5rem;
+                    width: 100%;
+                }
+
+                .bar-container {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    background-color: #d24f4f; /* Dark background */
+                    overflow: hidden;
+                    position: relative;
+                    width: 100%;
+
+                    .bar-fill {
+                        background-color: #88bd8a; /* Yellow fill */
+                        height: 24px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                        position: relative;
+                        z-index: 1;
+
+                        .stat-value {
+                            color: black;
+                            font-weight: bold;
+                            padding-left: 8px;
+                        }
+                    }
+
+                    .max-value {
+                        color: white;
+                        padding-right: 8px;
+                        position: absolute;
+                        right: 0;
+                        z-index: 2;
+                    }
+                }
             }
         }
     }
 }
-  </style>
+</style>
