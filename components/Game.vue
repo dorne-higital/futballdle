@@ -76,7 +76,7 @@
 		</template>
 
 		<div v-if="gameSummaries.length > 0 && alreadyPlayed" class="game-summaries">
-			<h6>Game Summaries</h6>
+			<h6>Todays games</h6>
 			<div v-for="(summary, index) in gameSummaries" :key="index" :class="{ 'game-won': summary.won, 'game-lost': !summary.won }" class="prev-games">
 				<p class="title">
 					Game {{ index + 1 }}
