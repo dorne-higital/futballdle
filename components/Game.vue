@@ -405,7 +405,7 @@ const updateStats = (gameWon) => {
 
 	// Store game summary
 	let gameSummaries = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
-    gameSummaries.unshift({
+    gameSummaries.push({
         targetPlayer: targetPlayer.value,
         guesses: guesses.value,
         won: gameWon,
@@ -638,9 +638,11 @@ const startNewGame = () => {
 				p {
 					padding-bottom: .5rem;
 				}
+
 				button {
-					margin-bottom: 0;
-					margin-top: .5rem;
+					background-color: #88bd8a;
+					border: 1px solid #567c57;
+					padding: .75rem;
 					width: 100%;
 				}
 			}
