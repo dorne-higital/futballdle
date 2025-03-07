@@ -614,7 +614,7 @@ const startNewGame = () => {
 		.clues {
 			background-color: #f0f0f0;
 			border: 1px solid #cfcfcf;
-			bottom: 5rem;
+			bottom: 1rem;
 			margin: 0 2rem;
 			padding: .5rem;
 			position: absolute;
