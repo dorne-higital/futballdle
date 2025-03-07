@@ -169,7 +169,8 @@ const stats = ref({
     lossStreak: 0,
     maxLossStreak: 0,
     guessesPerWin: [],
-    mostGuessedPlayer: {}
+    mostGuessedPlayer: {},
+    lastTenResults: [],
 });
 
 const isGameOverModalOpen = ref(false);
@@ -389,7 +390,9 @@ const updateStats = (gameWon) => {
 
         if (stats.value.winStreak > stats.value.maxWinStreak) {
             stats.value.maxWinStreak = stats.value.winStreak;
-        }
+		}
+
+		stats.value.lastTenResults.push('win');
     } else {
         stats.value.gamesLost++;
         stats.value.winStreak = 0;
@@ -397,8 +400,15 @@ const updateStats = (gameWon) => {
 
         if (stats.value.lossStreak > stats.value.maxLossStreak) {
             stats.value.maxLossStreak = stats.value.lossStreak;
-        }
-    }
+		}
+		
+        stats.value.lastTenResults.push('lose');
+	}
+	
+    if (stats.value.lastTenResults.length > 10) {
+        stats.value.lastTenResults.shift();
+	}
+	
     calculateMostGuessed();
     saveStats();
 	emit('stats-updated');
@@ -494,8 +504,8 @@ const startNewGame = () => {
     isGameOverModalOpen.value = false;
 	saveGameData();
 	
-    clues.value.push(generateClues(targetPlayer.value)[0]);
-};
+	clues.value.push(generateClues(targetPlayer.value)[0]);
+	};
 </script>
 
 <style lang="scss" scoped>

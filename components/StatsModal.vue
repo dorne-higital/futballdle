@@ -84,13 +84,11 @@
                     </div>
                 </div>
 
-                <div class="stat-bar" v-if="stats.gamesPlayed >= 10">
-                    <span class="stat-label">Most Guessed Player (Times)</span>
-                    <div class="bar-container">
-                        <div class="bar-fill" :style="{ width: (stats.mostGuessedPlayer.count / maxGuessedCount) * 100 + '%' }">
-                            <span class="stat-value">{{ stats.mostGuessedPlayer.count }}</span>
-                        </div>
-                        <span class="max-value">{{ maxGuessedCount }}</span>
+                <div class="prev-results">
+                    <span class="stat-label">Recent results</span>
+
+                    <div class="chips">
+                        <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
                     </div>
                 </div>
             </div>
@@ -130,11 +128,6 @@ const maxGames = computed(() => {
 
 const maxStreak = computed(() => {
     return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1); // Ensure it's not zero
-});
-
-const maxGuessedCount = computed(() => {
-    if (props.stats.gamesPlayed < 10) return 1;
-    return Math.max(props.stats.mostGuessedPlayer.count, 1); // Ensure it's not zero
 });
 
 const winPercentageSplit = computed(() => {
@@ -261,7 +254,7 @@ const lossPercentageSplit = computed(() => {
                         }
 
                         .stat-value {
-                            font-size: 3rem;
+                            font-size: 2.5rem;
                             font-weight: 300;
                             z-index: 10;
                         }
@@ -329,6 +322,38 @@ const lossPercentageSplit = computed(() => {
                         position: absolute;
                         right: 0;
                         z-index: 2;
+                    }
+                }
+            }
+
+            .prev-results {
+                align-items: center;
+                display: flex;
+                flex-direction: column;
+                gap: .5rem;
+                justify-content: center;
+                margin-top: 1rem;
+
+                .stat-label {
+                    margin-right: 1rem;
+                }
+
+                .chips {
+                    display: flex;
+                    gap: .5rem;
+
+                    .chip {
+                        width: .75rem;
+                        height: 1.5rem;
+                        display: inline-block;
+
+                        &.green {
+                            background-color: #88bd8a;
+                        }
+
+                        &.red {
+                            background-color: #d24f4f;
+                        }
                     }
                 }
             }
