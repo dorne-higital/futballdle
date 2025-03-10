@@ -24,6 +24,7 @@
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72",
   "devDependencies": {
     "@iconify-json/carbon": "^1.2.8",
+    "@iconify-json/circle-flags": "^1.2.6",
     "sass": "^1.85.1"
   }
 }

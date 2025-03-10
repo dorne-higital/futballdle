@@ -1,18 +1,16 @@
 // stores/messages.js
 export const winMessages = [
-	'Fantastic win!',
-	'You\'re a Premier League expert!',
-	'Amazing guess!',
-	'Brilliant! You nailed it!',
-	'Champion guess!',
+	'You got it!',
+	'Smashed it!',
+	'You got lucky!',
+	'Winner!',
 ];
 
 export const loseMessages = [
-	'Better luck next time!',
-	'Almost there!',
-	'Don\'t give up!',
-	'Keep practicing!',
-	'The Premier League is tough!',
+	'Whoops...',
+	'Maybe next time!',
+	'At least you tried',
+	'Its hard being a failure!',
 ];
 
 export const alreadyPlayedMessages = [

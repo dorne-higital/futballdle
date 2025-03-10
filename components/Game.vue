@@ -66,8 +66,8 @@
 						<div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
 							<Icon v-if="rowIndex * 3 + colIndex >= clues.length" :name="clueIcons[rowIndex * 3 + colIndex]" class="clue-icon" />
 							<template v-else>
-								<span class="clue">{{ clue }}</span>
 								<span class="clue-title">{{ clueTitles[rowIndex * 3 + colIndex] }}</span>
+								<span class="clue">{{ clue }}</span>
 							</template>
 						</div>
 					</div>
@@ -264,7 +264,6 @@ const checkDailyPlay = () => {
     if (playsToday >= 3) {
         gameOver.value = true;
         alreadyPlayed.value = true;
-        isGameOverModalOpen.value = true;
         try {
             loadSavedGame();
         } catch (e) {
@@ -626,6 +625,7 @@ const startNewGame = () => {
 			border: 1px solid #cfcfcf;
 			bottom: 1rem;
 			margin: 0 2rem;
+			max-width: 400px;
 			padding: .5rem;
 			position: absolute;
 			text-align: center;
@@ -686,6 +686,7 @@ const startNewGame = () => {
 
 				.clues-row {
 					display: flex;
+					flex-direction: column;
 					justify-content: space-between;
 					width: 100%;
 
@@ -694,16 +695,17 @@ const startNewGame = () => {
 						background-color: #f7f7f7;
 						border: 1px solid #ddd;
 						display: flex;
-						flex-direction: column;
+						flex-direction: row;
 						gap: .5rem;
-						height: 6rem;
+						height: 1rem;
 						justify-content: space-between;
 						padding: 1rem;
 						text-align: center;
-						width: 33%;
+						width: 100%;
 
 						.clue-icon {
-							font-size: 3.5rem;
+							font-size: 2.5rem;
+							margin: 0 auto;
 						}
 
 						.clue {

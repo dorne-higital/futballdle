@@ -15,7 +15,7 @@
                     You have reached your daily play limit.
                 </p>
 
-                <Icon class="close-button" name="carbon:close-filled" @click="closeModal" />
+                <button @click="closeModal" class="close-button">×</button>
             </div>
 
             <div class="guesses">
@@ -28,12 +28,39 @@
             </div>
 
             <div class="modal-body">
+				<div class="player-stats" v-if="targetPlayer">
+					<div class="stat-row">
+						<p>Player</p>
+						<h3>{{ targetPlayer.name }}</h3>
+					</div>
+					<div class="stat-grid">
+						<div class="stat-item">
+							<Icon 
+								v-if="countryIconMap[targetPlayer.nationality]" 
+								:name="`circle-flags:${countryIconMap[targetPlayer.nationality]}`" 
+							/>
+							<p>Nationality</p>
+						</div>
+						<div class="stat-item">
+							<Icon 
+								v-if="countryIconMap[targetPlayer.nationality]" 
+								:name="`circle-flags:${countryIconMap[targetPlayer.nationality]}`" 
+							/>
+							<p>Nationality</p>
+						</div>
+					</div>
+				</div>
                 <div class="player-details" v-if="targetPlayer">
                     <div class="detail-item">
                         <strong>Name:</strong> {{ targetPlayer.name }}
                     </div>
                     <div class="detail-item">
-                        <strong>Nationality:</strong> {{ targetPlayer.nationality }}
+                         {{ targetPlayer.nationality }}
+					
+						<Icon 
+							v-if="countryIconMap[targetPlayer.nationality]" 
+							:name="`circle-flags:${countryIconMap[targetPlayer.nationality]}`" 
+						/>
                     </div>
                     <div class="detail-item">
                         <strong>Position:</strong> {{ targetPlayer.position }}
@@ -73,14 +100,6 @@
                     </div>
                     <div class="detail-item">
                         <strong>Expected Goals:</strong> {{ targetPlayer.expectedGoals }}
-                    </div>
-                </div>
-                <div v-if="alreadyPlayed && gameOver && gameSummaries.length > 0">
-                    <h3>Last 3 Games:</h3>
-                    <div v-for="(summary, index) in gameSummaries" :key="index">
-                        <p v-if="summary.won">Won: {{ summary.targetPlayer.name }}</p>
-                        <p v-else>Lost: {{ summary.targetPlayer.name }}</p>
-                        <p>Guesses: {{ summary.guesses.join(', ') }}</p>
                     </div>
                 </div>
             </div>
@@ -133,6 +152,67 @@ const resetPlays = () => {
     localStorage.setItem('playsToday', '0');
     checkDailyPlay();
 };
+
+const countryIconMap = {
+    'Albania': 'al',
+    'Algeria': 'dz',
+    'Argentina': 'ar',
+    'Australia': 'au',
+    'Belgium': 'be',
+    'Brazil': 'br',
+    'Burkina Faso': 'bf',
+    'Cameroon': 'cm',
+    'Chile': 'cl',
+    'Colombia': 'co',
+    'Cote d\'Ivoire': 'ci',
+    'Croatia': 'hr',
+    'Czech Republic': 'cz',
+    'Democratic Republic of Congo': 'cd',
+    'Denmark': 'dk',
+    'Ecuador': 'ec',
+    'Egypt': 'eg',
+    'England': 'gb-eng',
+    'France': 'fr',
+    'Gabon': 'ga',
+    'Gambia': 'gm',
+    'Germany': 'de',
+    'Ghana': 'gh',
+    'Greece': 'gr',
+    'Guinea-Bissau': 'gw',
+    'Hungary': 'hu',
+    'Iraq': 'iq',
+    'Italy': 'it',
+    'Jamaica': 'jm',
+    'Japan': 'jp',
+    'Kosovo': 'xk',
+    'Mali': 'ml',
+    'Mexico': 'mx',
+    'Morocco': 'ma',
+    'Netherlands': 'nl',
+    'New Zealand': 'nz',
+    'Nigeria': 'ng',
+    'Northern Ireland': 'gb-nir',
+    'Norway': 'no',
+    'Paraguay': 'py',
+    'Poland': 'pl',
+    'Portugal': 'pt',
+    'Republic of Ireland': 'ie',
+    'Romania': 'ro',
+    'Scotland': 'gb-sct',
+    'Senegal': 'sn',
+    'Serbia': 'rs',
+    'Slovakia': 'sk',
+    'South Korea': 'kr',
+    'Spain': 'es',
+    'Sweden': 'se',
+    'Switzerland': 'ch',
+    'Turkey': 'tr',
+    'Ukraine': 'ua',
+    'Uruguay': 'uy',
+    'USA': 'us',
+    'Wales': 'gb-wls',
+    'Zambia': 'zm',
+};
 </script>
 
 <style lang="scss" scoped>
@@ -177,12 +257,12 @@ const resetPlays = () => {
             display: flex;
             justify-content: space-between;
 
-            .close-button {
-                border: none;
-                color: #292929;
-                cursor: pointer;
-                font-size: 1.75rem;
-            }
+			.close-button {
+				border: none;
+				color: #292929;
+				cursor: pointer;
+				font-size: 1.75rem;
+			}
         }
 
         .guesses {
@@ -191,6 +271,44 @@ const resetPlays = () => {
 
         .modal-body {
             text-align: left;
+
+			.player-stats {
+				display: flex;
+				flex-direction: column;
+
+				.stat-row {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					margin-bottom: .5rem;
+				}
+
+				.stat-grid {
+					display: flex;
+					flex-direction: row;
+					flex-wrap: wrap;
+					gap: .5rem;
+
+					.stat-item {
+						background-color: #f0f0f0;
+						border: 1px solid #cfcfcf;
+						padding: .5rem;						
+						width: calc(50% - .25rem);
+
+						span {
+							aspect-ratio: 1 / 1;
+							height: calc(100% - 2rem);
+							width: 100%;
+						}
+
+						p {
+							border-top: 1px solid #cfcfcf;;
+							line-height: 2rem;
+							text-align: center;
+						}
+					}
+				}
+			}
 
             .player-details {
                 display: flex;
