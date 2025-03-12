@@ -311,23 +311,23 @@ const saveGameData = () => {
 
 const clueTitles = [
 	'Position',
-    'Nationality',
-    'Age',
-    'Club',
-    'Goals + Assists',
-    'Matches Played',
+	'Nationality',
+	'Age',
+	'Club',
+	'Goals + Assists',
+	'Matches Played',
 ];
 
 
 const generateClues = (player) => {
-  return [
-  	`${player.position}`,
-	`${player.nationality}`,
-    `${player.age}`,
-    `${player.team}`,
-    `${player.goalsAndAssists}`,
-    `${player.matchesPlayed}`,
-  ];
+	return [
+		`${player.position}`,
+		`${player.nationality}`,
+		`${player.age}`,
+		`${player.team}`,
+		`${player.goalsAndAssists}`,
+		`${player.matchesPlayed}`,
+	];
 };
 
 const guessesRemaining = computed(() => {
