@@ -16,7 +16,6 @@
 	import { collection, addDoc, writeBatch, doc } from 'firebase/firestore'; // Import doc
 	import { useNuxtApp } from '#app';
 	import Papa from 'papaparse';
-	import countries from './countries.json';
 
 	const { $firestore } = useNuxtApp();
   
