@@ -22,11 +22,12 @@
 				@click="toggleDarkMode"
 			/>
 
-			<Icon 
+			<!-- Hidden for now until work is done -->
+			<!-- <Icon 
 				v-else
 				name="carbon:moon" 
 				@click="toggleDarkMode"
-			/>
+			/> -->
 		</div>
 	</div>
 </template>
