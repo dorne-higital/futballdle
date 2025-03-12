@@ -202,17 +202,28 @@ const selectSuggestion = (playerName) => {
 };
 
 onMounted(async () => {
-    await playerStore.fetchPlayers(); // Fetch players from Firestore
+    await playerStore.fetchPlayers();
     loadStats();
     checkDailyPlay();
     window.addEventListener('keydown', handleDesktopKeyPress);
 
-    // Ensure players are fetched before trying to get a random player
-    if (!gameOver.value && playerStore.players && playerStore.players.length > 0) {
-        targetPlayer.value = playerStore.getRandomPlayer();
-        clues.value.push(generateClues(targetPlayer.value)[0]);
+    const today = new Date().toISOString().slice(0, 10);
+    const dailyPlayers = JSON.parse(localStorage.getItem(`dailyPlayers_${today}`) || '[]');
+
+    if (dailyPlayers.length > 0) {
+        targetPlayer.value = playerStore.players.find(player => player.name === dailyPlayers[0]);
     } else {
-        console.log("Players not loaded or game over.");
+        const newDailyPlayers = [];
+        for (let i = 0; i < 3; i++) {
+            const player = playerStore.getRandomPlayer();
+            newDailyPlayers.push(player.name);
+        }
+        localStorage.setItem(`dailyPlayers_${today}`, JSON.stringify(newDailyPlayers));
+        targetPlayer.value = playerStore.players.find(player => player.name === newDailyPlayers[0]);
+    }
+
+    if(targetPlayer.value){
+        clues.value.push(generateClues(targetPlayer.value)[0]);
     }
 
     gameSummaries.value = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
@@ -492,19 +503,31 @@ const closeInfoModal = () => {
 
 const startNewGame = () => {
     let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-    if (playsToday >= 3) return; // Prevent new game if limit reached.
+    if (playsToday >= 3) return;
 
     guesses.value = [];
     currentGuess.value = '';
     gameOver.value = false;
     won.value = false;
     clues.value = [];
-    targetPlayer.value = playerStore.getRandomPlayer();
+
+    const today = new Date().toISOString().slice(0, 10);
+    const dailyPlayers = JSON.parse(localStorage.getItem(`dailyPlayers_${today}`) || '[]');
+
+    if(dailyPlayers.length > 0){
+        let gameNumber = parseInt(localStorage.getItem("playsToday") || "0");
+        targetPlayer.value = playerStore.players.find(player => player.name === dailyPlayers[gameNumber]);
+    } else {
+        targetPlayer.value = playerStore.getRandomPlayer();
+    }
+
     isGameOverModalOpen.value = false;
-	saveGameData();
-	
-	clues.value.push(generateClues(targetPlayer.value)[0]);
-	};
+    saveGameData();
+
+    if(targetPlayer.value){
+        clues.value.push(generateClues(targetPlayer.value)[0]);
+    }
+};
 </script>
 
 <style lang="scss" scoped>
