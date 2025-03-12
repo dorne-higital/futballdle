@@ -89,13 +89,13 @@
                     </div>
                 </div>
 
-                <div class="prev-results">
+                <!-- <div class="prev-results">
                     <span class="stat-label">Recent results</span>
 
                     <div class="chips">
                         <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
