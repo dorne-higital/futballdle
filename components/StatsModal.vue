@@ -3,7 +3,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Your Stats</h3>
-                <button @click="closeModal" class="close-button">×</button>
+					
+                <Icon 
+                    class="close-button"
+                    name="carbon:close-filled" 
+                    @click="closeModal"
+                />
             </div>
             <div class="modal-body">
                 <div class="stat-section">

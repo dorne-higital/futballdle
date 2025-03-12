@@ -15,7 +15,11 @@
                     You have reached your daily play limit.
                 </p>
 
-                <button @click="closeModal" class="close-button">×</button>
+				<Icon 
+					class="close-button"
+					name="carbon:close-filled" 
+					@click="closeModal"
+				/>
             </div>
 
             <div class="guesses">
@@ -35,12 +39,12 @@
 					</div>
 					<div class="stat-grid">
 						<div class="stat-item">
-							<Icon 
-								v-if="countryIconMap[targetPlayer.nationality]" 
-								:name="`circle-flags:${countryIconMap[targetPlayer.nationality]}`" 
-							/>
-							<p>Nationality</p>
+							<img 
+								:src="'../images/' + targetPlayer.team + '.png'" alt=""
+							>
+							<p>Club</p>
 						</div>
+
 						<div class="stat-item">
 							<Icon 
 								v-if="countryIconMap[targetPlayer.nationality]" 
@@ -49,61 +53,71 @@
 							<p>Nationality</p>
 						</div>
 					</div>
+
+					<div class="stat-grid">
+						<div class="stat-item compact">
+							<span>
+								<h1 v-if="targetPlayer.position === 'Goalkeeper'">GK</h1>
+								<h1 v-else-if="targetPlayer.position === 'Defender'">DF</h1>
+								<h1 v-else-if="targetPlayer.position === 'Midfielder'">MF</h1>
+								<h1 v-else-if="targetPlayer.position === 'Forwar'">ST</h1>
+							</span>
+							<p>Position</p>
+						</div>
+
+						<div class="stat-item compact">
+							<span>
+								<h1>{{ targetPlayer.age }}</h1>
+							</span>
+							<p>Age</p>
+						</div>
+
+						<div class="stat-item compact">
+							<span>
+								<h1>{{ targetPlayer.matchesPlayed }}</h1>
+							</span>
+							<p>Played</p>
+						</div>
+
+						<div class="stat-item compact">
+							<span>
+								<h1>{{ targetPlayer.matchesStarted }}</h1>
+							</span>
+							<p>Started</p>
+						</div>
+
+						<div class="stat-item compact">
+							<span>
+								<h1>{{ targetPlayer.goalsScored }}</h1>
+							</span>
+							<p>Goals</p>
+						</div>
+
+						<div class="stat-item compact">
+							<span>
+								<h1>{{ targetPlayer.assists }}</h1>
+							</span>
+							<p>Assists</p>
+						</div>
+
+						<div class="stat-item compact yellow">
+							<span>
+								<h1>{{ targetPlayer.yellowCards }}</h1>
+							</span>
+							<p>Yellow's</p>
+						</div>
+
+						<div class="stat-item compact red">
+							<span>
+								<h1>{{ targetPlayer.redCards }}</h1>
+							</span>
+							<p>Red's</p>
+						</div>
+					</div>
 				</div>
-                <div class="player-details" v-if="targetPlayer">
-                    <div class="detail-item">
-                        <strong>Name:</strong> {{ targetPlayer.name }}
-                    </div>
-                    <div class="detail-item">
-                         {{ targetPlayer.nationality }}
-					
-						<Icon 
-							v-if="countryIconMap[targetPlayer.nationality]" 
-							:name="`circle-flags:${countryIconMap[targetPlayer.nationality]}`" 
-						/>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Position:</strong> {{ targetPlayer.position }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Team:</strong> {{ targetPlayer.team }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Age:</strong> {{ targetPlayer.age }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Year Born:</strong> {{ targetPlayer.yearBorn }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Matches Played:</strong> {{ targetPlayer.matchesPlayed }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Matches Started:</strong> {{ targetPlayer.matchesStarted }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Minutes Played:</strong> {{ targetPlayer.minutesPlayed }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Goals Scored:</strong> {{ targetPlayer.goalsScored }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Assists:</strong> {{ targetPlayer.assists }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Goals + Assists:</strong> {{ targetPlayer.goalsAndAssists }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Yellow Cards:</strong> {{ targetPlayer.yellowCards }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Red Cards:</strong> {{ targetPlayer.redCards }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Expected Goals:</strong> {{ targetPlayer.expectedGoals }}
-                    </div>
-                </div>
+
+				<p class="small">Stats are accurate to end of Feb 2025, and are applicable to the 24/25 season</p>
             </div>
-            <button @click="resetPlays">Reset Plays (Testing Only)</button>
         </div>
     </div>
 </template>
@@ -147,11 +161,6 @@ onMounted(() => {
         gameSummaries.value = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
     }
 });
-
-const resetPlays = () => {
-    localStorage.setItem('playsToday', '0');
-    checkDailyPlay();
-};
 
 const countryIconMap = {
     'Albania': 'al',
@@ -275,6 +284,7 @@ const countryIconMap = {
 			.player-stats {
 				display: flex;
 				flex-direction: column;
+				margin-top: 2rem;
 
 				.stat-row {
 					display: flex;
@@ -288,21 +298,59 @@ const countryIconMap = {
 					flex-direction: row;
 					flex-wrap: wrap;
 					gap: .5rem;
+					margin-bottom: .5rem;
 
 					.stat-item {
 						background-color: #f0f0f0;
 						border: 1px solid #cfcfcf;
-						padding: .5rem;						
+						display: flex;
+						flex-direction: column;
+						gap: .5rem;
+						padding: .5rem;
 						width: calc(50% - .25rem);
 
+						&.compact {
+							width: calc(25% - .375rem) !important;
+
+							h1 {
+								font-size: 2rem;
+							}
+						}
+
+						&.yellow {
+							background-color: #fff480;
+							border: 1px solid #c1b533;
+
+							p {
+								border-top: 1px solid #c1b533;
+							}
+						}
+
+						&.red {
+							background-color: #ff8080;
+							border: 1px solid #b84444;
+
+							p {
+								border-top: 1px solid #b84444;
+							}
+						}
+
 						span {
+							align-items: center;
 							aspect-ratio: 1 / 1;
+							display: flex;
+							justify-content: center;
 							height: calc(100% - 2rem);
 							width: 100%;
+
+							h1 {
+								font-size: 3.5rem;
+							}
 						}
 
 						p {
-							border-top: 1px solid #cfcfcf;;
+							border-top: 1px solid #cfcfcf;
+							font-size: .75rem;
 							line-height: 2rem;
 							text-align: center;
 						}
@@ -310,18 +358,10 @@ const countryIconMap = {
 				}
 			}
 
-            .player-details {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-
-                .detail-item {
-                    display: flex;
-                    justify-content: space-between;
-                    border-bottom: 1px solid #eee;
-                    padding-bottom: 0.5rem;
-                }
-            }
+			.small {
+				font-size: .75rem;
+				margin-top: 1rem;
+			}
         }
     }
 }
