@@ -1,5 +1,9 @@
 <template>
+    <div v-if="isLoading" class="loader-container">
+        <Loader />
+    </div>
 	<div 
+		v-else
 		:class="{ 'dark': isDarkMode }"
 		class="container"
 	>
@@ -36,6 +40,9 @@
     import StatsModal from '../components/StatsModal.vue';
     import InfoModal from '../components/InfoModal.vue';
     import Header from '../components/Header.vue';
+	import Loader from '../components/Loader.vue';
+
+	const isLoading = ref(true);
 
     const stats = ref({
         gamesPlayed: 0,
@@ -65,7 +72,11 @@
         const storedDarkMode = localStorage.getItem('darkMode');
         if (storedDarkMode === 'true') {
             isDarkMode.value = true;
-        }
+		}
+
+		setTimeout(() => {
+            isLoading.value = false; // Set loading to false when done
+        }, 1000);
     });
 
     const openStats = () => {

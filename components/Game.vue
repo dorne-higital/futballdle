@@ -509,9 +509,10 @@ const startNewGame = () => {
 
 <style lang="scss" scoped>
 	.game {
+		align-items: center;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		max-width: 400px;
 		padding: 2rem;
 		width: 100vw;
 
