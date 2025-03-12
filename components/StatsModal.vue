@@ -89,6 +89,7 @@
                     </div>
                 </div>
 
+                <!-- temp hidden as not working on mobile -->
                 <!-- <div class="prev-results">
                     <span class="stat-label">Recent results</span>
 
