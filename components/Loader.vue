@@ -9,6 +9,8 @@
 		</svg>
 
 		<div class="shadow"></div>
+
+		<p class="text">Warming up...</p>
 	</div>
   </template>
 
@@ -34,6 +36,7 @@
 			position: relative;
 			width: 6rem;
 		}
+
 		.shadow {
 			animation: shadow-scale 1.5s ease-in-out infinite;
 			background: rgba(0, 0, 0, 0.3);
@@ -41,6 +44,10 @@
 			filter: blur(.25rem);
 			height: .75rem;
 			width: 3rem;
+		}
+
+		.text {
+			margin-top: 2rem;
 		}
 	}
 

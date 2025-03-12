@@ -75,8 +75,8 @@
 		}
 
 		setTimeout(() => {
-            isLoading.value = false; // Set loading to false when done
-        }, 1000);
+            isLoading.value = false;
+        }, 1500);
     });
 
     const openStats = () => {
