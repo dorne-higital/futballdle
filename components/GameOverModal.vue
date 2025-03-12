@@ -60,7 +60,7 @@
 								<h1 v-if="targetPlayer.position === 'Goalkeeper'">GK</h1>
 								<h1 v-else-if="targetPlayer.position === 'Defender'">DF</h1>
 								<h1 v-else-if="targetPlayer.position === 'Midfielder'">MF</h1>
-								<h1 v-else-if="targetPlayer.position === 'Forwar'">ST</h1>
+								<h1 v-else-if="targetPlayer.position === 'Forward'">ST</h1>
 							</span>
 							<p>Position</p>
 						</div>
