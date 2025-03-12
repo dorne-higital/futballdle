@@ -312,6 +312,10 @@ const countryIconMap = {
 						&.compact {
 							width: calc(25% - .375rem) !important;
 
+							span {
+								aspect-ratio: auto;
+							}
+
 							h1 {
 								font-size: 2rem;
 							}
