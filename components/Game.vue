@@ -75,32 +75,20 @@
 			</div>
 		</template>
 
-		<div v-if="gameSummaries.length > 0 && alreadyPlayed" class="game-summaries">
+		<div v-if="gameSummaries.length > 0 && alreadyPlayed" class="game-summaries" :key="gameSummaries.length">
 			<h6>Todays games</h6>
 			<div v-for="(summary, index) in gameSummaries" :key="index" :class="{ 'game-won': summary.won, 'game-lost': !summary.won }" class="prev-games">
 				<p class="title">
 					Game {{ index + 1 }}
-				
-					<Icon 
-						v-if="summary.won"
-						class="guessed-indicator"
-						name="carbon:checkmark"
-					/>
-
-					<Icon 
-						v-else
-						class="guessed-indicator"
-						name="carbon:close"
-					/>
+					<Icon v-if="summary.won" class="guessed-indicator" name="carbon:checkmark" />
+					<Icon v-else class="guessed-indicator" name="carbon:close" />
 				</p>
 				<span class="summary-row">
 					<p>Winning Player</p>
-
 					<p>{{ summary.targetPlayer.name }}</p>
 				</span>
 				<span class="summary-row">
 					<p>Guesses</p>
-
 					<p v-if="summary.won">{{ summary.guesses.length }} / 6</p>
 					<p v-else>Failed</p>
 				</span>
@@ -219,6 +207,13 @@ const selectSuggestion = (playerName) => {
 };
 
 onMounted(async () => {
+    // Load gameSummaries from localStorage first
+    const storedSummaries = localStorage.getItem('gameSummaries');
+    if (storedSummaries) {
+        gameSummaries.value = JSON.parse(storedSummaries);
+    }
+    console.log('Loaded gameSummaries:', gameSummaries.value);
+
     await playerStore.fetchPlayers();
     await loadStats();
     checkDailyPlay();
@@ -229,7 +224,9 @@ onMounted(async () => {
         clues.value.push(generateClues(targetPlayer.value)[0]);
     } else {
         console.log("Players not loaded or game over.");
-    }
+	}
+
+    await nextTick();
 });
 
 onUnmounted(() => {
@@ -271,6 +268,8 @@ const checkDailyPlay = () => {
         localStorage.setItem('playsToday', '0');
         localStorage.setItem('lastPlayed', today);
         resetGame();
+        gameSummaries.value = []; // Clear the summaries
+        localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value)); // Save the cleared summaries
     }
 
     if (playsToday >= 3) {
@@ -370,8 +369,6 @@ const loadStats = async () => {
 
         if (docSnap.exists()) {
             stats.value = docSnap.data().stats;
-            gameSummaries.value = docSnap.data().gameSummaries || [];
-            localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value));
         } else {
             console.log("No such document!");
             resetStats();
@@ -387,7 +384,6 @@ const saveStats = async () => {
         console.log('saveStats called');
         await setDoc(doc(db, "users", userId.value), {
             stats: stats.value,
-            gameSummaries: gameSummaries.value,
         });
         console.log('saveStats successful');
     } catch (e) {
@@ -443,26 +439,25 @@ const updateStats = (gameWon) => {
 		statsStore.stats.lastTenResults.shift();
 	}
 
+	calculateMostGuessed();
+	statsStore.saveStats();
+	statsStore.loadStats();
+	emit('stats-updated');
 
-    calculateMostGuessed();
-    statsStore.saveStats(); // Save stats to firebase.
-    statsStore.loadStats(); // Reload stats.
-    emit('stats-updated');
+	gameSummaries.value = gameSummaries.value || [];
+	gameSummaries.value.unshift({
+		targetPlayer: targetPlayer.value,
+		guesses: guesses.value,
+		won: gameWon,
+	});
 
-    gameSummaries.value = gameSummaries.value || []; // Ensure gameSummaries.value is an array
-    gameSummaries.value.unshift({
-        targetPlayer: targetPlayer.value,
-        guesses: guesses.value,
-        won: gameWon,
-    });
+	gameSummaries.value = gameSummaries.value.slice(0, 3);
+	localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value)); // Save here!
 
-    gameSummaries.value = gameSummaries.value.slice(0, 3);
-    localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value));
-
-    let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-    playsToday++;
-    localStorage.setItem('playsToday', playsToday.toString());
-    checkDailyPlay();
+	let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+	playsToday++;
+	localStorage.setItem('playsToday', playsToday.toString());
+	checkDailyPlay();
 };
 
 const calculateMostGuessed = () => {
