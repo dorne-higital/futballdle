@@ -1,9 +1,9 @@
 <template>
-    <div v-if="isOpen" :class="{ 'dark': darkMode }" class="stats-modal">
+    <div v-if="isOpen && stats" :class="{ 'dark': darkMode }" class="stats-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Your Stats</h3>
-					
+                    
                 <Icon 
                     class="close-button"
                     name="carbon:close-filled" 
@@ -89,14 +89,13 @@
                     </div>
                 </div>
 
-                <!-- temp hidden as not working on mobile -->
-                <!-- <div class="prev-results">
+                <div class="prev-results">
                     <span class="stat-label">Recent results</span>
 
                     <div class="chips">
                         <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
@@ -129,11 +128,11 @@ const averageGuessesPerWin = computed(() => {
 });
 
 const maxGames = computed(() => {
-    return Math.max(props.stats.gamesPlayed, 1); // Ensure it's not zero
+    return Math.max(props.stats.gamesPlayed, 1);
 });
 
 const maxStreak = computed(() => {
-    return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1); // Ensure it's not zero
+    return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1);
 });
 
 const winPercentageSplit = computed(() => {

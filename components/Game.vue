@@ -118,8 +118,24 @@
 <script setup>
 import { ref, computed, onMounted, defineEmits, onUnmounted } from 'vue';
 import { usePlayerStore } from '~/stores/players';
+import { useStatsStore } from '~/stores/stats';
 import GameOverModal from './GameOverModal.vue';
 import InfoModal from './InfoModal.vue';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
+
+const { $firestore: db } = useNuxtApp();
+
+const getOrCreateUserId = () => {
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = uuidv4();
+        localStorage.setItem('userId', userId);
+    }
+    return userId;
+};
+
+const userId = ref(getOrCreateUserId());
 
 const props = defineProps({
     darkMode: {
@@ -131,7 +147,8 @@ const props = defineProps({
 const emit = defineEmits(['stats-updated']);
 
 const playerStore = usePlayerStore();
-const targetPlayer = ref(null); // Initialize to null
+const statsStore = useStatsStore();
+const targetPlayer = ref(null);
 
 const playerDetails = computed(() => {
   if (targetPlayer.value) {
@@ -197,27 +214,23 @@ const filteredSuggestions = computed(() => {
 
 const selectSuggestion = (playerName) => {
     currentGuess.value = playerName;
-    filteredSuggestions.value = []; // Clear suggestions
-    handleGuess(); // Submit the guess immediately
+    filteredSuggestions.value = [];
+    handleGuess();
 };
 
 onMounted(async () => {
-    await playerStore.fetchPlayers(); // Fetch players from Firestore
-    loadStats();
+    await playerStore.fetchPlayers();
+    await loadStats();
     checkDailyPlay();
     window.addEventListener('keydown', handleDesktopKeyPress);
 
-    // Ensure players are fetched before trying to get a random player
     if (!gameOver.value && playerStore.players && playerStore.players.length > 0) {
         targetPlayer.value = playerStore.getRandomPlayer();
         clues.value.push(generateClues(targetPlayer.value)[0]);
     } else {
         console.log("Players not loaded or game over.");
     }
-
-    gameSummaries.value = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
 });
-
 
 onUnmounted(() => {
     window.removeEventListener('keydown', handleDesktopKeyPress);
@@ -254,7 +267,6 @@ const checkDailyPlay = () => {
     let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
 
     if (storedLastPlayed !== today) {
-        // New day, reset plays
         playsToday = 0;
         localStorage.setItem('playsToday', '0');
         localStorage.setItem('lastPlayed', today);
@@ -264,19 +276,8 @@ const checkDailyPlay = () => {
     if (playsToday >= 3) {
         gameOver.value = true;
         alreadyPlayed.value = true;
-        try {
-            loadSavedGame();
-        } catch (e) {
-            handleLocalStorageError();
-        }
-    } else if (gameOver.value) {
-        try {
-            loadSavedGame();
-        } catch (e) {
-            handleLocalStorageError();
-        }
     } else {
-        resetGame();
+        alreadyPlayed.value = false;
     }
 };
 
@@ -288,18 +289,18 @@ const resetGame = () => {
     alreadyPlayed.value = false;
     isGameOverModalOpen.value = false;
     clues.value = [];
-}
+};
 
 const loadSavedGame = () => {
     guesses.value = JSON.parse(localStorage.getItem('guesses')) || [];
     won.value = JSON.parse(localStorage.getItem('won')) || false;
     clues.value = JSON.parse(localStorage.getItem('clues')) || [];
-}
+};
 
 const handleLocalStorageError = () => {
     console.error('Error parsing local storage data:');
     resetGame();
-}
+};
 
 const saveGameData = () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -310,24 +311,23 @@ const saveGameData = () => {
 };
 
 const clueTitles = [
-	'Position',
-	'Nationality',
-	'Age',
-	'Club',
-	'Goals + Assists',
-	'Matches Played',
+    'Position',
+    'Nationality',
+    'Age',
+    'Club',
+    'Goals + Assists',
+    'Matches Played',
 ];
 
-
 const generateClues = (player) => {
-	return [
-		`${player.position}`,
-		`${player.nationality}`,
-		`${player.age}`,
-		`${player.team}`,
-		`${player.goalsAndAssists}`,
-		`${player.matchesPlayed}`,
-	];
+    return [
+        `${player.position}`,
+        `${player.nationality}`,
+        `${player.age}`,
+        `${player.team}`,
+        `${player.goalsAndAssists}`,
+        `${player.matchesPlayed}`,
+    ];
 };
 
 const guessesRemaining = computed(() => {
@@ -363,72 +363,106 @@ const handleGuess = () => {
     saveGameData();
 };
 
-const loadStats = () => {
+const loadStats = async () => {
     try {
-        const storedStats = JSON.parse(localStorage.getItem('stats'));
-        if (storedStats) {
-            stats.value = storedStats;
+        const docRef = doc(db, "users", userId.value);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            stats.value = docSnap.data().stats;
+            gameSummaries.value = docSnap.data().gameSummaries || [];
+            localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value));
+        } else {
+            console.log("No such document!");
+            resetStats();
         }
     } catch (e) {
-        console.error('Error parsing stats:', e);
+        console.error("Error loading stats:", e);
+        resetStats();
     }
 };
 
-const saveStats = () => {
-    localStorage.setItem('stats', JSON.stringify(stats.value));
+const saveStats = async () => {
+    try {
+        console.log('saveStats called');
+        await setDoc(doc(db, "users", userId.value), {
+            stats: stats.value,
+            gameSummaries: gameSummaries.value,
+        });
+        console.log('saveStats successful');
+    } catch (e) {
+        console.error("Error saving stats:", e);
+    }
+};
+
+const resetStats = () => {
+    stats.value = {
+        gamesPlayed: 0,
+        gamesWon: 0,
+        gamesLost: 0,
+        winStreak: 0,
+        maxWinStreak: 0,
+        lossStreak: 0,
+        maxLossStreak: 0,
+        guessesPerWin: [],
+        mostGuessedPlayer: {},
+        lastTenResults: [],
+    };
+    gameSummaries.value = [];
 };
 
 const updateStats = (gameWon) => {
-    stats.value.gamesPlayed++;
 
-    if (gameWon) {
-        stats.value.gamesWon++;
-        stats.value.guessesPerWin.push(guesses.value.length);
-        stats.value.winStreak++;
-        stats.value.lossStreak = 0;
+    console.log('updateStats called');
+    statsStore.stats.gamesPlayed++;
 
-        if (stats.value.winStreak > stats.value.maxWinStreak) {
-            stats.value.maxWinStreak = stats.value.winStreak;
+	if (gameWon) {
+		statsStore.stats.gamesWon++;
+		statsStore.stats.guessesPerWin.push(guesses.value.length);
+		statsStore.stats.winStreak++;
+		statsStore.stats.lossStreak = 0;
+
+		if (statsStore.stats.winStreak > statsStore.stats.maxWinStreak) {
+			statsStore.stats.maxWinStreak = statsStore.stats.winStreak;
 		}
 
-		stats.value.lastTenResults.push('win');
-    } else {
-        stats.value.gamesLost++;
-        stats.value.winStreak = 0;
-        stats.value.lossStreak++;
+		statsStore.stats.lastTenResults.push('win');
+	} else {
+		statsStore.stats.gamesLost++;
+		statsStore.stats.winStreak = 0;
+		statsStore.stats.lossStreak++;
 
-        if (stats.value.lossStreak > stats.value.maxLossStreak) {
-            stats.value.maxLossStreak = stats.value.lossStreak;
+		if (statsStore.stats.lossStreak > statsStore.stats.maxLossStreak) {
+			statsStore.stats.maxLossStreak = statsStore.stats.lossStreak;
 		}
-		
-        stats.value.lastTenResults.push('lose');
+
+		statsStore.stats.lastTenResults.push('lose');
 	}
-	
-    if (stats.value.lastTenResults.length > 10) {
-        stats.value.lastTenResults.shift();
+
+	if (statsStore.stats.lastTenResults.length > 10) {
+		statsStore.stats.lastTenResults.shift();
 	}
-	
+
+
     calculateMostGuessed();
-    saveStats();
-	emit('stats-updated');
+    statsStore.saveStats(); // Save stats to firebase.
+    statsStore.loadStats(); // Reload stats.
+    emit('stats-updated');
 
-	// Store game summary
-	let gameSummaries = JSON.parse(localStorage.getItem('gameSummaries') || '[]');
-    gameSummaries.push({
+    gameSummaries.value = gameSummaries.value || []; // Ensure gameSummaries.value is an array
+    gameSummaries.value.unshift({
         targetPlayer: targetPlayer.value,
         guesses: guesses.value,
         won: gameWon,
     });
 
-    // Keep only the last 3 games
-    gameSummaries = gameSummaries.slice(0, 3);
-    localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries));
+    gameSummaries.value = gameSummaries.value.slice(0, 3);
+    localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value));
 
-
-    // Increment playsToday here, at the end of the game
     let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
     playsToday++;
     localStorage.setItem('playsToday', playsToday.toString());
+    checkDailyPlay();
 };
 
 const calculateMostGuessed = () => {
@@ -446,8 +480,8 @@ const calculateMostGuessed = () => {
             maxCount = guessedPlayers[player];
         }
     }
-    if (stats.value.gamesPlayed >= 10){
-        stats.value.mostGuessedPlayer = {name: mostGuessed, count: maxCount};
+    if (stats.value.gamesPlayed >= 10) {
+        stats.value.mostGuessedPlayer = { name: mostGuessed, count: maxCount };
     }
 };
 
@@ -474,7 +508,7 @@ const handleDesktopKeyPress = (event) => {
     } else if (key === 'Backspace') {
         if (activeElement.tagName !== 'INPUT') {
             currentGuess.value = currentGuess.value.slice(0, -1);
-        } else if (activeElement.tagName === 'INPUT' && activeElement.value === ""){
+        } else if (activeElement.tagName === 'INPUT' && activeElement.value === "") {
             currentGuess.value = currentGuess.value.slice(0, -1);
         }
     } else if (/^[a-zA-Z\s]+$/.test(key) && activeElement.tagName !== 'INPUT') {
@@ -492,7 +526,7 @@ const closeInfoModal = () => {
 
 const startNewGame = () => {
     let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-    if (playsToday >= 3) return; // Prevent new game if limit reached.
+    if (playsToday >= 3) return;
 
     guesses.value = [];
     currentGuess.value = '';
@@ -501,10 +535,10 @@ const startNewGame = () => {
     clues.value = [];
     targetPlayer.value = playerStore.getRandomPlayer();
     isGameOverModalOpen.value = false;
-	saveGameData();
-	
-	clues.value.push(generateClues(targetPlayer.value)[0]);
-	};
+    saveGameData();
+
+    clues.value.push(generateClues(targetPlayer.value)[0]);
+};
 </script>
 
 <style lang="scss" scoped>
