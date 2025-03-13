@@ -682,6 +682,7 @@ const startNewGame = () => {
 				button {
 					background-color: #88bd8a;
 					border: 1px solid #567c57;
+					color: #000000;
 					padding: .75rem;
 					width: 100%;
 				}
@@ -704,6 +705,7 @@ const startNewGame = () => {
 				button {
 					background-color: #f67c7c;
 					border: 1px solid #d24f4f;
+					color: #000000;
 					padding: .75rem;
 					width: 100%;
 				}
