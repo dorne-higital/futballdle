@@ -15,6 +15,8 @@
                     You have reached your daily play limit.
                 </p>
 
+				<span class="difficulty-badge" :class="difficultyClass">{{ difficultyLabel }}</span>
+
 				<Icon 
 					class="close-button"
 					name="carbon:close-filled" 
@@ -134,6 +136,10 @@ const props = defineProps({
     guesses: Array,
     alreadyPlayed: Boolean,
     darkMode: Boolean,
+	difficulty: {
+		type: Number,
+		default: 1
+	}
 });
 
 const emit = defineEmits(['close']);
@@ -141,6 +147,37 @@ const emit = defineEmits(['close']);
 const closeModal = () => {
     emit('close');
 };
+
+const difficultyLabel = computed(() => {
+  switch (props.difficulty) {
+    case 1: return 'Easy';
+    case 2: return 'Medium';
+    case 3: return 'Hard';
+    default: return 'Unknown';
+  }
+});
+
+const difficultyClass = computed(() => {
+  switch (props.difficulty) {
+    case 1: return 'difficulty-easy';
+    case 2: return 'difficulty-medium';
+    case 3: return 'difficulty-hard';
+    default: return '';
+  }
+});
+
+const gamesRemainingToday = computed(() => {
+  const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+  return Math.max(0, 3 - playsToday);
+});
+
+const difficultyNextGame = computed(() => {
+  const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+  
+  if (playsToday === 0) return 'Easy';
+  if (playsToday === 1) return 'Medium';
+  return 'Hard';
+});
 
 const winMessage = computed(() => {
     return winMessages[Math.floor(Math.random() * winMessages.length)];
@@ -236,6 +273,30 @@ const countryIconMap = {
     top: 0;
     width: 100%;
     z-index: 1000;
+
+	.difficulty-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 0.8rem;
+	font-weight: bold;
+	margin-left: 8px;
+	}
+
+	.difficulty-easy {
+	background-color: #4CAF50;
+	color: white;
+	}
+
+	.difficulty-medium {
+	background-color: #FF9800;
+	color: white;
+	}
+
+	.difficulty-hard {
+	background-color: #F44336;
+	color: white;
+	}
 
     &.dark {
         background-color: rgba(50, 50, 50, 0.5);

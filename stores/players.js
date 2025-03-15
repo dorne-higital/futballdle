@@ -1,25 +1,26 @@
 // stores/players.js
 import { defineStore } from 'pinia';
 import { collection, getDocs } from 'firebase/firestore';
+import { ref } from 'vue';
 
 export const usePlayerStore = defineStore('players', () => {
     const players = ref([]);
     const { $firestore } = useNuxtApp();
 
-	async function fetchPlayers() {
-		try {
-			console.log('Fetching players...'); // Add this line
-			const querySnapshot = await getDocs(collection($firestore, 'players'));
-			console.log('Query snapshot:', querySnapshot); // Add this line
-			players.value = querySnapshot.docs.map((doc) => ({
-				id: doc.id,
-				...doc.data(),
-			}));
-			console.log('Players fetched:', players.value); // Add this line
-		} catch (error) {
-			console.error('Error fetching players:', error);
-		}
-	}
+    async function fetchPlayers() {
+        try {
+            console.log('Fetching players...'); 
+            const querySnapshot = await getDocs(collection($firestore, 'players'));
+            console.log('Query snapshot:', querySnapshot);
+            players.value = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            console.log('Players fetched:', players.value);
+        } catch (error) {
+            console.error('Error fetching players:', error);
+        }
+    }
 
     function getRandomPlayer() {
         if (players.value.length === 0) {
@@ -35,10 +36,33 @@ export const usePlayerStore = defineStore('players', () => {
         return players.value.find((player) => player.name === playerName) || {};
     }
 
+    // New method to get player by difficulty level
+    function getRandomPlayerByDifficulty(difficulty) {
+        if (players.value.length === 0) {
+            return null;
+        }
+        
+        // Filter players by difficulty level
+        const filteredPlayers = players.value.filter(player => 
+            player.difficulty === difficulty
+        );
+        
+        // If no players found for this difficulty, fallback to any player
+        if (filteredPlayers.length === 0) {
+            console.warn(`No players found for difficulty ${difficulty}. Using random player.`);
+            return getRandomPlayer();
+        }
+        
+        const randomIndex = Math.floor(Math.random() * filteredPlayers.length);
+        console.log(`Random ${difficulty} difficulty player selected:`, filteredPlayers[randomIndex]);
+        return filteredPlayers[randomIndex];
+    }
+
     return {
         players,
         fetchPlayers,
         getRandomPlayer,
         getPlayerDetails,
+        getRandomPlayerByDifficulty,
     };
 });

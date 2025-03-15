@@ -7,6 +7,11 @@
 
 		<div class="icons">
 			<Icon 
+				name="carbon:trophy" 
+				@click="openLeaderboard"
+			/>
+
+			<Icon 
 				name="carbon:settings-adjust" 
 				@click="openStats"
 			/>
@@ -42,7 +47,13 @@
         },
 	});
 
-	const emit = defineEmits(['openStats', 'openInfo', 'toggleDarkMode']);
+	const emit = defineEmits(['openLeaderboard', 'openStats', 'openInfo', 'toggleDarkMode']);
+
+
+	const openLeaderboard = () => {
+		console.log("Header: Opening leaderboard");
+		emit('openLeaderboard');
+	};
 
 	const openStats = () => {
 		emit('openStats');

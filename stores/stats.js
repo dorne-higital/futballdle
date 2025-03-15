@@ -17,6 +17,13 @@ export const useStatsStore = defineStore('stats', () => {
         guessesPerWin: [],
         mostGuessedPlayer: {},
         lastTenResults: [],
+        easyGamesPlayed: 0,
+        mediumGamesPlayed: 0,
+        hardGamesPlayed: 0,
+        easyGamesWon: 0,
+        mediumGamesWon: 0,
+        hardGamesWon: 0,
+        totalPoints: 0,
     });
 
     const { $firestore: db } = useNuxtApp();

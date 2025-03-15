@@ -85,8 +85,12 @@ h6 {
     font-size: $h6-font-size;
 }
 
+sup {
+    font-size: .75rem;
+}
+
 p, button, input,
-ul, li, span {
+ul, li, span, sup {
 	font-family: "Montserrat", serif;
 	font-optical-sizing: auto;
 	font-style: normal;

@@ -10,7 +10,46 @@
                     @click="closeModal"
                 />
             </div>
+            
             <div class="modal-body">
+                <!-- User Display Name Section -->
+                <div class="user-profile-section">
+                    <sup>Display name</sup>
+                    <div v-if="!isEditingName" class="display-name-container">
+                        <span class="display-name">{{ displayName || 'Anonymous Player' }}</span>
+                        <Icon 
+                            name="carbon:edit" 
+                            class="edit-icon"
+                            @click="startEditName"
+                        />
+                    </div>
+                    <div v-else class="name-edit-container">
+                        <input 
+                            v-model="newDisplayName" 
+                            type="text" 
+                            class="name-input"
+                            placeholder="Enter display name"
+                            ref="nameInput"
+                            @keyup.enter="saveName"
+                        />
+                        <div class="name-buttons">
+                            <!-- <button class="save-btn" @click="saveName">Save</button>
+                            <button class="cancel-btn" @click="cancelEdit">Cancel</button> -->
+                            <Icon 
+                                name="carbon:checkmark" 
+                                class="save-btn"
+                                @click="saveName"
+                            />
+                            <Icon 
+                                name="carbon:close" 
+                                class="cancel-btn"
+                                @click="cancelEdit"
+                            />
+
+                        </div>
+                    </div>
+                </div>
+
                 <div class="stat-section">
                     <div class="stat-type">
                         <div class="stat-container">
@@ -102,15 +141,94 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed } from 'vue';
+import { defineProps, defineEmits, computed, ref, onMounted, nextTick } from 'vue';
+import { useNuxtApp } from '#app';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const props = defineProps({
     isOpen: Boolean,
     stats: Object,
     darkMode: Boolean,
+    userId: String, // Add userId prop to identify the user
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'nameUpdated']);
+
+// Firebase reference
+const { $firestore: db } = useNuxtApp();
+
+// Name editing state
+const isEditingName = ref(false);
+const displayName = ref('');
+const newDisplayName = ref('');
+const nameInput = ref(null);
+
+// Fetch the current display name when component mounts
+onMounted(async () => {
+    if (props.userId) {
+        await fetchDisplayName();
+    }
+});
+
+// Watch for changes to isOpen and userId
+watch(() => [props.isOpen, props.userId], async ([newIsOpen, newUserId]) => {
+    if (newIsOpen && newUserId) {
+        await fetchDisplayName();
+    }
+}, { immediate: true });
+
+const fetchDisplayName = async () => {
+    try {
+        const userDoc = await getDoc(doc(db, "users", props.userId));
+        if (userDoc.exists()) {
+            displayName.value = userDoc.data().displayName || '';
+        }
+    } catch (error) {
+        console.error("Error fetching user display name:", error);
+    }
+};
+
+const startEditName = () => {
+    newDisplayName.value = displayName.value;
+    isEditingName.value = true;
+    // Focus the input field after the DOM has updated
+    nextTick(() => {
+        if (nameInput.value) {
+            nameInput.value.focus();
+        }
+    });
+};
+
+const saveName = async () => {
+    if (!newDisplayName.value.trim()) {
+        // Don't save empty names
+        cancelEdit();
+        return;
+    }
+    
+    try {
+        const trimmedName = newDisplayName.value.trim();
+        await updateDoc(doc(db, "users", props.userId), {
+            displayName: trimmedName
+        });
+        
+        displayName.value = trimmedName;
+        isEditingName.value = false;
+        
+        // Emit event so parent components can update if needed
+        emit('nameUpdated', trimmedName);
+        
+        console.log("Display name updated successfully");
+    } catch (error) {
+        console.error("Error updating display name:", error);
+        // You might want to show an error message to the user
+    }
+};
+
+const cancelEdit = () => {
+    isEditingName.value = false;
+    newDisplayName.value = '';
+};
 
 const closeModal = () => {
     emit('close');
@@ -200,6 +318,85 @@ const lossPercentageSplit = computed(() => {
         }
 
         .modal-body {
+            .user-profile-section {
+                margin-bottom: 1rem;
+                padding: .5rem 0;
+                border-bottom: 1px solid #eee;
+
+                .display-name-container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    .display-name {
+                        font-weight: 400;
+                        padding: .75rem .5rem;
+                    }
+
+                    .edit-icon {
+                        cursor: pointer;
+                        opacity: 0.7;
+                        transition: opacity 0.2s;
+
+                        &:hover {
+                            opacity: 1;
+                        }
+                    }
+                }
+
+                .name-edit-container {
+                    align-items: center;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    width: 100%;
+
+                    .name-input {
+                        padding: .75rem .5rem;
+                        border: none;
+                        border-radius: .25rem;
+                        width: 80%;
+                        background-color: #ececec;
+                        color: black;
+
+                        &:focus {
+                            outline: none;
+                        }
+
+                    }
+                    
+                    .name-buttons {
+                        display: flex;
+                        justify-content: space-around;
+                        width: 20%;
+
+                        .save-btn, .cancel-btn {
+                            padding: 6px 12px;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            font-size: 1.5rem;
+                            transition: background-color 0.2s;
+                        }
+
+                        .save-btn {
+                            background-color: #4CAF50;
+                            color: white;
+
+                            &:hover {
+                                background-color: #45a049;
+                            }
+                        }
+
+                        .cancel-btn {
+                            background-color: #F44336;
+                            color: #000000;
+                        }
+                    }
+                }
+            }
+
             .stat-section {
                 display: flex;
                 flex-direction: row;

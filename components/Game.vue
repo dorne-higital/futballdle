@@ -1,102 +1,103 @@
 <template>
     <div :class="{ 'dark': darkMode }" class="game">
-        <p v-if="!alreadyPlayed && guessesRemaining > 0">Guesses remaining: {{ guessesRemaining }}</p>
+        <p v-if="!alreadyPlayed && guessesRemaining > 0">
+            <span class="difficulty-badge" :class="currentDifficultyClass">{{ currentDifficultyLabel }}</span>
+            Guesses remaining: {{ guessesRemaining }}
+        </p>
         <p v-else-if="alreadyPlayed" style="text-align: center;">You have reached your daily play limit. See the summary below of your games, and check back tomorrow for another try!</p>
 
-		<template v-if="!alreadyPlayed">
-			<div class="guesses-input-container">
-				<span v-for="(guessObj, index) in guesses" :key="index" class="previous-guess" :class="{ 'correct-guess': guessObj.correct }">
-					{{index + 1}}. {{ guessObj.guess }}
+        <template v-if="!alreadyPlayed">
+            <div class="guesses-input-container">
+                <span v-for="(guessObj, index) in guesses" :key="index" class="previous-guess" :class="{ 'correct-guess': guessObj.correct }">
+                    {{index + 1}}. {{ guessObj.guess }}
 
-					<Icon 
-						v-if="guessObj.correct"
-						class="guessed-indicator"
-						name="carbon:checkmark"
-					/>
+                    <Icon 
+                        v-if="guessObj.correct"
+                        class="guessed-indicator"
+                        name="carbon:checkmark"
+                    />
 
-					<Icon 
-						v-else
-						class="guessed-indicator"
-						name="carbon:close"
-					/>
-				</span>
+                    <Icon 
+                        v-else
+                        class="guessed-indicator"
+                        name="carbon:close"
+                    />
+                </span>
 
-				<div class="guess-container">
-					<input v-if="!won && !gameOver" v-model="currentGuess" placeholder="Enter player name" :disabled="gameOver" />
-					<ul v-if="filteredSuggestions.length > 0" class="suggestions">
-						<li v-for="suggestion in filteredSuggestions" :key="suggestion.name" class="player-suggestion" @click="selectSuggestion(suggestion.name)">
-							{{ suggestion.name }}
+                <div class="guess-container">
+                    <input v-if="!won && !gameOver" v-model="currentGuess" placeholder="Enter player name" :disabled="gameOver" />
+                    <ul v-if="filteredSuggestions.length > 0" class="suggestions">
+                        <li v-for="suggestion in filteredSuggestions" :key="suggestion.name" class="player-suggestion" @click="selectSuggestion(suggestion.name)">
+                            {{ suggestion.name }}
 
-							<Icon 
-								v-if="suggestion.guessed"
-								class="guessed-indicator"
-								name="carbon:close-outline"
-							/>
-						</li>
-					</ul>
-				</div>
-			</div>
+                            <Icon 
+                                v-if="suggestion.guessed"
+                                class="guessed-indicator"
+                                name="carbon:close-outline"
+                            />
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-			<div class="clues">
-				<div v-if="won" class="win-message">
-					<h4>Easy, right!</h4>
+            <div class="clues">
+                <div v-if="won" class="win-message">
+                    <h4>Easy, right!</h4>
 
-					<p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday !== 1">s</span> left to play today...</p>
+                    <p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday !== 1">s</span> left to play today...</p>
 
-					<p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
+                    <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
 
-					<button v-else @click="startNewGame">New Game</button>
-				</div>
+                    <button v-else @click="startNewGame">New Game</button>
+                </div>
 
-				<div v-else-if="gameOver && !won" class="lose-message">
-					<h4>Better luck next time!</h4>
+                <div v-else-if="gameOver && !won" class="lose-message">
+                    <h4>Better luck next time!</h4>
 
-					<p>The correct player was: {{ targetPlayer.name }}</p>
+                    <p>The correct player was: {{ targetPlayer.name }}</p>
 
-					<p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
+                    <p>You have {{ gamesRemainingToday }} game<span v-if="gamesRemainingToday > 1">s</span> left to play today...</p>
 
-					<p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
+                    <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
 
-					<button v-else @click="startNewGame">New Game</button>
-				</div>
+                    <button v-else @click="startNewGame">New Game</button>
+                </div>
 
-				<div v-else class="clues-grid">
-					<h6>Hints</h6>
-					<div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
-						<div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
-							<Icon v-if="rowIndex * 3 + colIndex >= clues.length" :name="clueIcons[rowIndex * 3 + colIndex]" class="clue-icon" />
-							<template v-else>
-								<span class="clue-title">{{ clueTitles[rowIndex * 3 + colIndex] }}</span>
-								<span class="clue">{{ clue }}</span>
-							</template>
-						</div>
-					</div>
-				</div>
-			</div>
-		</template>
+                <div v-else class="clues-grid">
+                    <h6>Hints</h6>
+                    <div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
+                        <div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
+                            <Icon v-if="rowIndex * 3 + colIndex >= clues.length" :name="clueIcons[rowIndex * 3 + colIndex]" class="clue-icon" />
+                            <template v-else>
+                                <span class="clue-title">{{ getClueTitle(rowIndex * 3 + colIndex) }}</span>
+                                <span class="clue">{{ clue }}</span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
 
-		<div v-if="gameSummaries.length > 0 && alreadyPlayed" class="game-summaries" :key="gameSummaries.length">
-			<h6>Todays games</h6>
-			<div v-for="(summary, index) in gameSummaries" :key="index" :class="{ 'game-won': summary.won, 'game-lost': !summary.won }" class="prev-games">
-				<p class="title">
-					Game {{ index + 1 }}
-					<Icon v-if="summary.won" class="guessed-indicator" name="carbon:checkmark" />
-					<Icon v-else class="guessed-indicator" name="carbon:close" />
-				</p>
-				<span class="summary-row">
-					<p>Winning Player</p>
-					<p>{{ summary.targetPlayer.name }}</p>
-				</span>
-				<span class="summary-row">
-					<p>Guesses</p>
-					<p v-if="summary.won">{{ summary.guesses.length }} / 6</p>
-					<p v-else>Failed</p>
-				</span>
-			</div>
-		</div>
+        <div v-if="gameSummaries.length > 0 && alreadyPlayed" class="game-summaries" :key="gameSummaries.length">
+            <h6>Todays games</h6>
+            <div v-for="(summary, index) in [...gameSummaries].reverse()" :key="index" :class="{ 'game-won': summary.won, 'game-lost': !summary.won }" class="prev-games">
+                <p class="title">
+                    <span class="difficulty-badge" :class="getDifficultyClass(index)">{{ getDifficultyLabel(index) }}</span>
+                </p>
+                <span class="summary-row">
+                    <p>Winning Player</p>
+                    <p>{{ summary.targetPlayer.name }}</p>
+                </span>
+                <span class="summary-row">
+                    <p>Guesses</p>
+                    <p v-if="summary.won">{{ summary.guesses.length }} / 6</p>
+                    <p v-else>Failed</p>
+                </span>
+            </div>
+        </div>
 
         <GameOverModal :darkMode="darkMode" :isOpen="isGameOverModalOpen" :won="won" :targetPlayer="targetPlayer"
-            :guesses="guesses" :alreadyPlayed="alreadyPlayed"
+            :guesses="guesses" :alreadyPlayed="alreadyPlayed" :difficulty="currentDifficulty"
             @close="closeGameOverModal" @newGame="startNewGame" />
 
         <InfoModal :darkMode="darkMode" :isOpen="isInfoModalOpen" @close="closeInfoModal" />
@@ -104,7 +105,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, defineEmits, onUnmounted } from 'vue';
+import { ref, computed, onMounted, defineEmits, onUnmounted, nextTick } from 'vue';
 import { usePlayerStore } from '~/stores/players';
 import { useStatsStore } from '~/stores/stats';
 import GameOverModal from './GameOverModal.vue';
@@ -113,6 +114,12 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
 const { $firestore: db } = useNuxtApp();
+
+const DIFFICULTY = {
+    EASY: 1,
+    MEDIUM: 2, 
+    HARD: 3
+};
 
 const getOrCreateUserId = () => {
     let userId = localStorage.getItem('userId');
@@ -137,6 +144,7 @@ const emit = defineEmits(['stats-updated']);
 const playerStore = usePlayerStore();
 const statsStore = useStatsStore();
 const targetPlayer = ref(null);
+const currentDifficulty = ref(DIFFICULTY.EASY);
 
 const playerDetails = computed(() => {
   if (targetPlayer.value) {
@@ -176,6 +184,13 @@ const stats = ref({
     guessesPerWin: [],
     mostGuessedPlayer: {},
     lastTenResults: [],
+    // New stats for difficulty levels
+    easyGamesWon: 0,
+    mediumGamesWon: 0,
+    hardGamesWon: 0,
+    easyGamesPlayed: 0,
+    mediumGamesPlayed: 0,
+    hardGamesPlayed: 0,
 });
 
 const isGameOverModalOpen = ref(false);
@@ -206,6 +221,50 @@ const selectSuggestion = (playerName) => {
     handleGuess();
 };
 
+// Compute current difficulty based on plays today
+const getCurrentDifficulty = () => {
+    const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+    
+    if (playsToday === 0) return DIFFICULTY.EASY;
+    if (playsToday === 1) return DIFFICULTY.MEDIUM;
+    return DIFFICULTY.HARD;
+};
+
+// Get difficulty label for display
+const currentDifficultyLabel = computed(() => {
+    switch (currentDifficulty.value) {
+        case DIFFICULTY.EASY: return 'Easy';
+        case DIFFICULTY.MEDIUM: return 'Medium';
+        case DIFFICULTY.HARD: return 'Hard';
+        default: return 'Unknown';
+    }
+});
+
+// Get CSS class for difficulty styling
+const currentDifficultyClass = computed(() => {
+    switch (currentDifficulty.value) {
+        case DIFFICULTY.EASY: return 'difficulty-easy';
+        case DIFFICULTY.MEDIUM: return 'difficulty-medium';
+        case DIFFICULTY.HARD: return 'difficulty-hard';
+        default: return '';
+    }
+});
+
+// Helper functions for game summaries
+const getDifficultyLabel = (index) => {
+    // For showing Easy/Medium/Hard in correct order
+    if (index === 0) return 'Easy';
+    if (index === 1) return 'Medium';
+    return 'Hard';
+
+};
+
+const getDifficultyClass = (index) => {
+    if (index === 0) return 'difficulty-easy';
+    if (index === 1) return 'difficulty-medium';
+    return 'difficulty-hard';
+};
+
 onMounted(async () => {
     // Load gameSummaries from localStorage first
     const storedSummaries = localStorage.getItem('gameSummaries');
@@ -220,11 +279,12 @@ onMounted(async () => {
     window.addEventListener('keydown', handleDesktopKeyPress);
 
     if (!gameOver.value && playerStore.players && playerStore.players.length > 0) {
-        targetPlayer.value = playerStore.getRandomPlayer();
-        clues.value.push(generateClues(targetPlayer.value)[0]);
+        currentDifficulty.value = getCurrentDifficulty();
+        targetPlayer.value = playerStore.getRandomPlayerByDifficulty(currentDifficulty.value);
+        clues.value.push(generateClues(targetPlayer.value, currentDifficulty.value)[0]);
     } else {
         console.log("Players not loaded or game over.");
-	}
+    }
 
     await nextTick();
 });
@@ -277,6 +337,7 @@ const checkDailyPlay = () => {
         alreadyPlayed.value = true;
     } else {
         alreadyPlayed.value = false;
+        currentDifficulty.value = getCurrentDifficulty();
     }
 };
 
@@ -288,17 +349,7 @@ const resetGame = () => {
     alreadyPlayed.value = false;
     isGameOverModalOpen.value = false;
     clues.value = [];
-};
-
-const loadSavedGame = () => {
-    guesses.value = JSON.parse(localStorage.getItem('guesses')) || [];
-    won.value = JSON.parse(localStorage.getItem('won')) || false;
-    clues.value = JSON.parse(localStorage.getItem('clues')) || [];
-};
-
-const handleLocalStorageError = () => {
-    console.error('Error parsing local storage data:');
-    resetGame();
+    currentDifficulty.value = getCurrentDifficulty();
 };
 
 const saveGameData = () => {
@@ -307,26 +358,144 @@ const saveGameData = () => {
     localStorage.setItem('guesses', JSON.stringify(guesses.value));
     localStorage.setItem('won', JSON.stringify(won.value));
     localStorage.setItem('clues', JSON.stringify(clues.value));
+    localStorage.setItem('currentDifficulty', currentDifficulty.value.toString());
 };
 
-const clueTitles = [
-    'Position',
-    'Nationality',
-    'Age',
-    'Club',
-    'Goals + Assists',
-    'Matches Played',
-];
-
-const generateClues = (player) => {
-    return [
-        `${player.position}`,
-        `${player.nationality}`,
-        `${player.age}`,
-        `${player.team}`,
-        `${player.goalsAndAssists}`,
-        `${player.matchesPlayed}`,
+// Define clue sets per difficulty level
+const getClueTitle = (index) => {
+    // Different clue sets based on difficulty
+    const easyClueTitles = [
+        'Position',
+        'Club',
+        'Nationality',
+        'Age',
+        'Goals + Assists',
+        'Matches Played',
     ];
+    
+    const mediumClueTitles = [
+        'Position',
+        'League', // League instead of specific club
+        'Nationality', 
+        'Age Range',
+        'Goals + Assists',
+        'Matches Started',
+    ];
+    
+    const hardClueTitles = [
+        'Position Group', // Attack/Midfield/Defense instead of specific position
+        'Continent', // Continent instead of country
+        'Age Range',
+        'League',
+        'Goal Contribution Rate', // Per 90 instead of total
+        'Minutes Played',
+    ];
+    
+    switch (currentDifficulty.value) {
+        case DIFFICULTY.EASY:
+            return easyClueTitles[index];
+        case DIFFICULTY.MEDIUM:
+            return mediumClueTitles[index];
+        case DIFFICULTY.HARD:
+            return hardClueTitles[index];
+        default:
+            return easyClueTitles[index];
+    }
+};
+
+const getPositionGroup = (position) => {
+    if (['Striker', 'Forward', 'Center-Forward', 'Right Winger', 'Left Winger'].includes(position)) {
+        return 'Attack';
+    } else if (['Central Midfield', 'Defensive Midfield', 'Attacking Midfield', 'Right Midfielder', 'Left Midfielder'].includes(position)) {
+        return 'Midfield';
+    } else {
+        return 'Defense';
+    }
+};
+
+const getAgeRange = (age) => {
+    if (age < 23) return 'Under 23';
+    if (age < 28) return '23-27';
+    if (age < 32) return '28-31';
+    return '32+';
+};
+
+const getContinent = (nationality) => {
+    const europeanCountries = ['England', 'France', 'Spain', 'Germany', 'Italy', 'Portugal', 'Netherlands', 'Belgium', 'Scotland', 'Wales', 'Ireland', 'Croatia', 'Serbia', 'Norway', 'Sweden', 'Denmark', 'Poland', 'Ukraine', 'Russia', 'Switzerland', 'Austria'];
+    const southAmericanCountries = ['Brazil', 'Argentina', 'Uruguay', 'Colombia', 'Chile', 'Ecuador', 'Paraguay', 'Peru', 'Venezuela', 'Bolivia'];
+    const africanCountries = ['Senegal', 'Ghana', 'Nigeria', 'Ivory Coast', 'Egypt', 'Morocco', 'Algeria', 'Tunisia', 'Cameroon', 'South Africa'];
+    
+    if (europeanCountries.includes(nationality)) return 'Europe';
+    if (southAmericanCountries.includes(nationality)) return 'South America';
+    if (africanCountries.includes(nationality)) return 'Africa';
+    if (['USA', 'Canada', 'Mexico', 'Jamaica', 'Costa Rica', 'Honduras'].includes(nationality)) return 'North America';
+    if (['Japan', 'South Korea', 'China', 'Australia', 'Saudi Arabia', 'Iran', 'Qatar', 'UAE', 'New Zealand'].includes(nationality)) return 'Asia/Oceania';
+    
+    return 'Other';
+};
+
+const getLeague = (team) => {
+    const premierLeagueTeams = ['Arsenal', 'Aston Villa', 'Chelsea', 'Everton', 'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Tottenham', 'West Ham', 'Brighton', 'Brentford', 'Crystal Palace', 'Fulham', 'Leicester', 'Nottingham Forest', 'Southampton', 'Wolves', 'Burnley', 'Sheffield United'];
+    const laLigaTeams = ['Barcelona', 'Real Madrid', 'Atletico Madrid', 'Sevilla', 'Valencia', 'Villarreal', 'Real Sociedad', 'Athletic Bilbao', 'Real Betis', 'Getafe'];
+    const bundesligaTeams = ['Bayern Munich', 'Borussia Dortmund', 'RB Leipzig', 'Bayer Leverkusen', 'Borussia Monchengladbach', 'Wolfsburg', 'Eintracht Frankfurt', 'Union Berlin', 'SC Freiburg', 'Hoffenheim'];
+    const serieATeams = ['AC Milan', 'Inter Milan', 'Juventus', 'Napoli', 'Roma', 'Lazio', 'Atalanta', 'Fiorentina', 'Sassuolo', 'Torino'];
+    const ligue1Teams = ['PSG', 'Marseille', 'Lyon', 'Lille', 'Monaco', 'Nice', 'Rennes', 'Strasbourg', 'Lens', 'Nantes'];
+    
+    if (premierLeagueTeams.includes(team)) return 'Premier League';
+    if (laLigaTeams.includes(team)) return 'La Liga';
+    if (bundesligaTeams.includes(team)) return 'Bundesliga';
+    if (serieATeams.includes(team)) return 'Serie A';
+    if (ligue1Teams.includes(team)) return 'Ligue 1';
+    
+    return 'Other League';
+};
+
+const getGoalContributionRate = (player) => {
+    const totalMinutes = player.minutesPlayed || 1;
+    const totalContributions = player.goalsAndAssists || 0;
+    const rate = (totalContributions / totalMinutes) * 90;
+    return rate.toFixed(2) + ' per 90';
+};
+
+const generateClues = (player, difficulty) => {
+    switch (difficulty) {
+        case DIFFICULTY.EASY:
+            return [
+                `${player.position}`,
+                `${player.nationality}`,
+                `${player.age}`,
+                `${player.team}`,
+                `${player.goalsAndAssists}`,
+                `${player.matchesPlayed}`,
+            ];
+        case DIFFICULTY.MEDIUM:
+            return [
+                `${player.position}`,
+                `${player.nationality}`,
+                `${getAgeRange(player.age)}`,
+                `${getLeague(player.team)}`,
+                `${player.goalsAndAssists}`,
+                `${player.matchesStarted}`,
+            ];
+        case DIFFICULTY.HARD:
+            return [
+                `${getPositionGroup(player.position)}`,
+                `${getContinent(player.nationality)}`,
+                `${getAgeRange(player.age)}`,
+                `${getLeague(player.team)}`,
+                `${getGoalContributionRate(player)}`,
+                `${player.minutesPlayed}`,
+            ];
+        default:
+            return [
+                `${player.position}`,
+                `${player.nationality}`,
+                `${player.age}`,
+                `${player.team}`,
+                `${player.goalsAndAssists}`,
+                `${player.matchesPlayed}`,
+            ];
+    }
 };
 
 const guessesRemaining = computed(() => {
@@ -356,7 +525,7 @@ const handleGuess = () => {
         isGameOverModalOpen.value = true;
         updateStats(false);
     } else {
-        clues.value.push(generateClues(targetPlayer.value)[guesses.value.length]);
+        clues.value.push(generateClues(targetPlayer.value, currentDifficulty.value)[guesses.value.length]);
     }
 
     saveGameData();
@@ -369,6 +538,15 @@ const loadStats = async () => {
 
         if (docSnap.exists()) {
             stats.value = docSnap.data().stats;
+            // Handle legacy stats without difficulty fields
+            if (stats.value.easyGamesPlayed === undefined) {
+                stats.value.easyGamesPlayed = 0;
+                stats.value.mediumGamesPlayed = 0;
+                stats.value.hardGamesPlayed = 0;
+                stats.value.easyGamesWon = 0;
+                stats.value.mediumGamesWon = 0;
+                stats.value.hardGamesWon = 0;
+            }
         } else {
             console.log("No such document!");
             resetStats();
@@ -403,61 +581,93 @@ const resetStats = () => {
         guessesPerWin: [],
         mostGuessedPlayer: {},
         lastTenResults: [],
+        easyGamesPlayed: 0,
+        mediumGamesPlayed: 0,
+        hardGamesPlayed: 0,
+        easyGamesWon: 0,
+        mediumGamesWon: 0,
+        hardGamesWon: 0,
+		totalPoints: 0,
     };
     gameSummaries.value = [];
 };
 
 const updateStats = (gameWon) => {
-
     console.log('updateStats called');
     statsStore.stats.gamesPlayed++;
 
-	if (gameWon) {
-		statsStore.stats.gamesWon++;
-		statsStore.stats.guessesPerWin.push(guesses.value.length);
-		statsStore.stats.winStreak++;
-		statsStore.stats.lossStreak = 0;
+    // Update difficulty-specific stats
+    switch (currentDifficulty.value) {
+        case DIFFICULTY.EASY:
+            statsStore.stats.easyGamesPlayed++;
+            if (gameWon) {
+                statsStore.stats.easyGamesWon++;
+                statsStore.stats.totalPoints += 1; // 1 point for easy win
+			}
+			break;
+        case DIFFICULTY.MEDIUM:
+            statsStore.stats.mediumGamesPlayed++;
+            if (gameWon) {
+                statsStore.stats.mediumGamesWon++;
+                statsStore.stats.totalPoints += 2; // 2 points for medium win
+            }
+            break;
+        case DIFFICULTY.HARD:
+            statsStore.stats.hardGamesPlayed++;
+            if (gameWon) {
+                statsStore.stats.hardGamesWon++;
+                statsStore.stats.totalPoints += 3; // 3 points for hard win
+            }
+            break;
+    }
 
-		if (statsStore.stats.winStreak > statsStore.stats.maxWinStreak) {
-			statsStore.stats.maxWinStreak = statsStore.stats.winStreak;
-		}
+    if (gameWon) {
+        statsStore.stats.gamesWon++;
+        statsStore.stats.guessesPerWin.push(guesses.value.length);
+        statsStore.stats.winStreak++;
+        statsStore.stats.lossStreak = 0;
 
-		statsStore.stats.lastTenResults.push('win');
-	} else {
-		statsStore.stats.gamesLost++;
-		statsStore.stats.winStreak = 0;
-		statsStore.stats.lossStreak++;
+        if (statsStore.stats.winStreak > statsStore.stats.maxWinStreak) {
+            statsStore.stats.maxWinStreak = statsStore.stats.winStreak;
+        }
 
-		if (statsStore.stats.lossStreak > statsStore.stats.maxLossStreak) {
-			statsStore.stats.maxLossStreak = statsStore.stats.lossStreak;
-		}
+        statsStore.stats.lastTenResults.push('win');
+    } else {
+        statsStore.stats.gamesLost++;
+        statsStore.stats.winStreak = 0;
+        statsStore.stats.lossStreak++;
 
-		statsStore.stats.lastTenResults.push('lose');
-	}
+        if (statsStore.stats.lossStreak > statsStore.stats.maxLossStreak) {
+            statsStore.stats.maxLossStreak = statsStore.stats.lossStreak;
+        }
 
-	if (statsStore.stats.lastTenResults.length > 10) {
-		statsStore.stats.lastTenResults.shift();
-	}
+        statsStore.stats.lastTenResults.push('lose');
+    }
 
-	calculateMostGuessed();
-	statsStore.saveStats();
-	statsStore.loadStats();
-	emit('stats-updated');
+    if (statsStore.stats.lastTenResults.length > 10) {
+        statsStore.stats.lastTenResults.shift();
+    }
 
-	gameSummaries.value = gameSummaries.value || [];
-	gameSummaries.value.unshift({
-		targetPlayer: targetPlayer.value,
-		guesses: guesses.value,
-		won: gameWon,
-	});
+    calculateMostGuessed();
+    statsStore.saveStats();
+    statsStore.loadStats();
+    emit('stats-updated');
 
-	gameSummaries.value = gameSummaries.value.slice(0, 3);
-	localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value)); // Save here!
+    gameSummaries.value = gameSummaries.value || [];
+    gameSummaries.value.unshift({
+        targetPlayer: targetPlayer.value,
+        guesses: guesses.value,
+        won: gameWon,
+        difficulty: currentDifficulty.value
+    });
 
-	let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-	playsToday++;
-	localStorage.setItem('playsToday', playsToday.toString());
-	checkDailyPlay();
+    gameSummaries.value = gameSummaries.value.slice(0, 3);
+    localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value)); // Save here!
+
+    let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+    playsToday++;
+    localStorage.setItem('playsToday', playsToday.toString());
+    checkDailyPlay();
 };
 
 const calculateMostGuessed = () => {
@@ -477,18 +687,6 @@ const calculateMostGuessed = () => {
     }
     if (stats.value.gamesPlayed >= 10) {
         stats.value.mostGuessedPlayer = { name: mostGuessed, count: maxCount };
-    }
-};
-
-const handleKeyboardKeyPress = (key) => {
-    if (gameOver.value) return;
-
-    if (key === 'ENTER') {
-        handleGuess();
-    } else if (key === 'BACK') {
-        currentGuess.value = currentGuess.value.slice(0, -1);
-    } else {
-        currentGuess.value += key;
     }
 };
 
@@ -528,11 +726,17 @@ const startNewGame = () => {
     gameOver.value = false;
     won.value = false;
     clues.value = [];
-    targetPlayer.value = playerStore.getRandomPlayer();
+    
+    // Update difficulty for the next game
+    currentDifficulty.value = getCurrentDifficulty();
+    
+    // Get player based on difficulty level
+    targetPlayer.value = playerStore.getRandomPlayerByDifficulty(currentDifficulty.value);
     isGameOverModalOpen.value = false;
     saveGameData();
 
-    clues.value.push(generateClues(targetPlayer.value)[0]);
+    // Generate first clue based on difficulty
+    clues.value.push(generateClues(targetPlayer.value, currentDifficulty.value)[0]);
 };
 </script>
 
@@ -544,6 +748,30 @@ const startNewGame = () => {
 		max-width: 400px;
 		padding: 2rem;
 		width: 100vw;
+
+		.difficulty-badge {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 4px;
+			font-size: 0.8rem;
+			font-weight: 500;
+			width: 100%;
+
+			&.difficulty-easy {
+				background-color: #4CAF50;
+				color: white;
+			}
+
+			&.difficulty-medium {
+				background-color: #FF9800;
+				color: white;
+			}
+
+			&.difficulty-hard {
+				background-color: #F44336;
+				color: white;
+			}
+		}
 
 		.guesses-input-container {
 			display: flex;

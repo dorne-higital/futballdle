@@ -9,6 +9,7 @@
     >
         <Header
             :darkMode="isDarkMode"
+            @openLeaderboard="openLeaderboard"
             @openStats="openStats"
             @openInfo="openInfo"
             @toggleDarkMode="toggleDarkMode"
@@ -18,11 +19,21 @@
             :darkMode="isDarkMode"
         />
 
+        <Leaderboard
+            v-if="isLeaderboardModalOpen"
+            :isOpen="isLeaderboardModalOpen"
+            :darkMode="darkMode"
+            :currentUserId="userId"
+            @close="closeLeaderboardModal"
+        />
+
         <StatsModal 
             :darkMode="isDarkMode"
             :isOpen="isStatsOpen" 
             :stats="gameStats" 
+            :userId="userId"
             @close="closeStats" 
+            @nameUpdated="handleNameUpdate"
         />
 
         <InfoModal 
@@ -36,6 +47,7 @@
 <script setup>
     import { ref, onMounted, computed } from 'vue';
     import Game from '../components/Game.vue';
+    import Leaderboard from '../components/Leaderboard.vue';
     import StatsModal from '../components/StatsModal.vue';
     import InfoModal from '../components/InfoModal.vue';
     import Header from '../components/Header.vue';
@@ -44,11 +56,13 @@
     import { useStatsStore } from '~/stores/stats';
 
     const isLoading = ref(true);
+    const isLeaderboardModalOpen = ref(false);
     const isStatsOpen = ref(false);
     const isInfoModalOpen = ref(false);
     const isDarkMode = ref(false);
     const playerStore = usePlayerStore();
     const statsStore = useStatsStore();
+    const userId = ref('');
     
     const gameStats = computed(() => {
         return statsStore.getStats;
@@ -60,10 +74,34 @@
             isDarkMode.value = true;
         }
 
+        let storedUserId = localStorage.getItem('userId');
+        if (!storedUserId) {
+            // Generate a new UUID for the user
+            storedUserId = generateUUID(); // You'll need to implement this function
+            localStorage.setItem('userId', storedUserId);
+        }
+        userId.value = storedUserId;
+
         setTimeout(() => {
             isLoading.value = false;
         }, 1500);
     });
+
+    const handleNameUpdate = (newName) => {
+        console.log("User display name updated:", newName);
+        // You might want to update the name in other parts of your app
+        // Maybe refresh leaderboard or header display
+    };
+
+    const openLeaderboard = () => {
+        console.log("Opening leaderboard modal");
+        isLeaderboardModalOpen.value = true;
+    };
+
+    const closeLeaderboardModal = () => {
+        console.log("Closing leaderboard modal");
+        isLeaderboardModalOpen.value = false;
+    };
 
     const openStats = () => {
         isStatsOpen.value = true;
