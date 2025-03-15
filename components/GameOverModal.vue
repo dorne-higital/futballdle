@@ -15,8 +15,6 @@
                     You have reached your daily play limit.
                 </p>
 
-				<span class="difficulty-badge" :class="difficultyClass">{{ difficultyLabel }}</span>
-
 				<Icon 
 					class="close-button"
 					name="carbon:close-filled" 
@@ -25,12 +23,21 @@
             </div>
 
             <div class="guesses">
-                <p v-if="won">
-                    You guessed the player in {{ guesses.length }} guesses.
-                </p>
-                <p v-else-if="targetPlayer">
-                    The player was {{ targetPlayer.name }}.
-                </p>
+				<span 
+					class="difficulty-badge" 
+					:class="difficultyClass"
+				>
+					<p>{{ difficultyLabel }}</p>
+
+					<span>|</span>
+					
+					<p v-if="won">
+						You guessed the player in {{ guesses.length }} guesses.
+					</p>
+					<p v-else-if="targetPlayer">
+						The player was {{ targetPlayer.name }}.
+					</p>
+				</span>
             </div>
 
             <div class="modal-body">
@@ -274,30 +281,6 @@ const countryIconMap = {
     width: 100%;
     z-index: 1000;
 
-	.difficulty-badge {
-	display: inline-block;
-	padding: 2px 8px;
-	border-radius: 4px;
-	font-size: 0.8rem;
-	font-weight: bold;
-	margin-left: 8px;
-	}
-
-	.difficulty-easy {
-	background-color: #4CAF50;
-	color: white;
-	}
-
-	.difficulty-medium {
-	background-color: #FF9800;
-	color: white;
-	}
-
-	.difficulty-hard {
-	background-color: #F44336;
-	color: white;
-	}
-
     &.dark {
         background-color: rgba(50, 50, 50, 0.5);
 
@@ -336,7 +319,31 @@ const countryIconMap = {
         }
 
         .guesses {
-            text-align: center;
+			width: 100%;
+
+			.difficulty-badge {
+				display: flex;
+				font-size: 0.8rem;
+				font-weight: bold;
+				justify-content: space-between;
+				padding: .5rem;
+				width: 100%;
+
+				&.difficulty-easy {
+					background-color: #4CAF50;
+					color: white;
+				}
+
+				&.difficulty-medium {
+					background-color: #FF9800;
+					color: white;
+				}
+
+				&.difficulty-hard {
+					background-color: #F44336;
+					color: white;
+				}
+			}
         }
 
         .modal-body {
@@ -345,7 +352,6 @@ const countryIconMap = {
 			.player-stats {
 				display: flex;
 				flex-direction: column;
-				margin-top: 2rem;
 
 				.stat-row {
 					display: flex;

@@ -1,7 +1,6 @@
 <template>
-    <div :class="{ 'dark': darkMode }" class="game">
+    <div :class="[{ 'dark': darkMode },currentDifficultyClass]" class="game">
         <p v-if="!alreadyPlayed && guessesRemaining > 0">
-            <span class="difficulty-badge" :class="currentDifficultyClass">{{ currentDifficultyLabel }}</span>
             Guesses remaining: {{ guessesRemaining }}
         </p>
         <p v-else-if="alreadyPlayed" style="text-align: center;">You have reached your daily play limit. See the summary below of your games, and check back tomorrow for another try!</p>
@@ -64,7 +63,8 @@
                 </div>
 
                 <div v-else class="clues-grid">
-                    <h6>Hints</h6>
+					<h6 class="difficulty-badge" :class="currentDifficultyClass">{{ currentDifficultyLabel }}</h6>
+
                     <div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
                         <div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
                             <Icon v-if="rowIndex * 3 + colIndex >= clues.length" :name="clueIcons[rowIndex * 3 + colIndex]" class="clue-icon" />
@@ -337,7 +337,6 @@ const checkDailyPlay = () => {
         alreadyPlayed.value = true;
     } else {
         alreadyPlayed.value = false;
-        currentDifficulty.value = getCurrentDifficulty();
     }
 };
 
@@ -749,30 +748,6 @@ const startNewGame = () => {
 		padding: 2rem;
 		width: 100vw;
 
-		.difficulty-badge {
-			display: inline-block;
-			padding: 2px 8px;
-			border-radius: 4px;
-			font-size: 0.8rem;
-			font-weight: 500;
-			width: 100%;
-
-			&.difficulty-easy {
-				background-color: #4CAF50;
-				color: white;
-			}
-
-			&.difficulty-medium {
-				background-color: #FF9800;
-				color: white;
-			}
-
-			&.difficulty-hard {
-				background-color: #F44336;
-				color: white;
-			}
-		}
-
 		.guesses-input-container {
 			display: flex;
 			flex-direction: column;
@@ -943,6 +918,30 @@ const startNewGame = () => {
 				display: flex;
 				flex-direction: column;
 				width: 100%;
+
+				.difficulty-badge {
+					display: inline-block;
+					padding: .5rem;
+					border-radius: 4px;
+					font-weight: 400;
+					margin-bottom: .5rem;
+					width: 100%;
+
+					&.difficulty-easy {
+						background-color: #4CAF50;
+						color: white;
+					}
+
+					&.difficulty-medium {
+						background-color: #FF9800;
+						color: white;
+					}
+
+					&.difficulty-hard {
+						background-color: #F44336;
+						color: white;
+					}
+				}
 
 				.clues-row {
 					display: flex;
