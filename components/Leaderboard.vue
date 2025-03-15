@@ -41,7 +41,7 @@
 	</div>
   </template>
   
-  <script setup>
+<script setup>
   import { ref, onMounted, defineProps, defineEmits, watch } from 'vue';
   import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
   import { useNuxtApp } from '#app';
@@ -120,99 +120,87 @@ const fetchLeaderboard = async () => {
 	  fetchLeaderboard();
 	}
   });
-  </script>
+</script>
   
-  <style scoped>
-  .leaderboard-modal {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 1000;
-  }
+<style lang="scss" scoped>
+	.leaderboard-modal {
+		align-items: center;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		height: 100%;
+		left: 0;
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 1000;
   
-  .modal-content {
-	background-color: white;
-	border-radius: 8px;
-	width: 90%;
-	max-width: 500px;
-	max-height: 80vh;
-	overflow-y: auto;
-  }
+		.modal-content {
+			background-color: white;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			padding: 1.25rem;
+			width: 100%;
+			max-width: 600px;
+
+			.modal-header {
+				align-items: center;
+				display: flex;
+				justify-content: space-between;
+
+				.close-button {
+					border: none;
+					color: #292929;
+					cursor: pointer;
+					font-size: 1.75rem;
+				}
+			}
+
+			.modal-body {
+				.leaderboard-list {
+					width: 100%;
   
-  .dark .modal-content {
-	background-color: #1a1a1a;
-	color: white;
-  }
-  
-  .modal-header {
-	padding: 15px;
-	display: flex;
-	justify-content: space-between;
-	border-bottom: 1px solid #eee;
-  }
-  
-  .dark .modal-header {
-	border-bottom: 1px solid #333;
-  }
-  
-  .close-button {
-	cursor: pointer;
-	font-size: 20px;
-  }
-  
-  .modal-body {
-	padding: 15px;
-  }
-  
-  .leaderboard-list {
-	width: 100%;
-  }
-  
-  .leaderboard-header, .leaderboard-item {
-	display: grid;
-	grid-template-columns: 60px 1fr 80px;
-	padding: 8px 0;
-  }
-  
-  .leaderboard-header {
-	font-weight: bold;
-	border-bottom: 1px solid #eee;
-  }
-  
-  .dark .leaderboard-header {
-	border-bottom: 1px solid #333;
-  }
-  
-  .leaderboard-item {
-	border-bottom: 1px solid #f5f5f5;
-  }
-  
-  .dark .leaderboard-item {
-	border-bottom: 1px solid #222;
-  }
-  
-  .leaderboard-separator {
-	text-align: center;
-	padding: 8px 0;
-  }
-  
-  .current-user {
-	background-color: rgba(0, 128, 255, 0.1);
-	font-weight: bold;
-  }
-  
-  .rank {
-	text-align: center;
-  }
-  
-  .points {
-	text-align: right;
-  }
-  </style>
+					.leaderboard-header, .leaderboard-item {
+						display: grid;
+						grid-template-columns: 60px 1fr 80px;
+						padding: 8px 0;
+
+						.rank {
+							text-align: center;
+						}
+
+						.points {
+							text-align: right;
+						}
+					}
+
+					.leaderboard-header {
+						font-size: .8rem;
+						font-weight: 400;
+						border-bottom: 1px solid #eee;
+					}
+
+					.leaderboard-item {
+						border-bottom: 1px solid #f5f5f5;
+
+						&.current-user {
+							background-color: rgba(0, 128, 255, 0.1);
+							font-weight: 500;
+						}
+						.points {
+							padding-right: .5rem;
+						}
+					}
+					
+					.leaderboard-separator {
+						text-align: center;
+						padding: 8px 0;
+					}
+				}
+			}
+		}
+	}
+</style>
   
