@@ -21,8 +21,11 @@
 			<div v-for="(player, index) in topPlayers" :key="index" 
 				 class="leaderboard-item" 
 				 :class="{ 'current-user': player.userId === currentUserId }">
-			  <span class="rank">{{ index + 1 }}</span>
-			  <span class="user-id">{{ formatUserId(player.userId, player) }}</span>
+			  <span class="rank">{{ index + 1 }}.</span>
+			  <span class="user-id">
+					{{ formatUserId(player.userId, player) }}
+					<Icon v-if="player.userId === currentUserId" name="carbon:user-avatar-filled-alt"/>
+				</span>
 			  <span class="points">{{ player.points }}</span>
 			</div>
 			
@@ -32,7 +35,10 @@
 			<!-- Current user's position if not in top 25 -->
 			<div v-if="currentUserRank > 25" class="leaderboard-item current-user">
 			  <span class="rank">{{ currentUserRank }}</span>
-			  <span class="user-id">{{ formatUserId(player.userId, player) }}</span>
+			  <span class="user-id">
+					{{ formatUserId(player.userId, player) }}
+					<Icon v-if="player.userId === currentUserId" name="carbon:user-avatar-filled-alt"/>
+				</span>
 			  <span class="points">{{ currentUserPoints }}</span>
 			</div>
 		  </div>
@@ -164,7 +170,9 @@ const fetchLeaderboard = async () => {
   
 					.leaderboard-header, .leaderboard-item {
 						display: grid;
+						font-weight: 400;
 						grid-template-columns: 60px 1fr 80px;
+						letter-spacing: .07rem;
 						padding: 8px 0;
 
 						.rank {
@@ -173,6 +181,12 @@ const fetchLeaderboard = async () => {
 
 						.points {
 							text-align: right;
+						}
+					
+						.user-id {
+							align-items: center;
+							display: flex;
+							gap: .5rem;
 						}
 					}
 
@@ -187,7 +201,7 @@ const fetchLeaderboard = async () => {
 
 						&.current-user {
 							background-color: rgba(0, 128, 255, 0.1);
-							font-weight: 500;
+							font-weight: 600;
 						}
 						.points {
 							padding-right: .5rem;
