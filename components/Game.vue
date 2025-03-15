@@ -1003,6 +1003,29 @@ const startNewGame = () => {
 					gap: .5rem;
 					justify-content: center;
 					padding-bottom: .5rem;
+					
+					.difficulty-badge {
+						display: inline-block;
+						padding: .5rem;
+						border-radius: 4px;
+						font-weight: 400;
+						width: 100%;
+
+						&.difficulty-easy {
+							background-color: #4CAF50;
+							color: white;
+						}
+
+						&.difficulty-medium {
+							background-color: #FF9800;
+							color: white;
+						}
+
+						&.difficulty-hard {
+							background-color: #F44336;
+							color: white;
+						}
+					}
 				}
 
 				&.game-won {
