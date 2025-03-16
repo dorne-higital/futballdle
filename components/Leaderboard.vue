@@ -14,9 +14,9 @@
 			<div class="modal-body">
 				<div class="leaderboard-list">
 					<div class="leaderboard-header">
-						<span class="rank">Rank</span>
+						<span class="rank"></span>
 						<span class="user-id">Player</span>
-						<span class="points">Points</span>
+						<span class="points">Pts</span>
 					</div>
 				
 					<div 
@@ -27,7 +27,7 @@
 					>
 						<span class="rank">{{ index + 1 }}.</span>
 						<span class="user-id">
-							{{ formatUserId(player.userId, player) }}
+							{{ getPlayerDisplayName(player) }}
 							<Icon v-if="player.userId === currentUserId" name="carbon:user-avatar-filled-alt"/>
 						</span>
 						<span class="points">{{ player.points }}</span>
@@ -48,8 +48,8 @@
 					>
 						<span class="rank">{{ currentUserRank }}</span>
 						<span class="user-id">
-							{{ formatUserId(player.userId, player) }}
-							<Icon v-if="player.userId === currentUserId" name="carbon:user-avatar-filled-alt"/>
+							{{ currentUserDisplayName }}
+							<Icon name="carbon:user-avatar-filled-alt"/>
 						</span>
 						<span class="points">{{ currentUserPoints }}</span>
 					</div>
@@ -61,7 +61,7 @@
   
 <script setup>
 	import { ref, onMounted, defineProps, defineEmits, watch } from 'vue';
-	import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+	import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 	import { useNuxtApp } from '#app';
 
 	const props = defineProps({
@@ -75,19 +75,57 @@
 	const topPlayers = ref([]);
 	const currentUserRank = ref(0);
 	const currentUserPoints = ref(0);
+	const currentUserDisplayName = ref('');
 	const { $firestore: db } = useNuxtApp();
+	const displayNameCache = ref(new Map()); // Cache display names
 
 	const closeModal = () => {
 		emit('close');
 	};
 
-	// Format user ID function (implement as needed)
-	const formatUserId = (userId, playerObj) => {
-		if (playerObj && playerObj.displayName) {
-			return playerObj.displayName;
+	// Get player display name with better fallback mechanism
+	const getPlayerDisplayName = (player) => {
+		// Check if player has a displayName in object
+		if (player.displayName) {
+			return player.displayName;
 		}
-		// You may want to truncate long IDs or format them in some way
-		return userId ? userId.substring(0, 15) + (userId.length > 15 ? '...' : '') : 'Unknown';
+		
+		// Check if we have cached this player's display name
+		if (displayNameCache.value.has(player.userId)) {
+			return displayNameCache.value.get(player.userId);
+		}
+		
+		// If this is the current user, check localStorage
+		if (player.userId === props.currentUserId) {
+			const localName = localStorage.getItem('playerDisplayName');
+			if (localName) {
+				// Cache it for future use
+				displayNameCache.value.set(player.userId, localName);
+				return localName;
+			}
+		}
+		
+		// Default to truncated ID
+		return player.userId ? player.userId.substring(0, 10) + (player.userId.length > 10 ? '...' : '') : 'Anonymous Player';
+	};
+
+	// Load cached display names from localStorage
+	const loadCachedDisplayNames = () => {
+		const cachedNames = localStorage.getItem('displayNameCache');
+		if (cachedNames) {
+			try {
+				const parsed = JSON.parse(cachedNames);
+				displayNameCache.value = new Map(Object.entries(parsed));
+			} catch (e) {
+				console.error("Error parsing cached display names:", e);
+			}
+		}
+	};
+
+	// Save display name cache to localStorage
+	const saveDisplayNameCache = () => {
+		const cacheObj = Object.fromEntries(displayNameCache.value);
+		localStorage.setItem('displayNameCache', JSON.stringify(cacheObj));
 	};
 
 	const fetchLeaderboard = async () => {
@@ -108,17 +146,59 @@
 			
 			topPlayers.value = querySnapshot.docs.map((doc) => {
 				const userData = doc.data();
-				console.log("Document data:", doc.id, userData.stats?.totalPoints, userData.displayName);
+				const displayName = userData.displayName || null;
+				
+				// Cache any display names we find
+				if (displayName) {
+					displayNameCache.value.set(doc.id, displayName);
+				}
+				
 				return {
 					userId: doc.id,
-					displayName: userData.displayName || null, // Include displayName if it exists
+					displayName: displayName,
 					points: userData.stats?.totalPoints || 0
 				};
 			});
 			
+			// Save updated display name cache
+			saveDisplayNameCache();
+			
 			console.log("Top players:", topPlayers.value);
 			
-			// Rest of your code remains the same...
+			// Find current user's rank and points if not in top 25
+			let currentUserFound = topPlayers.value.some(player => player.userId === props.currentUserId);
+			
+			if (!currentUserFound && props.currentUserId) {
+				// Fetch current user info
+				const userDoc = await getDoc(doc(db, "users", props.currentUserId));
+				if (userDoc.exists()) {
+					const userData = userDoc.data();
+					currentUserPoints.value = userData.stats?.totalPoints || 0;
+					currentUserDisplayName.value = userData.displayName || getPlayerDisplayName({userId: props.currentUserId});
+					
+					// Cache this display name
+					if (userData.displayName) {
+						displayNameCache.value.set(props.currentUserId, userData.displayName);
+						saveDisplayNameCache();
+					}
+					
+					// Count how many users have more points
+					const rankQuery = query(
+						collection(db, "users"),
+						orderBy("stats.totalPoints", "desc")
+					);
+					
+					const rankSnapshot = await getDocs(rankQuery);
+					let rank = 1;
+					
+					for (const doc of rankSnapshot.docs) {
+						if (doc.id === props.currentUserId) break;
+						rank++;
+					}
+					
+					currentUserRank.value = rank;
+				}
+			}
 		} catch (error) {
 			console.error("Error fetching leaderboard:", error);
 		}
@@ -126,6 +206,18 @@
 
 	onMounted(() => {
 		console.log("Leaderboard component mounted, isOpen:", props.isOpen);
+		// Load cached display names first
+		loadCachedDisplayNames();
+		
+		// Fetch current user's display name from localStorage immediately
+		if (props.currentUserId) {
+			const localName = localStorage.getItem('playerDisplayName');
+			if (localName) {
+				currentUserDisplayName.value = localName;
+				displayNameCache.value.set(props.currentUserId, localName);
+			}
+		}
+		
 		if (props.isOpen) {
 			fetchLeaderboard();
 		}
@@ -192,6 +284,7 @@
 						}
 
 						.points {
+							padding-right: .5rem;
 							text-align: right;
 						}
 					

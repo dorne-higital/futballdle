@@ -184,7 +184,6 @@ const stats = ref({
     guessesPerWin: [],
     mostGuessedPlayer: {},
     lastTenResults: [],
-    // New stats for difficulty levels
     easyGamesWon: 0,
     mediumGamesWon: 0,
     hardGamesWon: 0,
@@ -364,8 +363,8 @@ const saveGameData = () => {
 const getClueTitle = (index) => {
     // Different clue sets based on difficulty
     const easyClueTitles = [
+		'Club',
         'Position',
-        'Club',
         'Nationality',
         'Age',
         'Goals + Assists',
@@ -460,10 +459,10 @@ const generateClues = (player, difficulty) => {
     switch (difficulty) {
         case DIFFICULTY.EASY:
             return [
+				`${player.team}`,
                 `${player.position}`,
                 `${player.nationality}`,
                 `${player.age}`,
-                `${player.team}`,
                 `${player.goalsAndAssists}`,
                 `${player.matchesPlayed}`,
             ];
@@ -1003,7 +1002,7 @@ const startNewGame = () => {
 					gap: .5rem;
 					justify-content: center;
 					padding-bottom: .5rem;
-					
+
 					.difficulty-badge {
 						display: inline-block;
 						padding: .5rem;

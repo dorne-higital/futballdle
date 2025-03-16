@@ -141,7 +141,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed, ref, onMounted, nextTick } from 'vue';
+import { defineProps, defineEmits, computed, ref, onMounted, nextTick, watch } from 'vue'; // Add watch import
 import { useNuxtApp } from '#app';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
@@ -163,8 +163,15 @@ const displayName = ref('');
 const newDisplayName = ref('');
 const nameInput = ref(null);
 
-// Fetch the current display name when component mounts
+// Initial load from localStorage as backup
 onMounted(async () => {
+    // First try to load from localStorage as fallback
+    const savedName = localStorage.getItem('playerDisplayName');
+    if (savedName) {
+        displayName.value = savedName;
+    }
+    
+    // Then try to fetch from Firebase if we have a userId
     if (props.userId) {
         await fetchDisplayName();
     }
@@ -181,7 +188,12 @@ const fetchDisplayName = async () => {
     try {
         const userDoc = await getDoc(doc(db, "users", props.userId));
         if (userDoc.exists()) {
-            displayName.value = userDoc.data().displayName || '';
+            const name = userDoc.data().displayName || '';
+            if (name) {
+                displayName.value = name;
+                // Also save to localStorage as backup
+                localStorage.setItem('playerDisplayName', name);
+            }
         }
     } catch (error) {
         console.error("Error fetching user display name:", error);
@@ -208,12 +220,20 @@ const saveName = async () => {
     
     try {
         const trimmedName = newDisplayName.value.trim();
-        await updateDoc(doc(db, "users", props.userId), {
-            displayName: trimmedName
-        });
         
+        // Save to Firebase if we have a userId
+        if (props.userId) {
+            await updateDoc(doc(db, "users", props.userId), {
+                displayName: trimmedName
+            });
+        }
+        
+        // Update local state
         displayName.value = trimmedName;
         isEditingName.value = false;
+        
+        // Always save to localStorage as backup
+        localStorage.setItem('playerDisplayName', trimmedName);
         
         // Emit event so parent components can update if needed
         emit('nameUpdated', trimmedName);
@@ -221,7 +241,10 @@ const saveName = async () => {
         console.log("Display name updated successfully");
     } catch (error) {
         console.error("Error updating display name:", error);
-        // You might want to show an error message to the user
+        // At least save to localStorage even if Firebase fails
+        localStorage.setItem('playerDisplayName', newDisplayName.value.trim());
+        displayName.value = newDisplayName.value.trim();
+        isEditingName.value = false;
     }
 };
 
@@ -234,6 +257,7 @@ const closeModal = () => {
     emit('close');
 };
 
+// Rest of your computed properties remain the same
 const winPercentage = computed(() => {
     if (props.stats.gamesPlayed === 0) return 0;
     return Math.round((props.stats.gamesWon / props.stats.gamesPlayed) * 100);
@@ -279,21 +303,6 @@ const lossPercentageSplit = computed(() => {
     width: 100%;
     z-index: 1000;
 
-    &.dark {
-        background-color: rgba(50, 50, 50, 0.5);
-
-        .modal-content {
-            background-color: #1f1f1f;
-            color: #e2e2e2;
-
-            .modal-header {
-                .close-button {
-                    color: #aeaeae;
-                }
-            }
-        }
-    }
-
     .modal-content {
         background-color: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -329,6 +338,7 @@ const lossPercentageSplit = computed(() => {
                     justify-content: space-between;
 
                     .display-name {
+                        border: 1px solid transparent;
                         font-weight: 400;
                         padding: .75rem .5rem;
                     }
@@ -353,10 +363,10 @@ const lossPercentageSplit = computed(() => {
 
                     .name-input {
                         padding: .75rem .5rem;
-                        border: none;
+                        border: 1px solid #cfcfcf;
                         border-radius: .25rem;
                         width: 80%;
-                        background-color: #ececec;
+                        background-color: #f0f0f0;
                         color: black;
 
                         &:focus {
