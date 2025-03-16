@@ -368,25 +368,25 @@ const getClueTitle = (index) => {
         'Nationality',
         'Age',
         'Goals + Assists',
-        'Matches Played',
+        'Games Played',
     ];
     
-    const mediumClueTitles = [
+	const mediumClueTitles = [
+		'Kit Colour',
         'Position',
-        'League', // League instead of specific club
         'Nationality', 
         'Age Range',
         'Goals + Assists',
-        'Matches Started',
+        'Games Played',
     ];
     
     const hardClueTitles = [
-        'Position Group', // Attack/Midfield/Defense instead of specific position
-        'Continent', // Continent instead of country
+        'Kit Colour',
+		'Position',
+		'Continent',
         'Age Range',
-        'League',
-        'Goal Contribution Rate', // Per 90 instead of total
-        'Minutes Played',
+        'Goal Contribution Rate',
+        'Games Played',
     ];
     
     switch (currentDifficulty.value) {
@@ -432,20 +432,31 @@ const getContinent = (nationality) => {
     return 'Other';
 };
 
-const getLeague = (team) => {
-    const premierLeagueTeams = ['Arsenal', 'Aston Villa', 'Chelsea', 'Everton', 'Liverpool', 'Manchester City', 'Manchester United', 'Newcastle', 'Tottenham', 'West Ham', 'Brighton', 'Brentford', 'Crystal Palace', 'Fulham', 'Leicester', 'Nottingham Forest', 'Southampton', 'Wolves', 'Burnley', 'Sheffield United'];
-    const laLigaTeams = ['Barcelona', 'Real Madrid', 'Atletico Madrid', 'Sevilla', 'Valencia', 'Villarreal', 'Real Sociedad', 'Athletic Bilbao', 'Real Betis', 'Getafe'];
-    const bundesligaTeams = ['Bayern Munich', 'Borussia Dortmund', 'RB Leipzig', 'Bayer Leverkusen', 'Borussia Monchengladbach', 'Wolfsburg', 'Eintracht Frankfurt', 'Union Berlin', 'SC Freiburg', 'Hoffenheim'];
-    const serieATeams = ['AC Milan', 'Inter Milan', 'Juventus', 'Napoli', 'Roma', 'Lazio', 'Atalanta', 'Fiorentina', 'Sassuolo', 'Torino'];
-    const ligue1Teams = ['PSG', 'Marseille', 'Lyon', 'Lille', 'Monaco', 'Nice', 'Rennes', 'Strasbourg', 'Lens', 'Nantes'];
+const kitColour = (team) => {
+    const redColour = ['Arsenal', 'Liverpool', 'Man United', 'Forest'];
+    const claretAndBlueColour = ['Aston Villa', 'West Ham'];
+    const redAndBlackColour = ['Bournemouth'];
+    const redAndWhiteColour = ['Brentford', 'Southampton'];
+    const blueAndWhiteColour = ['Brighton'];
+	const blueColour = ['Chelsea', 'Everton', 'Ipswich', 'Leicester', 'Man City'];
+    const blueAndRedColour = ['Palace'];
+    const whiteColour = ['Spurs', 'Fulham'];
+    const blackAndWhiteColour = ['Newcastle'];
+    const goldColour = ['Wolves'];
+
     
-    if (premierLeagueTeams.includes(team)) return 'Premier League';
-    if (laLigaTeams.includes(team)) return 'La Liga';
-    if (bundesligaTeams.includes(team)) return 'Bundesliga';
-    if (serieATeams.includes(team)) return 'Serie A';
-    if (ligue1Teams.includes(team)) return 'Ligue 1';
+    if (redColour.includes(team)) return 'Red';
+    if (claretAndBlueColour.includes(team)) return 'Claret & Blue';
+    if (redAndBlackColour.includes(team)) return 'Red & Black';
+    if (redAndWhiteColour.includes(team)) return 'Red & White';
+    if (blueAndWhiteColour.includes(team)) return 'Blue & White';
+    if (blueColour.includes(team)) return 'Blue';
+    if (blueAndRedColour.includes(team)) return 'Blue & Red';
+    if (whiteColour.includes(team)) return 'White';
+    if (blackAndWhiteColour.includes(team)) return 'Black & White';
+    if (goldColour.includes(team)) return 'Gold';
     
-    return 'Other League';
+    return 'Other Colour';
 };
 
 const getGoalContributionRate = (player) => {
@@ -468,21 +479,21 @@ const generateClues = (player, difficulty) => {
             ];
         case DIFFICULTY.MEDIUM:
             return [
+				`${kitColour(player.team)}`,
                 `${player.position}`,
                 `${player.nationality}`,
                 `${getAgeRange(player.age)}`,
-                `${getLeague(player.team)}`,
                 `${player.goalsAndAssists}`,
-                `${player.matchesStarted}`,
+                `${player.matchesPlayed}`,
             ];
         case DIFFICULTY.HARD:
             return [
-                `${getPositionGroup(player.position)}`,
+				`${kitColour(player.team)}`,
+                `${player.position}`,
                 `${getContinent(player.nationality)}`,
                 `${getAgeRange(player.age)}`,
-                `${getLeague(player.team)}`,
                 `${getGoalContributionRate(player)}`,
-                `${player.minutesPlayed}`,
+                `${player.matchesPlayed}`,
             ];
         default:
             return [
@@ -807,7 +818,6 @@ const startNewGame = () => {
 					padding: 0;
 					margin: 0;
 					border: none;
-					border-radius: 4px;
 					background-color: #f3f7ff;
 					font-size: .8rem;
 					max-height: 200px;
@@ -921,7 +931,6 @@ const startNewGame = () => {
 				.difficulty-badge {
 					display: inline-block;
 					padding: .5rem;
-					border-radius: 4px;
 					font-weight: 400;
 					margin-bottom: .5rem;
 					width: 100%;
@@ -1006,7 +1015,6 @@ const startNewGame = () => {
 					.difficulty-badge {
 						display: inline-block;
 						padding: .5rem;
-						border-radius: 4px;
 						font-weight: 400;
 						width: 100%;
 

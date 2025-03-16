@@ -135,6 +135,44 @@
                         <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
                     </div>
                 </div>
+
+                <div class="difficulty-results">
+                    <p>Wins by difficulty</p>
+
+                    <div class="stat-section">
+                        <div class="stat-type minimal">
+                            <div class="stat-container">
+                                <span class="stat-value">{{ stats.easyGamesWon }}</span>
+                            </div>
+
+                            <p class="stat-label difficulty-badge difficulty-easy">Easy</p>
+                        </div>
+
+                        <div class="stat-type minimal">
+                            <div class="stat-container">
+                                <span class="stat-value">{{ stats.mediumGamesWon }}</span>
+                            </div>
+
+                            <p class="stat-label difficulty-badge difficulty-medium">Medium</p>
+                        </div>
+
+                        <div class="stat-type minimal">
+                            <div class="stat-container">
+                                <span class="stat-value">{{ stats.hardGamesWon }}</span>
+                            </div>
+
+                            <p class="stat-label difficulty-badge difficulty-hard">Hard</p>
+                        </div>
+
+                        <div class="stat-type minimal">
+                            <div class="stat-container">
+                                <span class="stat-value">{{ stats.totalPoints }}</span>
+                            </div>
+
+                            <p class="stat-label">Points</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -309,14 +347,23 @@ const lossPercentageSplit = computed(() => {
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        padding: 1.25rem;
-        width: 100%;
+        height: 100%;
+        overflow: scroll;
+        position: absolute;
+        top: 0;
         max-width: 600px;
+        width: 100%;
 
         .modal-header {
             align-items: center;
+            background-color: white;
+            border-bottom: 1px solid #cfcfcf;
             display: flex;
             justify-content: space-between;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 9999;
 
             .close-button {
                 border: none;
@@ -327,6 +374,8 @@ const lossPercentageSplit = computed(() => {
         }
 
         .modal-body {
+            padding: 0 1rem 1rem;
+
             .user-profile-section {
                 margin-bottom: 1rem;
                 padding: .5rem 0;
@@ -364,7 +413,6 @@ const lossPercentageSplit = computed(() => {
                     .name-input {
                         padding: .75rem .5rem;
                         border: 1px solid #cfcfcf;
-                        border-radius: .25rem;
                         width: 80%;
                         background-color: #f0f0f0;
                         color: black;
@@ -383,7 +431,6 @@ const lossPercentageSplit = computed(() => {
                         .save-btn, .cancel-btn {
                             padding: 6px 12px;
                             border: none;
-                            border-radius: 4px;
                             cursor: pointer;
                             font-weight: bold;
                             font-size: 1.5rem;
@@ -425,6 +472,30 @@ const lossPercentageSplit = computed(() => {
 
                         .stat-value {
                             font-size: 2rem !important;
+                        }
+                    }
+
+                    .difficulty-badge {
+                        display: flex;
+                        font-size: 0.8rem;
+                        justify-content: center;
+                        padding: .5rem;
+                        margin: 0 -.5rem -.5rem;
+                        width: calc(100% + 1rem);
+
+                        &.difficulty-easy {
+                            background-color: #4CAF50;
+                            color: white;
+                        }
+
+                        &.difficulty-medium {
+                            background-color: #FF9800;
+                            color: white;
+                        }
+
+                        &.difficulty-hard {
+                            background-color: #F44336;
+                            color: white;
                         }
                     }
 
@@ -544,11 +615,7 @@ const lossPercentageSplit = computed(() => {
                 flex-direction: column;
                 gap: .5rem;
                 justify-content: center;
-                margin-top: 1rem;
-
-                .stat-label {
-                    margin-right: 1rem;
-                }
+                margin: 1rem auto;
 
                 .chips {
                     display: flex;
@@ -568,6 +635,14 @@ const lossPercentageSplit = computed(() => {
                         }
                     }
                 }
+            }
+
+            .difficulty-results {
+                display: flex;
+                flex-direction: column;
+                gap: .5rem;
+                margin-top: 1rem;
+                text-align: center;
             }
         }
     }

@@ -242,7 +242,6 @@
 		input[type="number"] {
 			padding: 0.75rem;
 			border: 1px solid #ddd;
-			border-radius: 4px;
 			font-size: 1rem;
 			outline: none;
 
@@ -272,7 +271,6 @@
 		background-color: #007bff;
 		color: white;
 		border: none;
-		border-radius: 4px;
 		font-size: 1rem;
 		cursor: pointer;
 		transition: background-color 0.3s ease;

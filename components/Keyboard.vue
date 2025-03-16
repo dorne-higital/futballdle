@@ -85,7 +85,6 @@
 				align-items: center;
 				background-color: #f6f6f6;
 				border: 1px solid #ccc;
-				border-radius: 0.25rem;
 				cursor: pointer;
 				display: flex;
 				flex: 1;
