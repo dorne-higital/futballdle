@@ -41,11 +41,16 @@ export const usePlayerStore = defineStore('players', () => {
         if (players.value.length === 0) {
             return null;
         }
+
+        console.log('Looking for players with difficulty:', difficulty);
+        console.log('Players available:', players.value.length);
         
         // Filter players by difficulty level
         const filteredPlayers = players.value.filter(player => 
-            player.difficulty === difficulty
+            Number(player.difficulty) === Number(difficulty)
         );
+
+        console.log(`Found ${filteredPlayers.length} players for difficulty ${difficulty}`);
         
         // If no players found for this difficulty, fallback to any player
         if (filteredPlayers.length === 0) {

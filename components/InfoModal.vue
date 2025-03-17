@@ -74,20 +74,6 @@
 		top: 0;
 		width: 100%;
 		z-index: 1000;
-
-		&.dark {
-			background-color: rgba(50, 50, 50, 0.5);
-
-			.modal-content {
-				background-color: #1f1f1f;
-
-				.modal-header{
-					.close-button {
-						color: #aeaeae;
-					}
-				}
-			}
-		}
 	
 		.modal-content {
 			background-color: white;
@@ -102,13 +88,6 @@
 				align-items: center;
 				display: flex;
 				justify-content: space-between;
-		
-				.close-button {
-					border: none;
-					color: #292929;
-					cursor: pointer;
-					font-size: 1.75rem;
-				}
 			}
 	
 			.modal-body {

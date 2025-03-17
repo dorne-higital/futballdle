@@ -281,21 +281,6 @@ const countryIconMap = {
     width: 100%;
     z-index: 1000;
 
-    &.dark {
-        background-color: rgba(50, 50, 50, 0.5);
-
-        .modal-content {
-            background-color: #1f1f1f;
-            color: #e2e2e2;
-
-            .modal-header {
-                .close-button {
-                    color: #aeaeae;
-                }
-            }
-        }
-    }
-
     .modal-content {
         background-color: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -309,41 +294,10 @@ const countryIconMap = {
             align-items: center;
             display: flex;
             justify-content: space-between;
-
-			.close-button {
-				border: none;
-				color: #292929;
-				cursor: pointer;
-				font-size: 1.75rem;
-			}
         }
 
         .guesses {
 			width: 100%;
-
-			.difficulty-badge {
-				display: flex;
-				font-size: 0.8rem;
-				font-weight: bold;
-				justify-content: space-between;
-				padding: .5rem;
-				width: 100%;
-
-				&.difficulty-easy {
-					background-color: #4CAF50;
-					color: white;
-				}
-
-				&.difficulty-medium {
-					background-color: #FF9800;
-					color: white;
-				}
-
-				&.difficulty-hard {
-					background-color: #F44336;
-					color: white;
-				}
-			}
         }
 
         .modal-body {

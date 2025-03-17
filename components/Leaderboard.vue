@@ -251,24 +251,28 @@
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
-			padding: 1.25rem;
-			width: 100%;
+			height: 100%;
+			overflow: scroll;
+			position: absolute;
+			top: 0;
 			max-width: 600px;
+			width: 100%;
 
 			.modal-header {
 				align-items: center;
+				background-color: white;
+				border-bottom: 1px solid #cfcfcf;
 				display: flex;
 				justify-content: space-between;
-
-				.close-button {
-					border: none;
-					color: #292929;
-					cursor: pointer;
-					font-size: 1.75rem;
-				}
+				padding: 1rem;
+				position: sticky;
+				top: 0;
+				z-index: 9999;
 			}
 
 			.modal-body {
+				padding: 0 1rem 1rem;
+				
 				.leaderboard-list {
 					width: 100%;
   

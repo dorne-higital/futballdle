@@ -77,10 +77,6 @@
 		padding: 1rem;
 		width: 100%;
 		z-index: 2;
-
-		&.dark {
-			box-shadow: 0px 0px 15px 0px #595959;
-		}
 	}
 
 	.icons {

@@ -67,14 +67,6 @@
 		flex-direction: column;
 		margin-top: 1.25rem;
 		width: 100%;
-
-		&.dark {
-			.keyboard-row .keyboard-key {
-				background-color: #272727;
-				border: 1px solid #000000;
-				color: #e2e2e2;
-			}
-		}
   
 		.keyboard-row {
 			display: flex;

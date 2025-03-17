@@ -85,7 +85,7 @@
                     <span class="difficulty-badge" :class="getDifficultyClass(index)">{{ getDifficultyLabel(index) }}</span>
                 </p>
                 <span class="summary-row">
-                    <p>Winning Player</p>
+                    <p>Player</p>
                     <p>{{ summary.targetPlayer.name }}</p>
                 </span>
                 <span class="summary-row">
@@ -363,30 +363,30 @@ const saveGameData = () => {
 const getClueTitle = (index) => {
     // Different clue sets based on difficulty
     const easyClueTitles = [
-		'Club',
+        'Club',
+        'Initials',
         'Position',
         'Nationality',
         'Age',
         'Goals + Assists',
-        'Games Played',
     ];
     
 	const mediumClueTitles = [
-		'Kit Colour',
+        'Team Nickname',
+        'Name',
         'Position',
         'Nationality', 
         'Age Range',
-        'Goals + Assists',
-        'Games Played',
+        'Initials',
     ];
     
     const hardClueTitles = [
         'Kit Colour',
 		'Position',
-		'Continent',
+		'Nationality',
         'Age Range',
-        'Goal Contribution Rate',
         'Games Played',
+        'Name',
     ];
     
     switch (currentDifficulty.value) {
@@ -423,11 +423,11 @@ const getContinent = (nationality) => {
     const southAmericanCountries = ['Brazil', 'Argentina', 'Uruguay', 'Colombia', 'Chile', 'Ecuador', 'Paraguay', 'Peru', 'Venezuela', 'Bolivia'];
     const africanCountries = ['Senegal', 'Ghana', 'Nigeria', 'Ivory Coast', 'Egypt', 'Morocco', 'Algeria', 'Tunisia', 'Cameroon', 'South Africa'];
     
-    if (europeanCountries.includes(nationality)) return 'Europe';
-    if (southAmericanCountries.includes(nationality)) return 'South America';
-    if (africanCountries.includes(nationality)) return 'Africa';
-    if (['USA', 'Canada', 'Mexico', 'Jamaica', 'Costa Rica', 'Honduras'].includes(nationality)) return 'North America';
-    if (['Japan', 'South Korea', 'China', 'Australia', 'Saudi Arabia', 'Iran', 'Qatar', 'UAE', 'New Zealand'].includes(nationality)) return 'Asia/Oceania';
+    if (europeanCountries.includes(nationality)) return 'European';
+    if (southAmericanCountries.includes(nationality)) return 'South American';
+    if (africanCountries.includes(nationality)) return 'African';
+    if (['USA', 'Canada', 'Mexico', 'Jamaica', 'Costa Rica', 'Honduras'].includes(nationality)) return 'North American';
+    if (['Japan', 'South Korea', 'China', 'Australia', 'Saudi Arabia', 'Iran', 'Qatar', 'UAE', 'New Zealand'].includes(nationality)) return 'Asian/Oceania';
     
     return 'Other';
 };
@@ -467,24 +467,41 @@ const getGoalContributionRate = (player) => {
 };
 
 const generateClues = (player, difficulty) => {
+    const nameLength = player.name.split(' ')
+        .map(part => '_'.repeat(part.length))
+        .join('/');
+
+    const nameInitials = player.name.split(' ')
+        .map(part => part[0] + '_'.repeat(part.length - 1))
+        .join(' ');
+
+    const nameInitialsEnd = player.name.split(' ')
+        .map(part => {
+            if (part.length === 1) {
+                return part; // If it's just one letter, show it
+            }
+            return part[0] + '_'.repeat(part.length - 2) + part[part.length - 1];
+        })
+        .join(' ');
+
     switch (difficulty) {
         case DIFFICULTY.EASY:
             return [
-				`${player.team}`,
+                `${player.team}`,
+                `${nameInitials}`,
                 `${player.position}`,
                 `${player.nationality}`,
                 `${player.age}`,
                 `${player.goalsAndAssists}`,
-                `${player.matchesPlayed}`,
             ];
         case DIFFICULTY.MEDIUM:
             return [
-				`${kitColour(player.team)}`,
+                `${player.nickname}`,
+                `${nameLength}`,
                 `${player.position}`,
                 `${player.nationality}`,
                 `${getAgeRange(player.age)}`,
-                `${player.goalsAndAssists}`,
-                `${player.matchesPlayed}`,
+                `${nameInitialsEnd}`,
             ];
         case DIFFICULTY.HARD:
             return [
@@ -492,8 +509,8 @@ const generateClues = (player, difficulty) => {
                 `${player.position}`,
                 `${getContinent(player.nationality)}`,
                 `${getAgeRange(player.age)}`,
-                `${getGoalContributionRate(player)}`,
                 `${player.matchesPlayed}`,
+                `${nameInitials}`,
             ];
         default:
             return [
@@ -618,14 +635,14 @@ const updateStats = (gameWon) => {
             statsStore.stats.mediumGamesPlayed++;
             if (gameWon) {
                 statsStore.stats.mediumGamesWon++;
-                statsStore.stats.totalPoints += 2; // 2 points for medium win
+                statsStore.stats.totalPoints += 3; // 3 points for medium win
             }
             break;
         case DIFFICULTY.HARD:
             statsStore.stats.hardGamesPlayed++;
             if (gameWon) {
                 statsStore.stats.hardGamesWon++;
-                statsStore.stats.totalPoints += 3; // 3 points for hard win
+                statsStore.stats.totalPoints += 5; // 5 points for hard win
             }
             break;
     }
@@ -928,29 +945,6 @@ const startNewGame = () => {
 				flex-direction: column;
 				width: 100%;
 
-				.difficulty-badge {
-					display: inline-block;
-					padding: .5rem;
-					font-weight: 400;
-					margin-bottom: .5rem;
-					width: 100%;
-
-					&.difficulty-easy {
-						background-color: #4CAF50;
-						color: white;
-					}
-
-					&.difficulty-medium {
-						background-color: #FF9800;
-						color: white;
-					}
-
-					&.difficulty-hard {
-						background-color: #F44336;
-						color: white;
-					}
-				}
-
 				.clues-row {
 					display: flex;
 					flex-direction: column;
@@ -976,7 +970,8 @@ const startNewGame = () => {
 						}
 
 						.clue {
-							font-size: 1.2rem;
+							font-size: 1rem;
+                            letter-spacing: 2px;
 						}
 
 						.clue-title {
@@ -1011,28 +1006,6 @@ const startNewGame = () => {
 					gap: .5rem;
 					justify-content: center;
 					padding-bottom: .5rem;
-
-					.difficulty-badge {
-						display: inline-block;
-						padding: .5rem;
-						font-weight: 400;
-						width: 100%;
-
-						&.difficulty-easy {
-							background-color: #4CAF50;
-							color: white;
-						}
-
-						&.difficulty-medium {
-							background-color: #FF9800;
-							color: white;
-						}
-
-						&.difficulty-hard {
-							background-color: #F44336;
-							color: white;
-						}
-					}
 				}
 
 				&.game-won {
@@ -1058,25 +1031,6 @@ const startNewGame = () => {
 					flex-direction: row;
 					justify-content: space-between;
 				}
-			}
-		}
-
-		&.dark {
-			input,
-			button,
-			.clues,
-			.guesses-display {
-				background-color: #333;
-				color: #fff;
-				border-color: #555;
-			}
-
-			button {
-				background-color: #66bb6a;
-			}
-
-			.win-message {
-				background-color: #4a7a4c;
 			}
 		}
 	}
