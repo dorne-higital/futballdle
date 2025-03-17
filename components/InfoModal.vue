@@ -27,18 +27,42 @@
 				<p class="descriptive-list">
 					Clues will vary from:
 
-					<ul>
-						<li>Age</li>
-						<li>Position</li>
-						<li>Goals + Assists combined this season</li>
-					</ul>
+					<br>
+					<span class="tag-container">
+						<span class="tag">Age</span>
+						<span class="tag">Nationality</span>
+						<span class="tag">Goals & Assists</span>
+						<span class="tag">Club</span>
+						<span class="tag">Position</span>
+						<span class="tag">Games Played</span>
+					</span>
 
-					<span>plus others...</span>
+				</p>
+
+				<h5>The Game Types</h5>
+
+				<p class="description">
+					<span class="difficulty-badge difficulty-easy minimal">Easy</span> | 
+					This will be a player from a "Big 6" club, and clues will be slightly easier to get.
 				</p>
 
 				<p class="description">
-					You get 3 plays per day. Check on your stats each day to see how you're getting on!
+					<span class="difficulty-badge difficulty-medium minimal">Medium</span> |
+					Clues will be slightly more cryptic, bit still very gettable. Players from this tend to come from top half, or established 
+					Premier League teams not with the "Big 6".
 				</p>
+
+				<p class="description">
+					<span class="difficulty-badge difficulty-hard minimal">Hard</span> |
+					Clues will test your knowledge on Premier League teams. Players will come from less established teams.
+				</p>
+
+				<button
+					class="button primary"
+					@click="closeModal"
+				>
+					Play Now
+				</button>
 			</div>
 		</div>
 	</div>

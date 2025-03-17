@@ -113,6 +113,30 @@ ul, li, span, sup {
     font-size: 1.75rem;
 }
 
+.button {
+    background: transparent;
+    border: none;
+
+    &.primary {
+        background-color: #8edf91;
+        font-size: 1.2rem;
+        padding: .5rem;
+    }
+}
+
+.tag-container {
+    display: flex;
+    gap: .2rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: .5rem auto;
+
+    .tag {
+        background-color: #a8c1f9;
+        padding: .2rem .5rem;
+    }
+}
+
 .difficulty-badge {
     display: flex;
     font-weight: 400;
@@ -134,5 +158,11 @@ ul, li, span, sup {
     &.difficulty-hard {
         background-color: $hard-primary;
         color: #000000;
+    }
+
+    &.minimal {
+        display: inline-block;
+        padding: .2rem .5rem;
+        width: fit-content;
     }
 }
