@@ -166,3 +166,7 @@ ul, li, span, sup {
         width: fit-content;
     }
 }
+
+.floatingchat-container-wrap-mobi {
+    left: calc(100% - 180px) !important;
+}

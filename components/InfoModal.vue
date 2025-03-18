@@ -70,6 +70,47 @@
   
 <script setup>
 	import { defineProps, defineEmits } from 'vue';
+	import { onMounted } from 'vue';
+	import { useHead } from '#imports';
+
+	useHead({
+	script: [
+		{
+		src: 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js',
+		defer: true,
+		},
+	],
+	});
+
+	onMounted(() => {
+		// Check if script is already loaded
+	if (!document.querySelector('script[src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"]')) {
+		const script = document.createElement('script');
+		script.src = 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js';
+		script.defer = true;
+		script.onload = () => {
+			if (window.kofiWidgetOverlay) {
+				window.kofiWidgetOverlay.draw('danhorne', {
+				type: 'floating-chat',
+				'floating-chat.donateButton.text': 'Support me',
+				'floating-chat.donateButton.background-color': '#ff5f5f',
+				'floating-chat.donateButton.text-color': '#fff',
+				});
+			}
+			};
+			document.body.appendChild(script);
+		} else {
+			// If already loaded, just initialize
+			if (window.kofiWidgetOverlay) {
+			window.kofiWidgetOverlay.draw('danhorne', {
+				type: 'floating-chat',
+				'floating-chat.donateButton.text': 'Support me',
+				'floating-chat.donateButton.background-color': '#ff5f5f',
+				'floating-chat.donateButton.text-color': '#fff',
+			});
+			}
+		}
+	});
 
 	const props = defineProps({
 		isOpen: Boolean,
@@ -128,6 +169,7 @@
 				display: flex;
 				flex-direction: column;
 				gap: .5rem;
+				margin-bottom: 3.5rem;
 				padding: 0 1rem 1rem;
 
 				.description {
