@@ -105,19 +105,30 @@
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
-			padding: 1.25rem;
+			height: 100%;
+			overflow: scroll;
+			position: absolute;
+			top: 0;
+			max-width: 600px;
 			width: 100%;
 
 			.modal-header {
 				align-items: center;
+				background-color: white;
+				border-bottom: 1px solid #cfcfcf;
 				display: flex;
 				justify-content: space-between;
+				padding: 1rem;
+				position: sticky;
+				top: 0;
+				z-index: 9999;
 			}
 	
 			.modal-body {
 				display: flex;
 				flex-direction: column;
 				gap: .5rem;
+				padding: 0 1rem 1rem;
 
 				.description {
 					padding-bottom: 1rem;
