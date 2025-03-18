@@ -6,7 +6,7 @@
 	>
 		<div class="modal-content">
 			<div class="modal-header">
-				<h2>Footballdle</h2>
+				<h1>Footballdle</h1>
 					
 				<Icon 
 					class="close-button"

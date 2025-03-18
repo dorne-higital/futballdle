@@ -2,7 +2,7 @@
     <div v-if="isOpen && stats" :class="{ 'dark': darkMode }" class="stats-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Your Stats</h3>
+                <h1>Your Stats</h1>
                     
                 <Icon 
                     class="close-button"

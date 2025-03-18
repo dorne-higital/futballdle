@@ -2,7 +2,7 @@
 	<div :class="{ 'dark': darkMode }" class="leaderboard-modal">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h3>Leaderboard</h3>
+				<h1>Leaderboard</h1>
 
 				<Icon 
 					class="close-button"
@@ -281,7 +281,7 @@
 						font-weight: 400;
 						grid-template-columns: 60px 1fr 80px;
 						letter-spacing: .07rem;
-						padding: 8px 0;
+						padding: .75rem 0;
 
 						.rank {
 							text-align: center;
@@ -300,13 +300,20 @@
 					}
 
 					.leaderboard-header {
+						background-color: #0046dd;
+						border-bottom: 1px solid #eee;
+						color: white;
 						font-size: .8rem;
 						font-weight: 400;
-						border-bottom: 1px solid #eee;
 					}
 
 					.leaderboard-item {
+						background-color: #fafafa;
 						border-bottom: 1px solid #f5f5f5;
+
+						&:nth-child(even) {
+							background-color: #ffffff;
+						}
 
 						&.current-user {
 							background-color: rgba(0, 128, 255, 0.1);
