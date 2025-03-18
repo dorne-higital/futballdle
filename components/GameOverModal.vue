@@ -287,13 +287,21 @@ const countryIconMap = {
         display: flex;
         flex-direction: column;
         gap: 1rem;
-        padding: 1.25rem;
+		max-height: 80%;
+		overflow: scroll;
+		position: relative;
         width: 100%;
 
         .modal-header {
-            align-items: center;
-            display: flex;
-            justify-content: space-between;
+			align-items: center;
+			background-color: white;
+			border-bottom: 1px solid #cfcfcf;
+			display: flex;
+			justify-content: space-between;
+			padding: 1rem;
+			position: sticky;
+			top: 0;
+			z-index: 9999;
         }
 
         .guesses {
@@ -302,6 +310,7 @@ const countryIconMap = {
 
         .modal-body {
             text-align: left;
+			padding: 0 1rem 1rem;
 
 			.player-stats {
 				display: flex;
