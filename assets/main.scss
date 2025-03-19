@@ -13,6 +13,10 @@ $easy-primary: #8edf91;
 $medium-primary: #ffe670;
 $hard-primary: #ff8178;
 
+$easy-primary-border: #52c656;
+$medium-primary-border: #e4c945;
+$hard-primary-border: #ec584d;
+
 html, body, div, span,
 h1, h2, h3, h4, h5, h6,
 p, img, sub, sup,
@@ -151,16 +155,19 @@ ul, li, span, sup {
 
     &.difficulty-easy {
         background-color: $easy-primary;
+        border: 1px solid $easy-primary-border;
         color: #000000;
     }
 
     &.difficulty-medium {
         background-color: $medium-primary;
+        border: 1px solid $medium-primary-border;
         color: #000000;
     }
 
     &.difficulty-hard {
         background-color: $hard-primary;
+        border: 1px solid $hard-primary-border;
         color: #000000;
     }
 

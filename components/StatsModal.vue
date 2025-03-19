@@ -472,6 +472,10 @@ const lossPercentageSplit = computed(() => {
                             .stat-label {
                                 padding: .5rem;
                             }
+
+                            .difficulty-badge {
+                                border-radius: 0 0 .5rem .5rem;
+                            }
                         }
 
                         .stat-container {
