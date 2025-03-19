@@ -274,6 +274,7 @@
 				padding: 0 1rem 1rem;
 				
 				.leaderboard-list {
+					border-radius: .5rem;
 					width: 100%;
   
 					.leaderboard-header, .leaderboard-item {
@@ -302,6 +303,7 @@
 					.leaderboard-header {
 						background-color: #6290f3;
 						border: 1px solid #346eea;
+						border-radius: .5rem .5rem 0 0;
 						color: white;
 						font-size: .8rem;
 						font-weight: 400;
@@ -314,6 +316,10 @@
 
 						&:nth-child(even) {
 							background-color: #ffffff;
+						}
+
+						&:last-child {
+							border-radius: 0 0 .5rem .5rem;
 						}
 
 						&.current-user {

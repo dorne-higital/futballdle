@@ -456,6 +456,7 @@ const lossPercentageSplit = computed(() => {
                     .stat-type {
                         background-color: #f0f0f0;
                         border: 1px solid #cfcfcf;
+                        border-radius: .5rem;
                         padding: .5rem;
                         text-align: center;
                         width: calc(50% - .25rem);
@@ -487,11 +488,12 @@ const lossPercentageSplit = computed(() => {
                         }
 
                         .pie-chart-container {
-                            width: 100%;
-                            position: relative;
+                            align-items: center;
                             display: flex;
                             justify-content: center;
-                            align-items: center;
+                            padding: .5rem;
+                            position: relative;
+                            width: 100%;
                         }
 
                         .pie-chart {
@@ -504,14 +506,14 @@ const lossPercentageSplit = computed(() => {
 
                             .pie-chart-inner {
                                 position: absolute;
-                                width: 70%;
-                                height: 70%;
+                                width: 65%;
+                                height: 65%;
                                 background-color: #f0f0f0;
                                 border-radius: 50%;
                             }
 
                             .stat-value {
-                                font-size: 2.5rem;
+                                font-size: 2rem;
                                 font-weight: 300;
                                 z-index: 10;
                             }

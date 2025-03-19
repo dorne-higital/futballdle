@@ -116,6 +116,7 @@ ul, li, span, sup {
 .button {
     background: transparent;
     border: none;
+    border-radius: .5rem;
 
     &.primary {
         background-color: #8edf91;
@@ -134,11 +135,13 @@ ul, li, span, sup {
 
     .tag {
         background-color: #a8c1f9;
+        border-radius: .25rem;
         padding: .2rem .5rem;
     }
 }
 
 .difficulty-badge {
+    border-radius: .25rem;
     display: flex;
     font-weight: 400;
     gap: .5rem;

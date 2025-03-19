@@ -609,7 +609,6 @@ const updateStats = (gameWon) => {
     switch (currentDifficulty.value) {
         case DIFFICULTY.EASY:
             statsStore.stats.easyGamesPlayed++;
-            statsStore.stats.easyGamesWon++;
             if (gameWon) {
                 statsStore.stats.easyGamesWon++;
 
@@ -990,6 +989,7 @@ const startNewGame = () => {
 		.game-summaries {
 			background-color: #f0f0f0;
 			border: 1px solid #cfcfcf;
+            border-radius: .5rem;
 			display: flex;
 			flex-direction: column;
 			gap: .5rem;
@@ -999,6 +999,7 @@ const startNewGame = () => {
 			width: 100%;
 
 			.prev-games {
+                border-radius: .375rem;
 				display: flex;
 				flex-direction: column;
 				gap: .3rem;
