@@ -554,6 +554,7 @@ const lossPercentageSplit = computed(() => {
                         flex: 1;
                         display: flex;
                         align-items: center;
+                        border-radius: .25rem;
                         background-color: #d24f4f; /* Dark background */
                         overflow: hidden;
                         position: relative;
@@ -598,9 +599,10 @@ const lossPercentageSplit = computed(() => {
                         gap: .5rem;
 
                         .chip {
-                            width: .75rem;
-                            height: 1.5rem;
+                            border-radius: .25rem;
                             display: inline-block;
+                            height: 1.5rem;
+                            width: .75rem;
 
                             &.green {
                                 background-color: #88bd8a;

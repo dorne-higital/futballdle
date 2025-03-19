@@ -306,6 +306,10 @@ const countryIconMap = {
 
         .guesses {
 			width: 100%;
+
+			.difficulty-badge {
+				border-radius: 0;
+			}
         }
 
         .modal-body {
@@ -333,6 +337,7 @@ const countryIconMap = {
 					.stat-item {
 						background-color: #f0f0f0;
 						border: 1px solid #cfcfcf;
+						border-radius: .5rem;
 						display: flex;
 						flex-direction: column;
 						gap: .5rem;

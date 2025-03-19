@@ -799,6 +799,14 @@ const startNewGame = () => {
 					background-color: #ffefef;
 				}
 
+                &:first-of-type {
+                    border-radius: .5rem .5rem 0 0;
+                }
+
+                &:last-of-type {
+                    border-radius: 0 0 .5rem .5rem;
+                }
+
 				span {
 					background-color: #d24f4f;
 				}
@@ -823,6 +831,7 @@ const startNewGame = () => {
 					background-color: #f3f7ff;
 					border: none;
 					border-bottom: 2px solid #3f50e9;
+                    border-radius: .5rem;
 					font-size: 1rem;
 					letter-spacing: .1rem;
 					padding: .75rem;
@@ -886,6 +895,7 @@ const startNewGame = () => {
 		.clues {
 			background-color: #f0f0f0;
 			border: 1px solid #cfcfcf;
+            border-radius: .5rem;
 			bottom: 1rem;
 			margin: 0 2rem;
 			max-width: 400px;
@@ -901,6 +911,7 @@ const startNewGame = () => {
 			.win-message {
 				background-color: #d6fad7;
 				border: 1px solid #88bd8a;
+                border-radius: .375rem;
 				padding: .75rem;
 				width: 100%;
 
@@ -915,6 +926,7 @@ const startNewGame = () => {
 				button {
 					background-color: #88bd8a;
 					border: 1px solid #567c57;
+                    border-radius: .25rem;
 					color: #000000;
 					padding: .75rem;
 					width: 100%;
@@ -924,6 +936,7 @@ const startNewGame = () => {
 			.lose-message {
 				background-color: #ffe5e5;
 				border: 1px solid #d24f4f;
+                border-radius: .375rem;
 				padding: .75rem;
 				width: 100%;
 
@@ -938,6 +951,7 @@ const startNewGame = () => {
 				button {
 					background-color: #f67c7c;
 					border: 1px solid #d24f4f;
+                    border-radius: .25rem;
 					color: #000000;
 					padding: .75rem;
 					width: 100%;
@@ -949,11 +963,23 @@ const startNewGame = () => {
 				flex-direction: column;
 				width: 100%;
 
+                .difficulty-badge {
+                    border-radius: .5rem .5rem 0 0;
+                }
+
 				.clues-row {
 					display: flex;
 					flex-direction: column;
 					justify-content: space-between;
 					width: 100%;
+
+                    &:last-child {
+                        .clue-item {
+                            &:last-child {
+                                border-radius: 0 0 .375rem .375rem;
+                            }
+                        }
+                    }
 
 					.clue-item {
 						align-items: center;
