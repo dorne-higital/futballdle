@@ -106,7 +106,7 @@
 		}
 		
 		// Default to truncated ID
-		return player.userId ? player.userId.substring(0, 10) + (player.userId.length > 10 ? '...' : '') : 'Anonymous Player';
+		return player.userId ? player.userId.substring(0, 15) + (player.userId.length > 15 ? '...' : '') : 'Anonymous Player';
 	};
 
 	// Load cached display names from localStorage
@@ -300,8 +300,8 @@
 					}
 
 					.leaderboard-header {
-						background-color: #0046dd;
-						border-bottom: 1px solid #eee;
+						background-color: #6290f3;
+						border: 1px solid #346eea;
 						color: white;
 						font-size: .8rem;
 						font-weight: 400;
@@ -309,7 +309,8 @@
 
 					.leaderboard-item {
 						background-color: #fafafa;
-						border-bottom: 1px solid #f5f5f5;
+						border: 1px solid #346eea;
+						border-top: 0;
 
 						&:nth-child(even) {
 							background-color: #ffffff;

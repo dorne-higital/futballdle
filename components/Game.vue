@@ -370,25 +370,25 @@ const getClueTitle = (index) => {
         'Age',
         'Goals + Assists',
     ];
-    
-	const mediumClueTitles = [
+
+    const mediumClueTitles = [
         'Team Nickname',
         'Name',
         'Position',
-        'Nationality', 
+        'Nationality',
         'Age Range',
         'Initials',
     ];
-    
+
     const hardClueTitles = [
         'Kit Colour',
-		'Position',
-		'Nationality',
+        'Position',
+        'Nationality',
         'Age Range',
         'Games Played',
         'Name',
     ];
-    
+
     switch (currentDifficulty.value) {
         case DIFFICULTY.EASY:
             return easyClueTitles[index];
@@ -398,16 +398,6 @@ const getClueTitle = (index) => {
             return hardClueTitles[index];
         default:
             return easyClueTitles[index];
-    }
-};
-
-const getPositionGroup = (position) => {
-    if (['Striker', 'Forward', 'Center-Forward', 'Right Winger', 'Left Winger'].includes(position)) {
-        return 'Attack';
-    } else if (['Central Midfield', 'Defensive Midfield', 'Attacking Midfield', 'Right Midfielder', 'Left Midfielder'].includes(position)) {
-        return 'Midfield';
-    } else {
-        return 'Defense';
     }
 };
 
@@ -439,7 +429,7 @@ const kitColour = (team) => {
     const redAndWhiteColour = ['Brentford', 'Southampton'];
     const blueAndWhiteColour = ['Brighton'];
 	const blueColour = ['Chelsea', 'Everton', 'Ipswich', 'Leicester', 'Man City'];
-    const blueAndRedColour = ['Palace'];
+    const blueAndRedColour = ['Crystal Palace'];
     const whiteColour = ['Spurs', 'Fulham'];
     const blackAndWhiteColour = ['Newcastle'];
     const goldColour = ['Wolves'];
@@ -457,13 +447,6 @@ const kitColour = (team) => {
     if (goldColour.includes(team)) return 'Gold';
     
     return 'Other Colour';
-};
-
-const getGoalContributionRate = (player) => {
-    const totalMinutes = player.minutesPlayed || 1;
-    const totalContributions = player.goalsAndAssists || 0;
-    const rate = (totalContributions / totalMinutes) * 90;
-    return rate.toFixed(2) + ' per 90';
 };
 
 const generateClues = (player, difficulty) => {
@@ -626,23 +609,45 @@ const updateStats = (gameWon) => {
     switch (currentDifficulty.value) {
         case DIFFICULTY.EASY:
             statsStore.stats.easyGamesPlayed++;
+            statsStore.stats.easyGamesWon++;
             if (gameWon) {
                 statsStore.stats.easyGamesWon++;
-                statsStore.stats.totalPoints += 1; // 1 point for easy win
+
+                if (guesses.value.length <= 2) {
+                    statsStore.stats.totalPoints += 3;
+                } else if (guesses.value.length <= 4) {
+                    statsStore.stats.totalPoints += 2;
+                } else {
+                    statsStore.stats.totalPoints += 1;
+                }
 			}
 			break;
         case DIFFICULTY.MEDIUM:
             statsStore.stats.mediumGamesPlayed++;
             if (gameWon) {
                 statsStore.stats.mediumGamesWon++;
-                statsStore.stats.totalPoints += 3; // 3 points for medium win
+
+                if (guesses.value.length <= 2) {
+                    statsStore.stats.totalPoints += 6;
+                } else if (guesses.value.length <= 4) {
+                    statsStore.stats.totalPoints += 4;
+                } else {
+                    statsStore.stats.totalPoints += 2;
+                }
             }
             break;
         case DIFFICULTY.HARD:
             statsStore.stats.hardGamesPlayed++;
             if (gameWon) {
                 statsStore.stats.hardGamesWon++;
-                statsStore.stats.totalPoints += 5; // 5 points for hard win
+
+                if (guesses.value.length <= 2) {
+                    statsStore.stats.totalPoints += 9;
+                } else if (guesses.value.length <= 4) {
+                    statsStore.stats.totalPoints += 6;
+                } else {
+                    statsStore.stats.totalPoints += 3;
+                }
             }
             break;
     }
