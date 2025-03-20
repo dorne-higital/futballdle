@@ -275,8 +275,6 @@ const saveName = async () => {
         
         // Emit event so parent components can update if needed
         emit('nameUpdated', trimmedName);
-        
-        console.log("Display name updated successfully");
     } catch (error) {
         console.error("Error updating display name:", error);
         // At least save to localStorage even if Firebase fails

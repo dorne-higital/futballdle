@@ -89,17 +89,13 @@
 
     const handleNameUpdate = (newName) => {
         console.log("User display name updated:", newName);
-        // You might want to update the name in other parts of your app
-        // Maybe refresh leaderboard or header display
     };
 
     const openLeaderboard = () => {
-        console.log("Opening leaderboard modal");
         isLeaderboardModalOpen.value = true;
     };
 
     const closeLeaderboardModal = () => {
-        console.log("Closing leaderboard modal");
         isLeaderboardModalOpen.value = false;
     };
 

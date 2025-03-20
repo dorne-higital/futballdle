@@ -270,7 +270,6 @@ onMounted(async () => {
     if (storedSummaries) {
         gameSummaries.value = JSON.parse(storedSummaries);
     }
-    console.log('Loaded gameSummaries:', gameSummaries.value);
 
     await playerStore.fetchPlayers();
     await loadStats();
@@ -282,7 +281,6 @@ onMounted(async () => {
         targetPlayer.value = playerStore.getRandomPlayerByDifficulty(currentDifficulty.value);
         clues.value.push(generateClues(targetPlayer.value, currentDifficulty.value)[0]);
     } else {
-        console.log("Players not loaded or game over.");
     }
 
     await nextTick();
@@ -557,7 +555,6 @@ const loadStats = async () => {
                 stats.value.hardGamesWon = 0;
             }
         } else {
-            console.log("No such document!");
             resetStats();
         }
     } catch (e) {
@@ -568,11 +565,9 @@ const loadStats = async () => {
 
 const saveStats = async () => {
     try {
-        console.log('saveStats called');
         await setDoc(doc(db, "users", userId.value), {
             stats: stats.value,
         });
-        console.log('saveStats successful');
     } catch (e) {
         console.error("Error saving stats:", e);
     }
@@ -602,7 +597,6 @@ const resetStats = () => {
 };
 
 const updateStats = (gameWon) => {
-    console.log('updateStats called');
     statsStore.stats.gamesPlayed++;
 
     // Update difficulty-specific stats

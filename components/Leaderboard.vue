@@ -17,6 +17,7 @@
 						<span class="rank"></span>
 						<span class="user-id">Player</span>
 						<span class="points">Pts</span>
+						<span class="avg-guesses">Avg G/W</span>
 					</div>
 				
 					<div 
@@ -25,12 +26,13 @@
 						class="leaderboard-item" 
 						:class="{ 'current-user': player.userId === currentUserId }"
 					>
-						<span class="rank">{{ index + 1 }}.</span>
+						<span class="rank">{{ index + 1 }}</span>
 						<span class="user-id">
 							{{ getPlayerDisplayName(player) }}
 							<Icon v-if="player.userId === currentUserId" name="carbon:user-avatar-filled-alt"/>
 						</span>
 						<span class="points">{{ player.points }}</span>
+						<span class="avg-guesses">{{ player.avgGuessesPerWin || 'N/A' }}</span>
 					</div>
 					
 					<!-- Separator if user is not in top 25 -->
@@ -54,6 +56,9 @@
 						<span class="points">{{ currentUserPoints }}</span>
 					</div>
 				</div>
+
+				<sup>*Avg G/W calculates how many guesses it takes per game win. This does not count games that have lost. 
+					If level on points, the person with the lowest Avg G/W will be ahead.</sup>
 			</div>
 		</div>
 	</div>
@@ -129,60 +134,59 @@
 	};
 
 	const fetchLeaderboard = async () => {
-		console.log("Fetching leaderboard data...");
-		console.log("Current user ID:", props.currentUserId);
-
 		try {
-			// Get top 25 users by points
 			const leaderboardQuery = query(
 				collection(db, "users"),
 				orderBy("stats.totalPoints", "desc"),
 				limit(25)
 			);
 			
-			console.log("Executing query...");
 			const querySnapshot = await getDocs(leaderboardQuery);
-			console.log("Query results:", querySnapshot.size, "documents");
 			
 			topPlayers.value = querySnapshot.docs.map((doc) => {
 				const userData = doc.data();
 				const displayName = userData.displayName || null;
-				
-				// Cache any display names we find
+
+				const guessesArray = userData.stats?.guessesPerWin || [];
+				const totalGuesses = guessesArray.reduce((sum, guesses) => sum + guesses, 0);
+				const avgGuessesPerWin = guessesArray.length > 0 ? (totalGuesses / guessesArray.length).toFixed(1) : 0; // Set to Infinity if no games played
+
 				if (displayName) {
 					displayNameCache.value.set(doc.id, displayName);
 				}
-				
+
 				return {
 					userId: doc.id,
 					displayName: displayName,
-					points: userData.stats?.totalPoints || 0
+					points: userData.stats?.totalPoints || 0,
+					avgGuessesPerWin: avgGuessesPerWin, 
 				};
 			});
-			
-			// Save updated display name cache
+
+			// Sorting: First by points (desc), then by avg guesses (asc)
+			topPlayers.value.sort((a, b) => {
+				if (b.points !== a.points) {
+					return b.points - a.points; // Higher points first
+				}
+				return a.avgGuessesPerWin - b.avgGuessesPerWin; // Lower avgGuessesPerWin first
+			});
+
 			saveDisplayNameCache();
-			
-			console.log("Top players:", topPlayers.value);
-			
-			// Find current user's rank and points if not in top 25
+						
 			let currentUserFound = topPlayers.value.some(player => player.userId === props.currentUserId);
 			
 			if (!currentUserFound && props.currentUserId) {
-				// Fetch current user info
 				const userDoc = await getDoc(doc(db, "users", props.currentUserId));
 				if (userDoc.exists()) {
 					const userData = userDoc.data();
 					currentUserPoints.value = userData.stats?.totalPoints || 0;
 					currentUserDisplayName.value = userData.displayName || getPlayerDisplayName({userId: props.currentUserId});
 					
-					// Cache this display name
 					if (userData.displayName) {
 						displayNameCache.value.set(props.currentUserId, userData.displayName);
 						saveDisplayNameCache();
 					}
 					
-					// Count how many users have more points
 					const rankQuery = query(
 						collection(db, "users"),
 						orderBy("stats.totalPoints", "desc")
@@ -205,7 +209,6 @@
 	};
 
 	onMounted(() => {
-		console.log("Leaderboard component mounted, isOpen:", props.isOpen);
 		// Load cached display names first
 		loadCachedDisplayNames();
 		
@@ -225,7 +228,6 @@
 
 	// Watch for changes to isOpen prop
 	watch(() => props.isOpen, (newVal) => {
-		console.log("isOpen changed to:", newVal);
 		if (newVal === true) {
 			fetchLeaderboard();
 		}
@@ -309,6 +311,10 @@
 			}
 
 			.modal-body {
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				height: 100%;
 				padding: 0 1rem 1rem;
 				
 				.leaderboard-list {
@@ -318,7 +324,7 @@
 					.leaderboard-header, .leaderboard-item {
 						display: grid;
 						font-weight: 400;
-						grid-template-columns: 60px 1fr 80px;
+						grid-template-columns: 40px 1fr 50px 70px;
 						letter-spacing: .07rem;
 						padding: .75rem 0;
 
@@ -327,14 +333,17 @@
 						}
 
 						.points {
-							padding-right: .5rem;
-							text-align: right;
+							text-align: center;
 						}
 					
 						.user-id {
 							align-items: center;
 							display: flex;
 							gap: .5rem;
+						}
+
+						.avg-guesses {
+							text-align: center;
 						}
 					}
 
@@ -360,12 +369,22 @@
 							border-radius: 0 0 .5rem .5rem;
 						}
 
+						.rank {
+							border-right: 1px solid #346eea;
+						}
+
 						&.current-user {
 							background-color: rgba(0, 128, 255, 0.1);
 							font-weight: 600;
 						}
-						.points {
-							padding-right: .5rem;
+					
+						.user-id {
+							padding-left: .5rem;
+						}
+
+						.points,
+						.avg-guesses {
+							border-left: 1px solid #346eea;
 						}
 					}
 					

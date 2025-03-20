@@ -9,14 +9,11 @@ export const usePlayerStore = defineStore('players', () => {
 
     async function fetchPlayers() {
         try {
-            console.log('Fetching players...'); 
             const querySnapshot = await getDocs(collection($firestore, 'players'));
-            console.log('Query snapshot:', querySnapshot);
             players.value = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             }));
-            console.log('Players fetched:', players.value);
         } catch (error) {
             console.error('Error fetching players:', error);
         }
@@ -27,8 +24,6 @@ export const usePlayerStore = defineStore('players', () => {
             return null;
         }
         const randomIndex = Math.floor(Math.random() * players.value.length);
-        console.log('Random index generated:', randomIndex);
-        console.log('Player selected:', players.value[randomIndex]);
         return players.value[randomIndex];
     }
 
@@ -41,16 +36,11 @@ export const usePlayerStore = defineStore('players', () => {
         if (players.value.length === 0) {
             return null;
         }
-
-        console.log('Looking for players with difficulty:', difficulty);
-        console.log('Players available:', players.value.length);
         
         // Filter players by difficulty level
         const filteredPlayers = players.value.filter(player => 
             Number(player.difficulty) === Number(difficulty)
         );
-
-        console.log(`Found ${filteredPlayers.length} players for difficulty ${difficulty}`);
         
         // If no players found for this difficulty, fallback to any player
         if (filteredPlayers.length === 0) {
@@ -59,7 +49,6 @@ export const usePlayerStore = defineStore('players', () => {
         }
         
         const randomIndex = Math.floor(Math.random() * filteredPlayers.length);
-        console.log(`Random ${difficulty} difficulty player selected:`, filteredPlayers[randomIndex]);
         return filteredPlayers[randomIndex];
     }
 

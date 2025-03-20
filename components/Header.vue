@@ -51,7 +51,6 @@
 
 
 	const openLeaderboard = () => {
-		console.log("Header: Opening leaderboard");
 		emit('openLeaderboard');
 	};
 

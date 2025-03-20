@@ -48,7 +48,6 @@ export const useStatsStore = defineStore('stats', () => {
             if (docSnap.exists()) {
                 stats.value = docSnap.data().stats;
             } else {
-                console.log("No such document!");
             }
         } catch (e) {
             console.error("Error loading stats:", e);
