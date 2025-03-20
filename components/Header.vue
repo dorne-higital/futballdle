@@ -21,18 +21,18 @@
 				@click="openInfo"
 			/>
 
-			<Icon 
+			<!-- <Icon 
 				v-if="isDarkMode"
 				name="carbon:sun" 
 				@click="toggleDarkMode"
-			/>
+			/> -->
 
 			<!-- Hidden for now until work is done -->
-			<Icon 
+			<!-- <Icon 
 				v-else
 				name="carbon:moon" 
 				@click="toggleDarkMode"
-			/>
+			/> -->
 		</div>
 	</div>
 </template>
