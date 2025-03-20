@@ -17,6 +17,14 @@ $easy-primary-border: #52c656;
 $medium-primary-border: #e4c945;
 $hard-primary-border: #ec584d;
 
+$easy-primary-dark: #528454;
+$medium-primary-dark: #97852f;
+$hard-primary-dark: #a2423b;
+
+$easy-primary-border-dark: #1c3c1d;
+$medium-primary-border-dark: #41380e;
+$hard-primary-border-dark: #641c17;
+
 html, body, div, span,
 h1, h2, h3, h4, h5, h6,
 p, img, sub, sup,
@@ -175,5 +183,43 @@ ul, li, span, sup {
         display: inline-block;
         padding: .2rem .5rem;
         width: fit-content;
+    }
+}
+
+.dark {
+    .close-button {
+        color: #FEFCFB;
+    }
+
+    .button {
+        &.primary {
+            background-color: #335033;
+            color: #ffffff;
+        }
+    }
+
+    .tag-container {
+        .tag {
+            background-color: #384767;
+        }
+    }
+    .difficulty-badge {
+        &.difficulty-easy {
+            background-color: $easy-primary-dark;
+            border: 1px solid $easy-primary-border-dark;
+            color: #ffffff;
+        }
+    
+        &.difficulty-medium {
+            background-color: $medium-primary-dark;
+            border: 1px solid $medium-primary-border-dark;
+            color: #ffffff;
+        }
+    
+        &.difficulty-hard {
+            background-color: $hard-primary-dark;
+            border: 1px solid $hard-primary-border-dark;
+            color: #ffffff;
+        }
     }
 }

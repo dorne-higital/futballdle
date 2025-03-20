@@ -28,11 +28,11 @@
 			/>
 
 			<!-- Hidden for now until work is done -->
-			<!-- <Icon 
+			<Icon 
 				v-else
 				name="carbon:moon" 
 				@click="toggleDarkMode"
-			/> -->
+			/>
 		</div>
 	</div>
 </template>
@@ -77,22 +77,28 @@
 		padding: 1rem;
 		width: 100%;
 		z-index: 2;
-	}
 
-	.icons {
-		display: flex;
-		gap: .8rem;
-		padding: 0.2rem 0.4rem;
-	}
+		&.dark {
+            background-color: #292929;
+			box-shadow: 0px 0px 15px 0px #444444;
+            color: #FEFCFB;
+		}
 
-	.icon {
-		background: none;
-		border: none;
-		font-size: 24px;
-		cursor: pointer;
-	}
+		.icons {
+			display: flex;
+			gap: .8rem;
+			padding: 0.2rem 0.4rem;
 
-	.icons span {
-		font-size: 1.2rem;
+			.icon {
+				background: none;
+				border: none;
+				font-size: 24px;
+				cursor: pointer;
+
+				span {
+					font-size: 1.2rem;
+				}
+			}
+		}
 	}
 </style>

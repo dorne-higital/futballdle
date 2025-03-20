@@ -99,6 +99,21 @@
 		top: 0;
 		width: 100%;
 		z-index: 1000;
+
+        &.dark {
+            background-color: #292929;
+            color: #FEFCFB;
+
+            .modal-content {
+                background-color: #292929;
+                color: #FEFCFB;
+
+                .modal-header {
+                    background-color: #292929;
+                    color: #FEFCFB;
+                }
+			}
+		}
 	
 		.modal-content {
 			background-color: white;

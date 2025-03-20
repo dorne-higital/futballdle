@@ -22,7 +22,7 @@
         <Leaderboard
             v-if="isLeaderboardModalOpen"
             :isOpen="isLeaderboardModalOpen"
-            :darkMode="darkMode"
+            :darkMode="isDarkMode"
             :currentUserId="userId"
             @close="closeLeaderboardModal"
         />
@@ -131,6 +131,10 @@
         display: flex;
         flex-direction: column;
         height: 100dvh;
-        transition: background-color 0.3s, color 0.3s;
+
+        &.dark {
+            background-color: #292929;
+            color: #FEFCFB;
+        }
     }
 </style>

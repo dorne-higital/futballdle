@@ -281,13 +281,67 @@ const countryIconMap = {
     width: 100%;
     z-index: 1000;
 
+	&.dark {
+		background-color: #292929;
+		color: #FEFCFB;
+
+		.modal-content {
+			background-color: #292929;
+			color: #FEFCFB;
+
+			.modal-header {
+				background-color: #292929;
+				color: #FEFCFB;
+			}
+
+			.modal-body {
+				.player-stats {
+					.stat-grid {
+						.stat-item {
+							background-color: #383838;
+							border: 1px solid #1d1d1d;
+
+							&.compact {
+								h1 {
+									font-size: 2rem;
+								}
+							}
+
+							&.yellow {
+								background-color: #b9ae38;
+								border: 1px solid #6b6417;
+
+								p {
+									border-top: 1px solid #6b6417;
+								}
+							}
+
+							&.red {
+								background-color: #b84444;
+								border: 1px solid #602121;
+
+								p {
+									border-top: 1px solid #602121;
+								}
+							}
+
+							p {
+								border-top: 1px solid #1d1d1d;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
     .modal-content {
         background-color: white;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         display: flex;
         flex-direction: column;
         gap: 1rem;
-		max-height: 80%;
+		height: 100%;
 		overflow: scroll;
 		position: relative;
         width: 100%;

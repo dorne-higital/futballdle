@@ -779,6 +779,137 @@ const startNewGame = () => {
 		padding: 2rem;
 		width: 100vw;
 
+        &.dark {
+            background-color: #292929;
+            color: #FEFCFB;
+
+            .guesses-input-container {
+                .previous-guess {
+                    background-color: #d24f4f;
+                    border-bottom: 1px solid #711c1c;
+
+                    &:nth-child(even) {
+                        background-color: #ab4040;
+                    }
+
+                    span {
+                        background-color: #711c1c;
+                    }
+
+                    &.correct-guess {
+                        background-color: #527454;
+                        border-bottom: 1px solid #3b5f3c;
+
+                        span {
+                            background-color: #527454;
+                        }
+                    }
+                }
+
+                .guess-container {
+                    input {
+                        background-color: #383838;
+                        border-bottom: 3px solid #595959;
+                        color: #FEFCFB;
+
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+
+                    .suggestions {
+                        background-color: #383838;
+                        color: #FEFCFB;
+                        
+                        li {
+                            border-bottom: 1px solid #292929;
+
+                            &:hover {
+                                background-color: #383838;
+                            }
+
+                            &:nth-child(even) {
+                                background-color: #1c1c1c;
+
+                                &:hover {
+                                    background-color: #c8d2f0;
+                                }
+                            }
+
+                            span {
+                                background-color: #d24f4f;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .clues {
+                background-color: #383838;
+                border: 1px solid #1d1d1d;
+
+                .win-message {
+                    background-color: #527454;
+                    border: 1px solid #3b5f3c;
+
+                    button {
+                        background-color: #88bd8a;
+                        border: 1px solid #567c57;
+                        color: #000000;
+                    }
+                }
+
+                .lose-message {
+                    background-color: #ab4040;
+                    border: 1px solid #4f1b1b;
+
+                    button {
+                        background-color: #f67c7c;
+                        border: 1px solid #4f1b1b;
+                        color: #000000;
+                    }
+                }
+
+                .clues-grid {
+                    .clues-row {
+                        .clue-item {
+                            background-color: #464646;
+                            border: 1px solid #1d1d1d;
+                        }
+                    }
+                }
+            }
+
+            .game-summaries {
+                background-color: #383838;
+                border: 1px solid #1d1d1d;
+
+                .prev-games {
+                    &.game-won {
+                        background-color: #416a42;
+                        border: 1px solid #2c402d;
+
+                        .title {
+                            border-bottom: 1px solid #2c402d;
+                        }
+                    }
+
+                    &.game-lost {
+                        background-color: #823b3b;
+                        border: 1px solid #4f1b1b;
+
+                        .title {
+                            border-bottom: 1px solid #4f1b1b;
+                        }
+                    }
+                }
+            }
+        }
+
+        p {
+            padding-bottom: 1rem;
+        }
+
 		.guesses-input-container {
 			display: flex;
 			flex-direction: column;
@@ -828,9 +959,9 @@ const startNewGame = () => {
 				width: 100%;
 
 				input {
-					background-color: #f3f7ff;
+					background-color: #eaeaea;
 					border: none;
-					border-bottom: 2px solid #3f50e9;
+					border-bottom: 3px solid #9f9f9f;
                     border-radius: .5rem;
 					font-size: 1rem;
 					letter-spacing: .1rem;
