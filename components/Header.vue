@@ -88,15 +88,9 @@
 			gap: .8rem;
 			padding: 0.2rem 0.4rem;
 
-			.icon {
-				background: none;
-				border: none;
-				font-size: 24px;
-				cursor: pointer;
-
-				span {
-					font-size: 1.2rem;
-				}
+			.iconify {
+				height: 1.5rem;
+				width: 1.5rem;
 			}
 		}
 	}
