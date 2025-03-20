@@ -1,9 +1,9 @@
 <template>
     <div :class="[{ 'dark': darkMode },currentDifficultyClass]" class="game">
-        <p v-if="!alreadyPlayed && guessesRemaining > 0">
+        <p v-if="!alreadyPlayed && guessesRemaining > 0" class="opening-comms">
             Guesses remaining: {{ guessesRemaining }}
         </p>
-        <p v-else-if="alreadyPlayed" style="text-align: center;">You have reached your daily play limit. See the summary below of your games, and check back tomorrow for another try!</p>
+        <p v-else-if="alreadyPlayed" class="opening-comms">You have reached your daily play limit. See the summary below of your games, and check back tomorrow for another try!</p>
 
         <template v-if="!alreadyPlayed">
             <div class="guesses-input-container">
@@ -900,8 +900,9 @@ const startNewGame = () => {
             }
         }
 
-        p {
+        .opening-comms {
             padding-bottom: 1rem;
+            text-align: center;
         }
 
 		.guesses-input-container {
