@@ -1182,10 +1182,10 @@ const startNewGame = () => {
 
 				&.game-lost {
 					background-color: #ffe5e5;
-					border: 1px solid #d24f4f;
+					border: 1px solid #ffb6b6;
 
 					.title {
-						border-bottom: 1px solid #d24f4f;
+						border-bottom: 1px solid #ffb6b6;
 					}
 				}
 
