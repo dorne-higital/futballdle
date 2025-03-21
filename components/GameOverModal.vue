@@ -342,6 +342,7 @@ const countryIconMap = {
         flex-direction: column;
         gap: 1rem;
 		height: 100%;
+		max-width: 600px;
 		overflow: scroll;
 		position: relative;
         width: 100%;
