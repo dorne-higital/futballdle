@@ -302,6 +302,7 @@
 				align-items: center;
 				background-color: white;
 				border-bottom: 1px solid #cfcfcf;
+				box-shadow: 0px 0px 15px 0px #d8d8d8;
 				display: flex;
 				justify-content: space-between;
 				padding: 1rem;
