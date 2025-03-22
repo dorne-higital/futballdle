@@ -78,12 +78,6 @@
 		width: 100%;
 		z-index: 2;
 
-		&.dark {
-            background-color: #292929;
-			box-shadow: 0px 0px 15px 0px #444444;
-            color: #FEFCFB;
-		}
-
 		.icons {
 			display: flex;
 			gap: .8rem;

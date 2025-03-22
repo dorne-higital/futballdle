@@ -127,10 +127,5 @@
         display: flex;
         flex-direction: column;
         height: 100dvh;
-
-        &.dark {
-            background-color: #292929;
-            color: #FEFCFB;
-        }
     }
 </style>

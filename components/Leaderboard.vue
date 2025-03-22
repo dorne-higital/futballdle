@@ -246,44 +246,6 @@
 		top: 0;
 		width: 100%;
 		z-index: 1000;
-
-		&.dark {
-			background-color: #292929;
-			color: #FEFCFB;
-
-			.modal-content {
-				background-color: #292929;
-				color: #FEFCFB;
-
-				.modal-header {
-					background-color: #292929;
-					color: #FEFCFB;
-				}
-
-				.modal-body {
-					.leaderboard-list {
-						.leaderboard-header {
-							background-color: #1a356f;
-							border: 1px solid #08132c;
-							color: white;
-						}
-
-						.leaderboard-item {
-							background-color: #464646;
-							border: 1px solid #08132c;
-
-							&:nth-child(even) {
-								background-color: #5c5c5c;
-							}
-
-							&.current-user {
-								background-color: #01234690;
-							}
-						}
-					}
-				}
-			}
-		}
 		
 		.modal-content {
 			background-color: white;

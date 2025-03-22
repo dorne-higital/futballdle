@@ -339,53 +339,6 @@ const lossPercentageSplit = computed(() => {
         width: 100%;
         z-index: 1000;
 
-        &.dark {
-            background-color: #292929;
-            color: #FEFCFB;
-
-            .modal-content {
-                background-color: #292929;
-                color: #FEFCFB;
-
-                .modal-header {
-                    background-color: #292929;
-                    color: #FEFCFB;
-                }
-
-                .modal-body {
-                    .user-profile-section {
-                        border-bottom: 1px solid #606060;
-
-                        .name-edit-container {
-                            .name-input {
-                                border: 1px solid #1d1d1d;
-                                width: 80%;
-                                background-color: #393939;
-                                color: #FEFCFB;
-                            }
-                        }
-                    }
-
-                    .stat-section {
-                        .stat-type {
-                            background-color: #383838;
-                            border: 1px solid #1d1d1d;
-
-                            .pie-chart {
-                                .pie-chart-inner {
-                                    background-color: #383838;
-                                }
-                            }
-
-                            p {
-                                border-top: 1px solid #1d1d1d;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         .modal-content {
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
