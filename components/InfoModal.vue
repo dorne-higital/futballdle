@@ -29,7 +29,7 @@
 				</p>
 
 				<div class="clue-list">
-					<p>Clues</p>
+					<h6>Clues</h6>
 
 					<div class="clues tag-container">
 						<span class="tag">Age</span>
