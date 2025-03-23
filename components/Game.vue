@@ -415,7 +415,7 @@
     };
 
     const getContinent = (nationality) => {
-        const europeanCountries = ['England', 'France', 'Spain', 'Germany', 'Italy', 'Portugal', 'Netherlands', 'Belgium', 'Scotland', 'Wales', 'Ireland', 'Croatia', 'Serbia', 'Norway', 'Sweden', 'Denmark', 'Poland', 'Ukraine', 'Russia', 'Switzerland', 'Austria'];
+        const europeanCountries = ['England', 'France', 'Spain', 'Germany', 'Italy', 'Portugal', 'Netherlands', 'Belgium', 'Scotland', 'Wales', 'Ireland', 'Republic of Ireland', 'Croatia', 'Serbia', 'Norway', 'Sweden', 'Denmark', 'Poland', 'Ukraine', 'Russia', 'Switzerland', 'Austria'];
         const southAmericanCountries = ['Brazil', 'Argentina', 'Uruguay', 'Colombia', 'Chile', 'Ecuador', 'Paraguay', 'Peru', 'Venezuela', 'Bolivia'];
         const africanCountries = ['Senegal', 'Ghana', 'Nigeria', 'Ivory Coast', 'Egypt', 'Morocco', 'Algeria', 'Tunisia', 'Cameroon', 'South Africa'];
         
