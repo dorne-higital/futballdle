@@ -7,7 +7,15 @@
 
         <template v-if="!alreadyPlayed">
             <div class="guesses-input-container">
-                <span v-for="(guessObj, index) in guesses" :key="index" class="previous-guess" :class="{ 'correct-guess': guessObj.correct }">
+                <span 
+                    v-for="(guessObj, index) in guesses" 
+                    :key="index" 
+                    class="previous-guess" 
+                    :class="{
+                        'correct-guess': guessObj.correct,             
+                        'single-guess': guesses.length === 1 
+                    }"
+                >
                     {{index + 1}}. {{ guessObj.guess }}
 
                     <Icon 
@@ -793,6 +801,10 @@
 				text-transform: uppercase;
 				font-size: .65rem;
 				letter-spacing: .1rem;
+
+                &.single-guess {
+                    border-radius: .5rem !important;
+                }
 
 				&:nth-child(even) {
 					background-color: #ffefef;

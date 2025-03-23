@@ -24,38 +24,47 @@
 					You will receive a new clue after every guess. These clues are not aimed to give you the answer, but to guide you in the right direction.
 				</p>
 
-				<p class="descriptive-list">
-					Clues will vary from:
+				<p class="description">
+					Clues will differ depending on the difficulty of the game. Some of the clues will be:
+				</p>
 
-					<br>
-					<span class="tag-container">
+				<div class="clue-list">
+					<p>Clues</p>
+
+					<div class="clues tag-container">
 						<span class="tag">Age</span>
 						<span class="tag">Nationality</span>
 						<span class="tag">Goals & Assists</span>
 						<span class="tag">Club</span>
 						<span class="tag">Position</span>
 						<span class="tag">Games Played</span>
-					</span>
-
-				</p>
-
-				<h5>The Game Types</h5>
+					</div>
+				</div>
 
 				<p class="description">
-					<span class="difficulty-badge difficulty-easy minimal">Easy</span> | 
-					This will be a player from a "Big 6" club, and clues will be slightly easier to get.
+					There are 3 rounds to play each day, these will increase in difficulty after each game.
 				</p>
 
-				<p class="description">
-					<span class="difficulty-badge difficulty-medium minimal">Medium</span> |
-					Clues will be slightly more cryptic, bit still very gettable. Players from this tend to come from top half, or established 
-					Premier League teams not with the "Big 6".
-				</p>
+				<div class="difficulty-badge difficulty-easy info-game">
+					<span class="minimal">Easy</span>
 
-				<p class="description">
-					<span class="difficulty-badge difficulty-hard minimal">Hard</span> |
-					Clues will test your knowledge on Premier League teams. Players will come from less established teams.
-				</p>
+					<p class="caption">This will be a player from a "Big 6" club, and clues will be slightly easier to get.</p>
+				</div>
+
+				<div class="difficulty-badge difficulty-medium info-game">
+					<span class="minimal">Medium</span>
+
+					<p class="caption">Clues will be slightly more cryptic, bit still very gettable. Players from this tend to come from top half, or established 
+					Premier League teams, not the "Big 6".</p>
+				</div>
+
+				<div class="difficulty-badge difficulty-hard info-game">
+					<span class="minimal">Hard</span>
+
+					<p class="caption">Clues will test your knowledge on Premier League teams. Players will come from less established teams.</p>
+				</div>
+
+				<p class="caption">Ready to go?</p>
 
 				<button
 					class="button primary"
@@ -129,12 +138,35 @@
 			.modal-body {
 				display: flex;
 				flex-direction: column;
-				gap: .5rem;
+				gap: 1rem;
 				margin-bottom: 3.5rem;
 				padding: 0 1rem 1rem;
+				text-align: center;
 
-				.description {
-					padding-bottom: 1rem;
+				.clue-list {
+					align-items: center;
+					background-color: #f0f0f0;
+					border: 1px solid #cfcfcf;
+					border-radius: .5rem;
+					display: flex;
+					flex-direction: column;
+					padding: .5rem;
+				}
+
+				.info-game {
+					align-items: center;
+					display: flex;
+					flex-direction: column;
+					gap: .5rem;
+					justify-content: center;
+					text-align: center;
+
+					p {
+						background-color: #FEFCFB;
+						border-radius: .25rem;
+						margin: -.25rem;
+						padding: .5rem .25rem;
+					}
 				}
 
 				ul {
