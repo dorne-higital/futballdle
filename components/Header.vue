@@ -21,6 +21,11 @@
 				@click="openInfo"
 			/>
 
+			<Icon 
+				name="carbon:settings" 
+				@click="openSettings"
+			/>
+
 			<!-- <Icon 
 				v-if="isDarkMode"
 				name="carbon:sun" 
@@ -47,7 +52,7 @@
         },
 	});
 
-	const emit = defineEmits(['openLeaderboard', 'openStats', 'openInfo', 'toggleDarkMode']);
+	const emit = defineEmits(['openLeaderboard', 'openStats', 'openInfo', 'openSettings', 'toggleDarkMode']);
 
 
 	const openLeaderboard = () => {
@@ -62,6 +67,10 @@
 		emit('openInfo');
 	};
 
+	const openSettings = () => {
+		emit('openSettings');
+	};
+
 	const toggleDarkMode = () => {
 		emit('toggleDarkMode');
 	};
@@ -70,8 +79,9 @@
 <style lang="scss" scoped>
 	.header {
 		align-items: center;
-		border-bottom: 1px solid #cfcfcf;
-		box-shadow: 0px 0px 15px 0px #d8d8d8;
+		background-color: var(--background-primary);
+		border-bottom: 1px solid var(--background-secondary);
+		box-shadow: 0px 0px 15px 0px var(--background-secondary);
 		display: flex;
 		justify-content: space-between;
 		padding: 1rem;
@@ -81,9 +91,10 @@
 		.icons {
 			display: flex;
 			gap: .8rem;
-			padding: 0.2rem 0.4rem;
+			padding: .2rem .4rem;
 
 			.iconify {
+				color: var(--text-primary);
 				height: 1.5rem;
 				width: 1.5rem;
 			}

@@ -17,6 +17,5 @@ export const alreadyPlayedMessages = [
 	'You\'ve already played today. Check back tomorrow!',
 	'One game per day! See you tomorrow.',
 	'Daily challenge complete! Come back for more.',
-	'Your daily guess is done. Try again tomorrow.',
 	'You\'ve used your daily attempt.',
 ];

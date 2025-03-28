@@ -1,19 +1,16 @@
 <template>
     <div v-if="isOpen" :class="{ 'dark': darkMode }" class="game-over-modal">
         <div class="modal-content">
-            <div class="modal-header">
+            <div 
+				:class="{ 'winner': won, 'loser': !won }"
+				class="modal-header"
+			>
                 <h2 v-if="won">
                     {{ winMessage }}
                 </h2>
-                <h2 v-else-if="alreadyPlayed">
+                <h2 v-else-if="!won">
                     {{ alreadyPlayedMessage }}
                 </h2>
-                <h2 v-else>
-                    {{ loseMessage }}
-                </h2>
-                <p v-if="alreadyPlayed && gameOver">
-                    You have reached your daily play limit.
-                </p>
 
 				<Icon 
 					class="close-button"
@@ -271,7 +268,7 @@
 <style lang="scss" scoped>
 	.game-over-modal {
 		align-items: center;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: var(--background-primary);
 		display: flex;
 		height: 100%;
 		justify-content: center;
@@ -282,8 +279,7 @@
 		z-index: 1000;
 
 		.modal-content {
-			background-color: white;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			background-color: var(--background-primary);
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
@@ -295,15 +291,25 @@
 
 			.modal-header {
 				align-items: center;
-				background-color: white;
-				border-bottom: 1px solid #cfcfcf;
-				box-shadow: 0px 0px 15px 0px #d8d8d8;
+				background-color: var(--background-primary);
+				border-bottom: 1px solid var(--background-secondary);
+				box-shadow: 0px 0px 15px 0px var(--background-secondary);
 				display: flex;
 				justify-content: space-between;
 				padding: 1rem;
 				position: sticky;
 				top: 0;
 				z-index: 9999;
+
+				&.winner {
+					background-color: var(--success);
+					border: 1px solid var(--color-easy);
+				}
+
+				&.loser {
+					background-color: var(--danger);
+					border: 1px solid var(--color-hard);
+				}
 			}
 
 			.guesses {
@@ -337,9 +343,9 @@
 						margin-bottom: .5rem;
 
 						.stat-item {
-							background-color: #f0f0f0;
-							border: 1px solid #cfcfcf;
-							border-radius: .5rem;
+							background-color: var(--background-secondary);
+							border: 1px solid var(--border);
+							border-radius: var(--global-border-radius);
 							display: flex;
 							flex-direction: column;
 							gap: .5rem;
@@ -359,20 +365,20 @@
 							}
 
 							&.yellow {
-								background-color: #fff480;
-								border: 1px solid #c1b533;
+								background-color: var(--color-medium);
+								border: 1px solid var(--color-medium-hover);
 
 								p {
-									border-top: 1px solid #c1b533;
+									border-top: 1px solid var(--color-medium-hover);
 								}
 							}
 
 							&.red {
-								background-color: #ff8080;
-								border: 1px solid #b84444;
+								background-color: var(--color-hard);
+								border: 1px solid var(--color-hard-hover);
 
 								p {
-									border-top: 1px solid #b84444;
+									border-top: 1px solid var(--color-hard-hover);
 								}
 							}
 
@@ -390,7 +396,7 @@
 							}
 
 							p {
-								border-top: 1px solid #cfcfcf;
+								border-top: 1px solid var(--border);
 								font-size: .75rem;
 								line-height: 2rem;
 								text-align: center;

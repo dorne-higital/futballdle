@@ -1,5 +1,55 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
+:root {
+    --background-primary: #f8f8f8;
+    --background-secondary: #e1e1e1;
+    --border: #c4c4c4;
+
+    --text-primary: #060606;
+    --text-secondary: #1e1e1e;
+
+    --color-easy: #8edf91;
+    --color-easy-hover: #52c656;
+    --color-medium: #ffe670;
+    --color-medium-hover: #e4c945;
+    --color-hard: #ff8178;
+    --color-hard-hover: #ec584d;
+
+    --success: #c6fdc6;
+    --warning: #f9c064;
+    --danger: #ffbebe;
+    --info: #a8c1f9;
+    --link: #1430ff;
+
+    --global-border-radius: .5rem;
+    --global-border-radius-sm: .25rem;
+}
+
+.dark {
+    --background-primary: #242424;
+    --background-secondary: #151515;
+    --border: #3f3f3f;
+
+    --text-primary: #f8f8f8;
+    --text-secondary: #ececec;
+
+    --color-easy: #458c48;
+    --color-easy-border: #19461b;
+    --color-medium: #b68218;
+    --color-medium-border: #806f1a;
+    --color-hard: #90433e;
+    --color-hard-border: #581e1a;
+
+    --success: #2a6e2a;
+    --warning: #dd831c;
+    --danger: #5f2727;
+    --info: #214083;
+    --link: #5569ff;
+
+    --global-border-radius: .5rem;
+    --global-border-radius-sm: .25rem;
+}
+
 // Heading Styles
 $h1-font-size: 2rem;
 $h2-font-size: 1.75rem;
@@ -7,23 +57,6 @@ $h3-font-size: 1.6rem;
 $h4-font-size: 1.4rem;
 $h5-font-size: 1.25rem;
 $h6-font-size: 1rem;
-
-// Colours
-$easy-primary: #8edf91;
-$medium-primary: #ffe670;
-$hard-primary: #ff8178;
-
-$easy-primary-border: #52c656;
-$medium-primary-border: #e4c945;
-$hard-primary-border: #ec584d;
-
-$easy-primary-dark: #528454;
-$medium-primary-dark: #97852f;
-$hard-primary-dark: #a2423b;
-
-$easy-primary-border-dark: #1c3c1d;
-$medium-primary-border-dark: #41380e;
-$hard-primary-border-dark: #641c17;
 
 html, body, div, span,
 h1, h2, h3, h4, h5, h6,
@@ -42,7 +75,8 @@ div, input {
 }
 
 body {
-    background-color: #FEFCFB;
+    background-color: var(--background-primary);
+    color: var(--text-secondary);
 }
 
 article, aside, footer,
@@ -60,6 +94,7 @@ h3,
 h4,
 h5,
 h6 {
+    color: var(--text-primary);
 	font-family: "Ubuntu", serif;
 	font-weight: 100;
 	font-style: normal;
@@ -102,6 +137,7 @@ h6 {
 }
 
 sup {
+    color: var(--text-secondary);
     font-size: .75rem;
 }
 
@@ -114,13 +150,14 @@ ul, li, span, sup {
 
 .caption {
     font-size: .75rem;
+    width: 100%;
 }
 
 // Global classes
 
 .close-button {
     border: none;
-    color: #292929;
+    color: var(--text-primary);
     cursor: pointer;
     font-size: 1.75rem;
 }
@@ -128,13 +165,34 @@ ul, li, span, sup {
 .button {
     background: transparent;
     border: none;
-    border-radius: .5rem;
+    border-radius: var(--global-border-radius-sm);
 
     &.primary {
-        background-color: #8edf91;
-        color: #000000;
+        background-color: var(--color-easy);
+        color: var(--text-primary);
         font-size: 1.2rem;
         padding: .5rem;
+    }
+
+    &.danger {
+        background-color: var(--color-hard);
+        color: var(--text-primary);
+        font-size: 1rem;
+        padding: .5rem;
+
+        &:hover {
+            background-color: var(--color-hard-hover);
+            cursor: pointer;
+        }
+    }
+
+    &.link {
+        color: var(--link);
+
+        &:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
     }
 }
 
@@ -144,10 +202,12 @@ ul, li, span, sup {
     flex-direction: row;
     flex-wrap: wrap;
     margin: .5rem auto;
+    width: 100%;
 
     .tag {
-        background-color: #a8c1f9;
-        border-radius: .25rem;
+        background-color: var(--info);
+        border-radius: var(--global-border-radius-sm);
+        font-size: .8rem;
         padding: .2rem .5rem;
         text-align: center;
         width: 100%;
@@ -155,7 +215,7 @@ ul, li, span, sup {
 }
 
 .difficulty-badge {
-    border-radius: .25rem;
+    border-radius: var(--global-border-radius-sm);
     display: flex;
     font-weight: 400;
     gap: .5rem;
@@ -164,21 +224,21 @@ ul, li, span, sup {
     width: 100%;
 
     &.difficulty-easy {
-        background-color: $easy-primary;
-        border: 1px solid $easy-primary-border;
-        color: #000000;
+        background-color: var(--color-easy);
+        border: 1px solid var(--color-easy-border);
+        color: var(--text-secondary);
     }
 
     &.difficulty-medium {
-        background-color: $medium-primary;
-        border: 1px solid $medium-primary-border;
-        color: #000000;
+        background-color: var(--color-medium);
+        border: 1px solid var(--color-medium-border);
+        color: var(--text-secondary);
     }
 
     &.difficulty-hard {
-        background-color: $hard-primary;
-        border: 1px solid $hard-primary-border;
-        color: #000000;
+        background-color: var(--color-hard);
+        border: 1px solid var(--color-hard-border);
+        color: var(--text-secondary);
     }
 
     &.minimal {

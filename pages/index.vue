@@ -1,7 +1,11 @@
 <template>
-    <div v-if="isLoading" class="loader-container">
+    <div 
+        v-if="isLoading" 
+        class="loader-container"
+    >
         <Loader />
     </div>
+    
     <div 
         v-else
         :class="{ 'dark': isDarkMode }"
@@ -12,6 +16,7 @@
             @openLeaderboard="openLeaderboard"
             @openStats="openStats"
             @openInfo="openInfo"
+            @openSettings="openSettings"
             @toggleDarkMode="toggleDarkMode"
         />
 
@@ -41,6 +46,14 @@
             :isOpen="isInfoModalOpen" 
             @close="closeInfoModal" 
         />
+
+        <SettingsModal 
+            :darkMode="isDarkMode"
+            :isOpen="isSettingsModalOpen" 
+            :userId="userId"
+            @toggleDarkMode="toggleDarkMode"
+            @close="closeSettingsModal" 
+        />
     </div>
 </template>
   
@@ -50,6 +63,7 @@
     import Leaderboard from '../components/Leaderboard.vue';
     import StatsModal from '../components/StatsModal.vue';
     import InfoModal from '../components/InfoModal.vue';
+    import SettingsModal from '../components/SettingsModal.vue';
     import Header from '../components/Header.vue';
     import Loader from '../components/Loader.vue';
     import { usePlayerStore } from '~/stores/players';
@@ -59,6 +73,7 @@
     const isLeaderboardModalOpen = ref(false);
     const isStatsOpen = ref(false);
     const isInfoModalOpen = ref(false);
+    const isSettingsModalOpen = ref(false);
     const isDarkMode = ref(false);
     const playerStore = usePlayerStore();
     const statsStore = useStatsStore();
@@ -115,8 +130,17 @@
         isInfoModalOpen.value = false;
     };
 
+    const openSettings = () => {
+        isSettingsModalOpen.value = !isSettingsModalOpen.value;
+    };
+
+    const closeSettingsModal = () => {
+        isSettingsModalOpen.value = false;
+    };
+
     const toggleDarkMode = () => {
         isDarkMode.value = !isDarkMode.value;
+        console.log("Toggled");
         localStorage.setItem('darkMode', String(isDarkMode.value));
     };
 </script>
@@ -124,6 +148,8 @@
 <style lang="scss" scoped>
     .container {
         align-items: center;
+        background-color: var(--background-primary);
+        color: var(--text-primary);
         display: flex;
         flex-direction: column;
         height: 100dvh;

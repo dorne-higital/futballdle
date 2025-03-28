@@ -99,7 +99,6 @@
 <style lang="scss" scoped>
 	.info-modal {
 		align-items: center;
-		background-color: rgba(0, 0, 0, 0.5);
 		display: flex;
 		height: 100%;
 		justify-content: center;
@@ -110,8 +109,7 @@
 		z-index: 1000;
 	
 		.modal-content {
-			background-color: white;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			background-color: var(--background-primary);
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
@@ -124,9 +122,9 @@
 
 			.modal-header {
 				align-items: center;
-				background-color: white;
-				border-bottom: 1px solid #cfcfcf;
-				box-shadow: 0px 0px 15px 0px #d8d8d8;
+				background-color: var(--background-primary);
+				border-bottom: 1px solid var(--background-secondary);
+				box-shadow: 0px 0px 15px 0px var(--background-secondary);
 				display: flex;
 				justify-content: space-between;
 				padding: 1rem;
@@ -145,9 +143,9 @@
 
 				.clue-list {
 					align-items: center;
-					background-color: #f0f0f0;
-					border: 1px solid #cfcfcf;
-					border-radius: .5rem;
+					background-color: var(--background-secondary);
+					border: 1px solid var(--border);
+					border-radius: var(--global-border-radius);
 					display: flex;
 					flex-direction: column;
 					padding: .5rem;
@@ -162,8 +160,8 @@
 					text-align: center;
 
 					p {
-						background-color: #FEFCFB;
-						border-radius: .25rem;
+						background-color: var(--background-primary);
+						border-radius: var(--global-border-radius-sm);
 						margin: -.25rem;
 						padding: .5rem .25rem;
 					}

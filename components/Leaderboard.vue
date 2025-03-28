@@ -237,7 +237,6 @@
 <style lang="scss" scoped>
 	.leaderboard-modal {
 		align-items: center;
-		background-color: rgba(0, 0, 0, 0.5);
 		display: flex;
 		justify-content: center;
 		height: 100%;
@@ -248,8 +247,8 @@
 		z-index: 1000;
 		
 		.modal-content {
-			background-color: white;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			background-color: var(--background-primary);
+			box-shadow: 0 4px 8px var(--background-secondary);
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
@@ -262,9 +261,9 @@
 
 			.modal-header {
 				align-items: center;
-				background-color: white;
-				border-bottom: 1px solid #cfcfcf;
-				box-shadow: 0px 0px 15px 0px #d8d8d8;
+				background-color: var(--background-primary);
+				border-bottom: 1px solid var(--background-secondary);
+				box-shadow: 0px 0px 15px 0px var(--background-secondary);
 				display: flex;
 				justify-content: space-between;
 				padding: 1rem;
@@ -281,7 +280,7 @@
 				padding: 0 1rem 1rem;
 				
 				.leaderboard-list {
-					border-radius: .5rem;
+					border-radius: var(--global-border-radius);
 					width: 100%;
   
 					.leaderboard-header, .leaderboard-item {
@@ -311,34 +310,34 @@
 					}
 
 					.leaderboard-header {
-						background-color: #6290f3;
-						border: 1px solid #346eea;
-						border-radius: .5rem .5rem 0 0;
-						color: white;
+						background-color: var(--info);
+						border: 1px solid var(--link);
+						border-radius: var(--global-border-radius) var(--global-border-radius) 0 0;
+						color: var(--text-primary);
 						font-size: .8rem;
 						font-weight: 400;
 					}
 
 					.leaderboard-item {
-						background-color: #fafafa;
-						border: 1px solid #346eea;
+						background-color: var(--background-primary);
+						border: 1px solid var(--link);
 						border-top: 0;
+						color: var(--text-primary);
 
 						&:nth-child(even) {
-							background-color: #ffffff;
+							background-color: var(--background-secondary);
 						}
 
 						&:last-child {
-							border-radius: 0 0 .5rem .5rem;
+							border-radius: 0 0  var(--global-border-radius) var(--global-border-radius);
 						}
 
 						.rank {
-							border-right: 1px solid #346eea;
+							border-right: 1px solid var(--link);
 						}
 
 						&.current-user {
-							background-color: rgba(0, 128, 255, 0.1);
-							font-weight: 600;
+							font-weight: 500;
 						}
 					
 						.user-id {
@@ -347,13 +346,13 @@
 
 						.points,
 						.avg-guesses {
-							border-left: 1px solid #346eea;
+							border-left: 1px solid var(--link);
 						}
 					}
 					
 					.leaderboard-separator {
 						text-align: center;
-						padding: 8px 0;
+						padding: .5rem 0;
 					}
 				}
 			}

@@ -17,7 +17,7 @@
 <style lang="scss" scoped>
 	.loader-container {
 		align-items: center;
-		background: rgba(255, 255, 255, 0.8);
+		background-color: var(--background-primary);
 		display: flex;
 		flex-direction: column;
 		height: 100%;
@@ -47,6 +47,7 @@
 		}
 
 		.text {
+			color: var(--text-secondary);
 			margin-top: 2rem;
 		}
 	}

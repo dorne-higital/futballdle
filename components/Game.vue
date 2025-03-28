@@ -792,30 +792,30 @@
 			width: 100%;
 
 			.previous-guess {
-				background-color: #ffe5e5;
-				border-bottom: 1px solid #d24f4f;
+				background-color: var(--color-hard);
+				border-bottom: 1px solid var(--color-hard-hover);
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
-				padding: 0.75rem;
+				padding: .75rem;
 				text-transform: uppercase;
 				font-size: .65rem;
 				letter-spacing: .1rem;
 
                 &.single-guess {
-                    border-radius: .5rem !important;
+                    border-radius: var(--global-border-radius) !important;
                 }
 
 				&:nth-child(even) {
-					background-color: #ffefef;
+					background-color: var(--danger);
 				}
 
                 &:first-of-type {
-                    border-radius: .5rem .5rem 0 0;
+                    border-radius: var(--global-border-radius) var(--global-border-radius) 0 0;
                 }
 
                 &:last-of-type {
-                    border-radius: 0 0 .5rem .5rem;
+                    border-radius: 0 0 var(--global-border-radius) var(--global-border-radius);
                 }
 
 				span {
@@ -823,12 +823,12 @@
 				}
 
 				&.correct-guess {
-					background-color: #d6fad7;
-					border-bottom: 1px solid #88bd8a;
+					background-color: var(--success);
+					border-bottom: 1px solid var(--color-easy-hover);
 					font-weight: 500;
 
 					span {
-						background-color: #527454;
+						background-color: var(--color-easy-hover);
 					}
 				}
 			}
@@ -839,10 +839,11 @@
 				width: 100%;
 
 				input {
-					background-color: #eaeaea;
+					background-color: var(--background-secondary);
 					border: none;
-					border-bottom: 3px solid #9f9f9f;
-                    border-radius: .5rem;
+					border-bottom: 3px solid var(--border);
+                    border-radius: var(--global-border-radius);
+                    color: var(--text-primary);
 					font-size: 1rem;
 					letter-spacing: .1rem;
 					padding: .75rem;
@@ -858,8 +859,9 @@
 					list-style: none;
 					padding: 0;
 					margin: 0;
-					border: none;
-					background-color: #f3f7ff;
+					border: 1px solid var(--border);
+					background-color: var(--background-secondary);
+                    color: var(--text-secondary);
 					font-size: .8rem;
 					max-height: 200px;
 					overflow-y: auto;
@@ -875,7 +877,7 @@
 					}
 					
 					li {
-						border-bottom: 1px solid #e3e6ff;
+						border-bottom: 1px solid var(--border);
 						display: flex;
 						flex-direction: row;
 						justify-content: space-between;
@@ -884,19 +886,19 @@
 						cursor: pointer;
 
 						&:hover {
-							background-color: #c8d2f0;
+							background-color: var(--background-secondary);
 						}
 
 						&:nth-child(even) {
-							background-color: #edf2fa;
+							background-color: var(--background-primary);
 
 							&:hover {
-								background-color: #c8d2f0;
+								background-color: var(--background-secondary);
 							}
 						}
 
 						span {
-							background-color: #d24f4f;
+							background-color: var(--danger);
 						}
 					}
 				}
@@ -904,9 +906,9 @@
 		}
 
 		.clues {
-			background-color: #f0f0f0;
-			border: 1px solid #cfcfcf;
-            border-radius: .5rem;
+			background-color: var(--background-secondary);
+			border: 1px solid var(--border);
+            border-radius: var(--global-border-radius);
 			bottom: 1rem;
 			margin: 0 2rem;
 			max-width: 400px;
@@ -920,9 +922,10 @@
 			}
 
 			.win-message {
-				background-color: #d6fad7;
-				border: 1px solid #88bd8a;
-                border-radius: .375rem;
+				background-color: var(--color-easy);
+				border: 1px solid var(--border);
+                border-radius: var(--global-border-radius-sm);
+                color: var(--text-secondary);
 				padding: .75rem;
 				width: 100%;
 
@@ -935,19 +938,20 @@
 				}
 
 				button {
-					background-color: #88bd8a;
-					border: 1px solid #567c57;
-                    border-radius: .25rem;
-					color: #000000;
+					background-color: var(--success);
+					border: 1px solid var(--color-easy);
+                    border-radius: var(--global-border-radius-sm);
+					color: var(--text-primary);
 					padding: .75rem;
 					width: 100%;
 				}
 			}
 
 			.lose-message {
-				background-color: #ffe5e5;
-				border: 1px solid #d24f4f;
-                border-radius: .375rem;
+				background-color: var(--color-hard);
+				border: 1px solid var(--border);
+                border-radius: var(--global-border-radius-sm);
+                color: var(--text-secondary);
 				padding: .75rem;
 				width: 100%;
 
@@ -960,10 +964,10 @@
 				}
 
 				button {
-					background-color: #f67c7c;
-					border: 1px solid #d24f4f;
-                    border-radius: .25rem;
-					color: #000000;
+					background-color: var(--danger);
+					border: 1px solid var(--color-hard);
+                    border-radius: var(--global-border-radius-sm);
+					color: var(--text-primary);
 					padding: .75rem;
 					width: 100%;
 				}
@@ -975,7 +979,7 @@
 				width: 100%;
 
                 .difficulty-badge {
-                    border-radius: .5rem .5rem 0 0;
+                    border-radius: var(--global-border-radius) var(--global-border-radius) 0 0;
                 }
 
 				.clues-row {
@@ -987,15 +991,15 @@
                     &:last-child {
                         .clue-item {
                             &:last-child {
-                                border-radius: 0 0 .375rem .375rem;
+                                border-radius: 0 0 var(--global-border-radius-sm) var(--global-border-radius-sm);
                             }
                         }
                     }
 
 					.clue-item {
 						align-items: center;
-						background-color: #f7f7f7;
-						border: 1px solid #ddd;
+						background-color: var(--background-primary);
+						border: 1px solid var(--border);
 						display: flex;
 						flex-direction: row;
 						gap: .5rem;
@@ -1024,9 +1028,9 @@
 		}
 
 		.game-summaries {
-			background-color: #f0f0f0;
-			border: 1px solid #cfcfcf;
-            border-radius: .5rem;
+			background-color: var(--background-secondary);
+			border: 1px solid var(--border);
+            border-radius: var(--global-border-radius);
 			display: flex;
 			flex-direction: column;
 			gap: .5rem;
@@ -1036,7 +1040,7 @@
 			width: 100%;
 
 			.prev-games {
-                border-radius: .375rem;
+                border-radius: var(--global-border-radius-sm);
 				display: flex;
 				flex-direction: column;
 				gap: .3rem;
@@ -1052,20 +1056,20 @@
 				}
 
 				&.game-won {
-					background-color: #d6fad7;
-					border: 1px solid #88bd8a;
+					background-color: var(--success);
+					border: 1px solid var(--color-easy);
 
 					.title {
-						border-bottom: 1px solid #88bd8a;
+						border-bottom: 1px solid var(--color-easy);
 					}
 				}
 
 				&.game-lost {
-					background-color: #ffe5e5;
-					border: 1px solid #ffb6b6;
+					background-color: var(--danger);
+					border: 1px solid var(--color-hard);
 
 					.title {
-						border-bottom: 1px solid #ffb6b6;
+						border-bottom: 1px solid var(--color-hard);
 					}
 				}
 

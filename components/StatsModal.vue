@@ -12,45 +12,9 @@
             </div>
             
             <div class="modal-body">
-                <!-- User Display Name Section -->
-                <div class="user-profile-section">
-                    <sup>Display name</sup>
-                    <div v-if="!isEditingName" class="display-name-container">
-                        <span class="display-name">{{ displayName || 'Anonymous Player' }}</span>
-                        <Icon 
-                            name="carbon:edit" 
-                            class="edit-icon"
-                            @click="startEditName"
-                        />
-                    </div>
-                    <div v-else class="name-edit-container">
-                        <input 
-                            v-model="newDisplayName" 
-                            type="text" 
-                            class="name-input"
-                            placeholder="Enter display name"
-                            ref="nameInput"
-                            @keyup.enter="saveName"
-                        />
-                        <div class="name-buttons">
-                            <!-- <button class="save-btn" @click="saveName">Save</button>
-                            <button class="cancel-btn" @click="cancelEdit">Cancel</button> -->
-                            <Icon 
-                                name="carbon:checkmark" 
-                                class="save-btn"
-                                @click="saveName"
-                            />
-                            <Icon 
-                                name="carbon:close" 
-                                class="cancel-btn"
-                                @click="cancelEdit"
-                            />
-
-                        </div>
-                    </div>
-                </div>
-
                 <div class="stat-section">
+                    <p v-if="displayName" class="">Hey {{ displayName }}! Check out your stats below!</p>
+
                     <div class="stat-type">
                         <div class="stat-container">
                             <span class="stat-value">{{ maxGames }}</span>
@@ -61,7 +25,7 @@
                     
                     <div class="stat-type">
                         <div class="pie-chart-container">
-                            <div class="pie-chart" :style="{ background: `conic-gradient(#88bd8a ${winPercentage}%, transparent ${winPercentage}%)` }">
+                            <div class="pie-chart" :style="{ background: `conic-gradient(var(--color-easy) ${winPercentage}%, transparent ${winPercentage}%)` }">
                                 <div class="pie-chart-inner"></div>
 
                                 <span class="stat-value">{{ winPercentage }}%</span>
@@ -238,57 +202,6 @@ const fetchDisplayName = async () => {
     }
 };
 
-const startEditName = () => {
-    newDisplayName.value = displayName.value;
-    isEditingName.value = true;
-    // Focus the input field after the DOM has updated
-    nextTick(() => {
-        if (nameInput.value) {
-            nameInput.value.focus();
-        }
-    });
-};
-
-const saveName = async () => {
-    if (!newDisplayName.value.trim()) {
-        // Don't save empty names
-        cancelEdit();
-        return;
-    }
-    
-    try {
-        const trimmedName = newDisplayName.value.trim();
-        
-        // Save to Firebase if we have a userId
-        if (props.userId) {
-            await updateDoc(doc(db, "users", props.userId), {
-                displayName: trimmedName
-            });
-        }
-        
-        // Update local state
-        displayName.value = trimmedName;
-        isEditingName.value = false;
-        
-        // Always save to localStorage as backup
-        localStorage.setItem('playerDisplayName', trimmedName);
-        
-        // Emit event so parent components can update if needed
-        emit('nameUpdated', trimmedName);
-    } catch (error) {
-        console.error("Error updating display name:", error);
-        // At least save to localStorage even if Firebase fails
-        localStorage.setItem('playerDisplayName', newDisplayName.value.trim());
-        displayName.value = newDisplayName.value.trim();
-        isEditingName.value = false;
-    }
-};
-
-const cancelEdit = () => {
-    isEditingName.value = false;
-    newDisplayName.value = '';
-};
-
 const closeModal = () => {
     emit('close');
 };
@@ -329,7 +242,7 @@ const lossPercentageSplit = computed(() => {
 <style lang="scss" scoped>
     .stats-modal {
         align-items: center;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: var(--background-primary);
         display: flex;
         justify-content: center;
         height: 100%;
@@ -340,8 +253,7 @@ const lossPercentageSplit = computed(() => {
         z-index: 1000;
 
         .modal-content {
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: var(--background-primary);
             display: flex;
             flex-direction: column;
             gap: 1rem;
@@ -354,9 +266,9 @@ const lossPercentageSplit = computed(() => {
 
             .modal-header {
                 align-items: center;
-                background-color: white;
-                border-bottom: 1px solid #cfcfcf;
-                box-shadow: 0px 0px 15px 0px #d8d8d8;
+                background-color: var(--background-primary);
+                border-bottom: 1px solid var(--background-secondary);
+                box-shadow: 0px 0px 15px 0px var(--background-secondary);
                 display: flex;
                 justify-content: space-between;
                 padding: 1rem;
@@ -368,82 +280,6 @@ const lossPercentageSplit = computed(() => {
             .modal-body {
                 padding: 0 1rem 1rem;
 
-                .user-profile-section {
-                    margin-bottom: 1rem;
-                    padding: .5rem 0;
-                    border-bottom: 1px solid #eee;
-
-                    .display-name-container {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-
-                        .display-name {
-                            border: 1px solid transparent;
-                            font-weight: 400;
-                            padding: .75rem .5rem;
-                        }
-
-                        .edit-icon {
-                            cursor: pointer;
-                            opacity: 0.7;
-
-                            &:hover {
-                                opacity: 1;
-                            }
-                        }
-                    }
-
-                    .name-edit-container {
-                        align-items: center;
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: space-between;
-                        width: 100%;
-
-                        .name-input {
-                            padding: .75rem .5rem;
-                            border: 1px solid #cfcfcf;
-                            width: 80%;
-                            background-color: #f0f0f0;
-                            color: black;
-
-                            &:focus {
-                                outline: none;
-                            }
-
-                        }
-                        
-                        .name-buttons {
-                            display: flex;
-                            justify-content: space-around;
-                            width: 20%;
-
-                            .save-btn, .cancel-btn {
-                                padding: 6px 12px;
-                                border: none;
-                                cursor: pointer;
-                                font-weight: bold;
-                                font-size: 1.5rem;
-                            }
-
-                            .save-btn {
-                                background-color: #4CAF50;
-                                color: white;
-
-                                &:hover {
-                                    background-color: #45a049;
-                                }
-                            }
-
-                            .cancel-btn {
-                                background-color: #F44336;
-                                color: #000000;
-                            }
-                        }
-                    }
-                }
-
                 .stat-section {
                     display: flex;
                     flex-direction: row;
@@ -451,9 +287,9 @@ const lossPercentageSplit = computed(() => {
                     gap: .5rem;
 
                     .stat-type {
-                        background-color: #f0f0f0;
-                        border: 1px solid #cfcfcf;
-                        border-radius: .5rem;
+                        background-color: var(--background-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: var(--global-border-radius);
                         padding: .5rem;
                         text-align: center;
                         width: calc(50% - .25rem);
@@ -471,7 +307,7 @@ const lossPercentageSplit = computed(() => {
                             }
 
                             .difficulty-badge {
-                                border-radius: 0 0 .5rem .5rem;
+                                border-radius: 0 0 var(--global-border-radius) var(--global-border-radius);
                             }
                         }
 
@@ -509,7 +345,7 @@ const lossPercentageSplit = computed(() => {
                                 position: absolute;
                                 width: 65%;
                                 height: 65%;
-                                background-color: #f0f0f0;
+                                background-color: var(--background-secondary);
                                 border-radius: 50%;
                             }
 
@@ -521,7 +357,7 @@ const lossPercentageSplit = computed(() => {
                         }
 
                         p {
-                            border-top: 1px solid #cfcfcf;
+                            border-top: 1px solid var(--border);
                             font-size: .75rem;
                             padding-top: .5rem;
                         }
@@ -532,7 +368,7 @@ const lossPercentageSplit = computed(() => {
                     align-items: center;
                     display: flex;
                     justify-content: space-between;
-                    margin-bottom: 0.75rem;
+                    margin-bottom: .75rem;
 
                     &.center {
                         flex-direction: column;
@@ -555,15 +391,15 @@ const lossPercentageSplit = computed(() => {
                         flex: 1;
                         display: flex;
                         align-items: center;
-                        border-radius: .25rem;
-                        background-color: #d24f4f; /* Dark background */
+                        border-radius: var(--global-border-radius-sm);
+                        background-color: var(--danger);
                         overflow: hidden;
                         position: relative;
                         width: 100%;
 
                         .bar-fill {
-                            background-color: #88bd8a; /* Yellow fill */
-                            height: 24px;
+                            background-color: var(--color-easy);
+                            height: 1.5rem;
                             display: flex;
                             align-items: center;
                             justify-content: flex-start;
@@ -571,18 +407,10 @@ const lossPercentageSplit = computed(() => {
                             z-index: 1;
 
                             .stat-value {
-                                color: black;
+                                color: var(--text-primary);
                                 font-weight: bold;
                                 padding-left: 8px;
                             }
-                        }
-
-                        .max-value {
-                            color: white;
-                            padding-right: 8px;
-                            position: absolute;
-                            right: 0;
-                            z-index: 2;
                         }
                     }
                 }
@@ -600,17 +428,17 @@ const lossPercentageSplit = computed(() => {
                         gap: .5rem;
 
                         .chip {
-                            border-radius: .25rem;
+                            border-radius: var(--global-border-radius-sm);
                             display: inline-block;
                             height: 1.5rem;
                             width: .75rem;
 
                             &.green {
-                                background-color: #88bd8a;
+                                background-color: var(--color-easy);
                             }
 
                             &.red {
-                                background-color: #d24f4f;
+                                background-color: var(--danger);
                             }
                         }
                     }
