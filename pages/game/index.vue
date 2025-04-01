@@ -1,3 +1,5 @@
 <template>
-	<Game />
+	<section>
+		<Game />
+	</section>
 </template>

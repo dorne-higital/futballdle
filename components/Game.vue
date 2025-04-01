@@ -18,7 +18,7 @@
                 >
                     {{index + 1}}. {{ guessObj.guess }}
 
-                    <Icon 
+                    <Icon to
                         v-if="guessObj.correct"
                         class="guessed-indicator"
                         name="carbon:checkmark"
@@ -111,12 +111,12 @@
 </template>
 
 <script setup>
-    import { ref, computed, onMounted, defineEmits, onUnmounted, nextTick } from 'vue';
-    import { usePlayerStore } from '~/stores/players';
-    import { useStatsStore } from '~/stores/stats';
-    import GameOverModal from './GameOverModal.vue';
-    import { doc, setDoc, getDoc } from 'firebase/firestore';
-    import { v4 as uuidv4 } from 'uuid';
+	import { ref, computed, onMounted, defineEmits, onUnmounted, nextTick } from 'vue';
+	import { usePlayerStore } from '~/stores/players';
+	import { useStatsStore } from '~/stores/stats';
+	import GameOverModal from '~/components/GameOverModal.vue';
+	import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import firebase functions
+	import { v4 as uuidv4 } from 'uuid';
 
     const { $firestore: db } = useNuxtApp();
 
@@ -127,12 +127,16 @@
     };
 
     const getOrCreateUserId = () => {
-        let userId = localStorage.getItem('userId');
-        if (!userId) {
-            userId = uuidv4();
-            localStorage.setItem('userId', userId);
+        if (process.client) { // Check if running on the client
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = uuidv4();
+                localStorage.setItem('userId', userId);
+            }
+            return userId;
+        } else {
+            return null; // or generate a server-side ID if needed.
         }
-        return userId;
     };
 
     const userId = ref(getOrCreateUserId());
@@ -269,29 +273,34 @@
     };
 
     onMounted(async () => {
-        // Load gameSummaries from localStorage first
-        const storedSummaries = localStorage.getItem('gameSummaries');
-        if (storedSummaries) {
-            gameSummaries.value = JSON.parse(storedSummaries);
+        if (process.client) { // Check if running on the client
+            const storedSummaries = localStorage.getItem('gameSummaries');
+            if (storedSummaries) {
+                gameSummaries.value = JSON.parse(storedSummaries);
+            }
         }
 
         await playerStore.fetchPlayers();
         await loadStats();
-        checkDailyPlay();
-        window.addEventListener('keydown', handleDesktopKeyPress);
+
+        if (process.client) { // Check if running on the client
+            checkDailyPlay();
+            window.addEventListener('keydown', handleDesktopKeyPress);
+        }
 
         if (!gameOver.value && playerStore.players && playerStore.players.length > 0) {
             currentDifficulty.value = getCurrentDifficulty();
             targetPlayer.value = playerStore.getRandomPlayerByDifficulty(currentDifficulty.value);
             clues.value.push(generateClues(targetPlayer.value, currentDifficulty.value)[0]);
-        } else {
         }
 
         await nextTick();
     });
 
     onUnmounted(() => {
-        window.removeEventListener('keydown', handleDesktopKeyPress);
+        if (process.client) { // Check if running on the client
+            window.removeEventListener('keydown', handleDesktopKeyPress);
+        }
     });
 
     const gamesRemainingToday = computed(() => {
@@ -320,24 +329,26 @@
     });
 
     const checkDailyPlay = () => {
-        const today = new Date().toISOString().slice(0, 10);
-        const storedLastPlayed = localStorage.getItem('lastPlayed');
-        let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+        if (process.client) { // Check if running on the client
+            const today = new Date().toISOString().slice(0, 10);
+            const storedLastPlayed = localStorage.getItem('lastPlayed');
+            let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
 
-        if (storedLastPlayed !== today) {
-            playsToday = 0;
-            localStorage.setItem('playsToday', '0');
-            localStorage.setItem('lastPlayed', today);
-            resetGame();
-            gameSummaries.value = []; // Clear the summaries
-            localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value)); // Save the cleared summaries
-        }
+            if (storedLastPlayed !== today) {
+                playsToday = 0;
+                localStorage.setItem('playsToday', '0');
+                localStorage.setItem('lastPlayed', today);
+                resetGame();
+                gameSummaries.value = [];
+                localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value));
+            }
 
-        if (playsToday >= 3) {
-            gameOver.value = true;
-            alreadyPlayed.value = true;
-        } else {
-            alreadyPlayed.value = false;
+            if (playsToday >= 3) {
+                gameOver.value = true;
+                alreadyPlayed.value = true;
+            } else {
+                alreadyPlayed.value = false;
+            }
         }
     };
 
@@ -353,12 +364,14 @@
     };
 
     const saveGameData = () => {
-        const today = new Date().toISOString().slice(0, 10);
-        localStorage.setItem('lastPlayed', today);
-        localStorage.setItem('guesses', JSON.stringify(guesses.value));
-        localStorage.setItem('won', JSON.stringify(won.value));
-        localStorage.setItem('clues', JSON.stringify(clues.value));
-        localStorage.setItem('currentDifficulty', currentDifficulty.value.toString());
+        if (process.client) { // Check if running on the client
+            const today = new Date().toISOString().slice(0, 10);
+            localStorage.setItem('lastPlayed', today);
+            localStorage.setItem('guesses', JSON.stringify(guesses.value));
+            localStorage.setItem('won', JSON.stringify(won.value));
+            localStorage.setItem('clues', JSON.stringify(clues.value));
+            localStorage.setItem('currentDifficulty', currentDifficulty.value.toString());
+        }
     };
 
     // Define clue sets per difficulty level
@@ -681,21 +694,23 @@
         statsStore.loadStats();
         emit('stats-updated');
 
-        gameSummaries.value = gameSummaries.value || [];
-        gameSummaries.value.unshift({
-            targetPlayer: targetPlayer.value,
-            guesses: guesses.value,
-            won: gameWon,
-            difficulty: currentDifficulty.value
-        });
+        if (process.client) { // Check if running on the client
+            gameSummaries.value = gameSummaries.value || [];
+            gameSummaries.value.unshift({
+                targetPlayer: targetPlayer.value,
+                guesses: guesses.value,
+                won: gameWon,
+                difficulty: currentDifficulty.value
+            });
 
-        gameSummaries.value = gameSummaries.value.slice(0, 3);
-        localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value)); // Save here!
+            gameSummaries.value = gameSummaries.value.slice(0, 3);
+            localStorage.setItem('gameSummaries', JSON.stringify(gameSummaries.value));
 
-        let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-        playsToday++;
-        localStorage.setItem('playsToday', playsToday.toString());
-        checkDailyPlay();
+            let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+            playsToday++;
+            localStorage.setItem('playsToday', playsToday.toString());
+            checkDailyPlay();
+        }
     };
 
     const calculateMostGuessed = () => {
@@ -719,21 +734,23 @@
     };
 
     const handleDesktopKeyPress = (event) => {
-        if (gameOver.value) return;
+        if (process.client) { // Check if running on the client
+            if (gameOver.value) return;
 
-        const key = event.key;
-        const activeElement = document.activeElement;
+            const key = event.key;
+            const activeElement = document.activeElement;
 
-        if (key === 'Enter') {
-            handleGuess();
-        } else if (key === 'Backspace') {
-            if (activeElement.tagName !== 'INPUT') {
-                currentGuess.value = currentGuess.value.slice(0, -1);
-            } else if (activeElement.tagName === 'INPUT' && activeElement.value === "") {
-                currentGuess.value = currentGuess.value.slice(0, -1);
+            if (key === 'Enter') {
+                handleGuess();
+            } else if (key === 'Backspace') {
+                if (activeElement.tagName !== 'INPUT') {
+                    currentGuess.value = currentGuess.value.slice(0, -1);
+                } else if (activeElement.tagName === 'INPUT' && activeElement.value === "") {
+                    currentGuess.value = currentGuess.value.slice(0, -1);
+                }
+            } else if (/^[a-zA-Z\s]+$/.test(key) && activeElement.tagName !== 'INPUT') {
+                currentGuess.value += key.toLowerCase();
             }
-        } else if (/^[a-zA-Z\s]+$/.test(key) && activeElement.tagName !== 'INPUT') {
-            currentGuess.value += key.toLowerCase();
         }
     };
 
@@ -742,24 +759,25 @@
     };
 
     const startNewGame = () => {
-        let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-        if (playsToday >= 3) return;
+        if (process.client) { // Check if running on the client
+            let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
+            if (playsToday >= 3) return;
+        }
 
         guesses.value = [];
         currentGuess.value = '';
         gameOver.value = false;
         won.value = false;
         clues.value = [];
-        
-        // Update difficulty for the next game
+
         currentDifficulty.value = getCurrentDifficulty();
-        
-        // Get player based on difficulty level
         targetPlayer.value = playerStore.getRandomPlayerByDifficulty(currentDifficulty.value);
         isGameOverModalOpen.value = false;
-        saveGameData();
 
-        // Generate first clue based on difficulty
+        if (process.client) { // Check if running on the client
+            saveGameData();
+        }
+
         clues.value.push(generateClues(targetPlayer.value, currentDifficulty.value)[0]);
     };
 </script>
