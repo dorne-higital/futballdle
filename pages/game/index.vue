@@ -1,5 +1,3 @@
 <template>
-	<Game 
-		:darkMode="isDarkMode"
-	/>
+	<Game />
 </template>
