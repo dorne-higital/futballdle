@@ -78,20 +78,24 @@
 
 
                 <div class="stat-section">
-                    <div v-if="stats.winStreak > 0" class="stat-type minimal">
+                    <div class="stat-type minimal">
                         <div class="stat-container">
-                            <span class="stat-value">{{ stats.winStreak }}</span>
+                            <span class="stat-value">{{ averageGuessesPerWin }}</span>
                         </div>
 
-                        <p class="stat-label">Winning run</p>
+                        <p class="stat-label">Avg. guesses per win</p>
                     </div>
 
-                    <div v-else class="stat-type minimal">
-                        <div class="stat-container">
-                            <span class="stat-value">{{ stats.lossStreak }}</span>
+                    <div class="stat-type minimal">
+                        <div v-if="stats.winStreak > 0" class="stat-container">
+                            <span class="stat-value">+ {{ stats.winStreak }}</span>
                         </div>
 
-                        <p class="stat-label">Losing streak</p>
+                        <div v-else class="stat-container">
+                            <span class="stat-value">- {{ stats.lossStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Current Streak</p>
                     </div>
 
                     <div class="stat-type minimal">
@@ -100,22 +104,6 @@
                         </div>
 
                         <p class="stat-label">Biggest win streak</p>
-                    </div>
-
-                    <div class="stat-type minimal">
-                        <div class="stat-container">
-                            <span class="stat-value">{{ stats.maxLossStreak }}</span>
-                        </div>
-
-                        <p class="stat-label">Longest losing streak</p>
-                    </div>
-
-                    <div class="stat-type minimal">
-                        <div class="stat-container">
-                            <span class="stat-value">{{ averageGuessesPerWin }}</span>
-                        </div>
-
-                        <p class="stat-label">Avg. guesses per win</p>
                     </div>
                 </div>
             </div>
@@ -327,7 +315,7 @@ const lossPercentageSplit = computed(() => {
 
                         &.minimal {
                             padding: 0;
-                            width: calc(25% - .375rem);
+                            width: calc(33% - .26rem);
 
                             .stat-value {
                                 font-size: 2rem !important;

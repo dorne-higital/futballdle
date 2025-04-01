@@ -11,7 +11,7 @@
 			</div>
 
 			<div class="menu-items">
-				<NuxtLink to="/info" class="item">
+				<NuxtLink to="/info" class="item" @click="closeMenu">
 					How to play
 
 					<span>
@@ -19,7 +19,7 @@
 					</span>
 				</NuxtLink>
 
-				<NuxtLink to="/stats" class="item">
+				<NuxtLink to="/stats" class="item" @click="closeMenu">
 					Stats
 
 					<span>
@@ -27,7 +27,7 @@
 					</span>
 				</NuxtLink>
 
-				<NuxtLink to="/leaderboard" class="item">
+				<NuxtLink to="/leaderboard" class="item" @click="closeMenu">
 					Leaderboard
 
 					<span>
@@ -118,15 +118,19 @@
 		}
 		try {
 			const trimmedName = newDisplayName.value.trim();
-		if (props.userId) {
-			await updateDoc(doc(db, 'users', props.userId), {
-				displayName: trimmedName,
-			});
-		}
-		displayName.value = trimmedName;
-		isEditingName.value = false;
-		localStorage.setItem('playerDisplayName', trimmedName);
-		emit('nameUpdated', trimmedName);
+			if (props.userId) {
+				console.log("Updating display name for userId:", props.userId);
+				await updateDoc(doc(db, 'users', props.userId), {
+					displayName: trimmedName,
+				});
+				console.log("Display name updated successfully.");
+				displayName.value = trimmedName;
+				isEditingName.value = false;
+				localStorage.setItem('playerDisplayName', trimmedName);
+				emit('nameUpdated', trimmedName);
+			} else {
+				console.error("userId is not defined.");
+			}
 		} catch (error) {
 			console.error('Error updating display name:', error);
 			localStorage.setItem('playerDisplayName', newDisplayName.value.trim());
@@ -139,6 +143,27 @@
 		isEditingName.value = false;
 		newDisplayName.value = '';
 	};
+
+	const retrieveDisplayName = async (userId) => {
+		try {
+			const userDoc = await getDoc(doc(db, 'users', userId));
+			if (userDoc.exists()) {
+			const userData = userDoc.data();
+			const storedDisplayName = userData.displayName;
+			console.log("Retrieved displayName:", storedDisplayName);
+			displayName.value = storedDisplayName;
+			} else {
+			console.log("User document not found.");
+			}
+		} catch (error) {
+			console.error("Error retrieving display name:", error);
+		}
+	};
+	onMounted(() => {
+		if (props.userId) {
+			retrieveDisplayName(props.userId);
+		}
+	});
 </script>
   
 <style lang="scss" scoped>

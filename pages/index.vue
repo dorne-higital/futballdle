@@ -64,8 +64,6 @@
         </div>
 
         <!-- <Leaderboard
-            v-if="isLeaderboardModalOpen"
-            :isOpen="isLeaderboardModalOpen"
             :darkMode="isDarkMode"
             :currentUserId="userId"
             @close="closeLeaderboardModal"
@@ -89,7 +87,6 @@
     import { doc, getDoc } from 'firebase/firestore';
 
     const isLoading = ref(true);
-    const isLeaderboardModalOpen = ref(false);
     const isStatsOpen = ref(false);
     const isInfoModalOpen = ref(false);
     const isSettingsModalOpen = ref(false);
@@ -187,14 +184,6 @@
 
     const handleNameUpdate = (newName) => {
         console.log("User display name updated:", newName);
-    };
-
-    const openLeaderboard = () => {
-        isLeaderboardModalOpen.value = true;
-    };
-
-    const closeLeaderboardModal = () => {
-        isLeaderboardModalOpen.value = false;
     };
 
     const openStats = () => {

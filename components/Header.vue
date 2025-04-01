@@ -15,7 +15,14 @@
 
 	</div>
 
-	<Menu :isVisible="menuOpen" @closeMenu="closeMenu" @navigate="handleNavigation"/>
+	<Menu
+		:isVisible="menuOpen"
+		:userId="currentUserId"
+		:initialDisplayName="userDisplayName"
+		@closeMenu="closeMenu"
+		@nameUpdated="handleNameUpdate"
+		@navigate="handleNavigation"
+	/>
 </template>
   
 <script setup>
@@ -30,10 +37,20 @@
 	});
 
 	const menuOpen = ref(false);
+	const currentUserId = ref(null);
+	const userDisplayName = ref(null);
 	
 	const emit = defineEmits(['openLeaderboard', 'openStats', 'openInfo', 'openSettings', 'toggleDarkMode']);
 
-
+    onMounted(() => {
+        if (process.client) {
+            currentUserId.value = localStorage.getItem('userId');
+            userDisplayName.value = localStorage.getItem('playerDisplayName');
+            console.log("Header - currentUserId:", currentUserId.value); // Add this line
+            console.log("Header - userDisplayName:", userDisplayName.value); // Add this line
+        }
+    });
+	
 	const openMenu = () => {
 		menuOpen.value = true;
 	};
@@ -44,6 +61,10 @@
 
 	const handleNavigation = (section) => {
 		console.log(`Navigating to: ${section}`);
+	};
+
+	const handleNameUpdate = (newName) => {
+		userDisplayName.value = newName;
 	};
 </script>
 
