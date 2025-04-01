@@ -3,47 +3,24 @@
 		:class="{ 'dark': darkMode }"
 		class="header"
 	>
-		<h1>Footballdle</h1>
+		<nuxt-link class="heading" to="/">Footballdle</nuxt-link>
 
 		<div class="icons">
 			<Icon 
-				name="carbon:trophy" 
-				@click="openLeaderboard"
+				name="solar:menu-dots-square-outline" 
+				@click="openMenu"
 			/>
-
-			<Icon 
-				name="carbon:settings-adjust" 
-				@click="openStats"
-			/>
-
-			<Icon 
-				name="carbon:information" 
-				@click="openInfo"
-			/>
-
-			<Icon 
-				name="carbon:settings" 
-				@click="openSettings"
-			/>
-
-			<!-- <Icon 
-				v-if="isDarkMode"
-				name="carbon:sun" 
-				@click="toggleDarkMode"
-			/> -->
-
-			<!-- Hidden for now until work is done -->
-			<!-- <Icon 
-				v-else
-				name="carbon:moon" 
-				@click="toggleDarkMode"
-			/> -->
 		</div>
+
+
 	</div>
+
+	<Menu :isVisible="menuOpen" @closeMenu="closeMenu" @navigate="handleNavigation"/>
 </template>
   
 <script setup>
 	import { defineProps, defineEmits } from 'vue';
+	import Menu from '@/components/Menu.vue';
   
 	const props = defineProps({
         darkMode: {
@@ -52,41 +29,45 @@
         },
 	});
 
+	const menuOpen = ref(false);
+	
 	const emit = defineEmits(['openLeaderboard', 'openStats', 'openInfo', 'openSettings', 'toggleDarkMode']);
 
 
-	const openLeaderboard = () => {
-		emit('openLeaderboard');
+	const openMenu = () => {
+		menuOpen.value = true;
 	};
 
-	const openStats = () => {
-		emit('openStats');
+	const closeMenu = () => {
+		menuOpen.value = false;
 	};
 
-	const openInfo = () => {
-		emit('openInfo');
-	};
-
-	const openSettings = () => {
-		emit('openSettings');
-	};
-
-	const toggleDarkMode = () => {
-		emit('toggleDarkMode');
+	const handleNavigation = (section) => {
+		console.log(`Navigating to: ${section}`);
 	};
 </script>
 
 <style lang="scss" scoped>
 	.header {
 		align-items: center;
-		background-color: var(--background-primary);
-		border-bottom: 1px solid var(--background-secondary);
-		box-shadow: 0px 0px 15px 0px var(--background-secondary);
+		background-color: var(--color-1);
 		display: flex;
 		justify-content: space-between;
 		padding: 1rem;
 		width: 100%;
 		z-index: 2;
+
+		.heading {
+			color: var(--text-secondary);
+			font-family: "Ubuntu", serif;
+			font-weight: 100;
+			font-style: normal;
+			font-size: 2rem;
+
+			@media (max-width: 600px) {
+				font-size: 1.75rem;
+			}
+		}
 
 		.icons {
 			display: flex;

@@ -26,6 +26,7 @@
   "devDependencies": {
     "@iconify-json/carbon": "^1.2.8",
     "@iconify-json/circle-flags": "^1.2.6",
+    "@iconify-json/solar": "^1.2.2",
     "sass": "^1.85.1"
   }
 }

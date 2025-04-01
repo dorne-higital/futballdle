@@ -1,50 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
 :root {
-    --background-primary: #f8f8f8;
-    --background-secondary: #e1e1e1;
-    --border: #c4c4c4;
+    --background-primary: #FFFFFF;
+    --background-secondary: #F5F5F5;
+    --border: #C3C3C3;
 
-    --text-primary: #060606;
-    --text-secondary: #1e1e1e;
+    --text-primary: #323334;
+    --text-secondary: #000000;
 
-    --color-easy: #8edf91;
-    --color-easy-hover: #52c656;
-    --color-medium: #ffe670;
-    --color-medium-hover: #e4c945;
-    --color-hard: #ff8178;
-    --color-hard-hover: #ec584d;
+    --color-1: #9FD6EF;
+    --color-2: #63D99E;
+    --color-3: #ED4D4D;
 
-    --success: #c6fdc6;
-    --warning: #f9c064;
-    --danger: #ffbebe;
-    --info: #a8c1f9;
-    --link: #1430ff;
+    --color-easy: #a5d6a7;
+    --color-easy-hover: #81c784;
+    --color-medium: #ffe082;
+    --color-medium-hover: #ffd54f;
+    --color-hard: #ef9a9a;
+    --color-hard-hover: #e57373;
+
+    --success: #c8e6c9;
+    --warning: #ffcc80;
+    --danger: #ffcdd2;
+    --info: #bbdefb;
+    --link: #1976d2;
 
     --global-border-radius: .5rem;
     --global-border-radius-sm: .25rem;
 }
 
 .dark {
-    --background-primary: #242424;
-    --background-secondary: #151515;
-    --border: #3f3f3f;
+    --background-primary: #2f3136;
+    --background-secondary: #36393f;
+    --border: #4f545c;
 
-    --text-primary: #f8f8f8;
-    --text-secondary: #ececec;
+    --text-primary: #dcdcdc;
+    --text-secondary: #c8c8c8;
 
-    --color-easy: #458c48;
-    --color-easy-border: #19461b;
-    --color-medium: #b68218;
-    --color-medium-border: #806f1a;
-    --color-hard: #90433e;
-    --color-hard-border: #581e1a;
+    --color-easy: #66bb6a;
+    --color-easy-hover: #43a047;
+    --color-medium: #ffb300;
+    --color-medium-hover: #ffa000;
+    --color-hard: #e57373; 
+    --color-hard-hover: #d32f2f;
 
-    --success: #2a6e2a;
-    --warning: #dd831c;
-    --danger: #5f2727;
-    --info: #214083;
-    --link: #5569ff;
+    --success: #81c784;
+    --warning: #ffb74d;
+    --danger: #ef5350;
+    --info: #64b5f6;
+    --link: #64b5f6;
 
     --global-border-radius: .5rem;
     --global-border-radius-sm: .25rem;
@@ -65,7 +69,7 @@ b, u, i, ol, ul, li,
 fieldset, form, label,
 article, aside, footer,
 header, nav, section,
-div, input {
+div, input, a {
     margin: 0;
     padding: 0;
     border: 0;
@@ -88,16 +92,27 @@ ol, ul {
     list-style: none;
 }
 
+a {
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
-h6 {
-    color: var(--text-primary);
+h6,
+.hero {
+    color: var(--text-secondary);
 	font-family: "Ubuntu", serif;
 	font-weight: 100;
 	font-style: normal;
+}
+
+.hero {
+    font-size: 3.5rem;
 }
 
 h1 {
@@ -142,15 +157,15 @@ sup {
 }
 
 p, button, input,
-ul, li, span, sup {
+ul, li, span, sup, a {
 	font-family: "Montserrat", serif;
 	font-optical-sizing: auto;
 	font-style: normal;
 }
 
 .caption {
+    color: var(--text-primary);
     font-size: .75rem;
-    width: 100%;
 }
 
 // Global classes
@@ -167,15 +182,26 @@ ul, li, span, sup {
     border: none;
     border-radius: var(--global-border-radius-sm);
 
+    &.full {
+        width: 100%;
+    }
+
     &.primary {
-        background-color: var(--color-easy);
+        background-color: var(--color-1);
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        padding: .5rem;
+    }
+
+    &.secondary {
+        background-color: var(--color-2);
         color: var(--text-primary);
         font-size: 1.2rem;
         padding: .5rem;
     }
 
     &.danger {
-        background-color: var(--color-hard);
+        background-color: var(--color-2);
         color: var(--text-primary);
         font-size: 1rem;
         padding: .5rem;
@@ -187,12 +213,32 @@ ul, li, span, sup {
     }
 
     &.link {
+        align-items: center;
+        border-bottom: 1px solid var(--link);
         color: var(--link);
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
 
         &:hover {
             text-decoration: underline;
             cursor: pointer;
         }
+    }
+}
+
+.link {
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-bottom: .15rem;
+
+    &:hover {
+        text-decoration: underline;
+        cursor: pointer;
     }
 }
 

@@ -959,6 +959,13 @@
   dependencies:
     "@iconify/types" "*"
 
+"@iconify-json/solar@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@iconify-json/solar/-/solar-1.2.2.tgz#510651545d75c4fe2c43e531da743016df5a188c"
+  integrity sha512-lcTb6DWL4HZObiY1W3fHfuxxuQHUc6CFHFeywKEx7Ry0k+dU6POZCMC7oVLr0F8vuf+KgaQ3oOoGO/yFzOwrNg==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify/collections@^1.0.496":
   version "1.0.522"
   resolved "https://registry.yarnpkg.com/@iconify/collections/-/collections-1.0.522.tgz#4d2f3c35a05f4fca9c240da786a88c89ff25c7cc"

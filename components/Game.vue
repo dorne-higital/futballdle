@@ -107,8 +107,6 @@
         <GameOverModal :darkMode="darkMode" :isOpen="isGameOverModalOpen" :won="won" :targetPlayer="targetPlayer"
             :guesses="guesses" :alreadyPlayed="alreadyPlayed" :difficulty="currentDifficulty"
             @close="closeGameOverModal" @newGame="startNewGame" />
-
-        <InfoModal :darkMode="darkMode" :isOpen="isInfoModalOpen" @close="closeInfoModal" />
     </div>
 </template>
 
@@ -117,7 +115,6 @@
     import { usePlayerStore } from '~/stores/players';
     import { useStatsStore } from '~/stores/stats';
     import GameOverModal from './GameOverModal.vue';
-    import InfoModal from './InfoModal.vue';
     import { doc, setDoc, getDoc } from 'firebase/firestore';
     import { v4 as uuidv4 } from 'uuid';
 
@@ -204,7 +201,6 @@
     const alreadyPlayed = ref(false);
     const clues = ref([]);
     const gameSummaries = ref([]);
-    const isInfoModalOpen = ref(true);
 
     const suggestions = ref([]);
 
@@ -745,10 +741,6 @@
         isGameOverModalOpen.value = false;
     };
 
-    const closeInfoModal = () => {
-        isInfoModalOpen.value = false;
-    };
-
     const startNewGame = () => {
         let playsToday = parseInt(localStorage.getItem('playsToday') || '0');
         if (playsToday >= 3) return;
@@ -948,7 +940,7 @@
 			}
 
 			.lose-message {
-				background-color: var(--color-hard);
+				background-color: var(--danger);
 				border: 1px solid var(--border);
                 border-radius: var(--global-border-radius-sm);
                 color: var(--text-secondary);
@@ -964,8 +956,8 @@
 				}
 
 				button {
-					background-color: var(--danger);
-					border: 1px solid var(--color-hard);
+					background-color: var(--color-hard);
+					border: 1px solid var(--color-hard-hover);
                     border-radius: var(--global-border-radius-sm);
 					color: var(--text-primary);
 					padding: .75rem;

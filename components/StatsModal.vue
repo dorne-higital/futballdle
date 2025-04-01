@@ -1,38 +1,29 @@
 <template>
-    <div v-if="isOpen && stats" :class="{ 'dark': darkMode }" class="stats-modal">
+    <div v-if="stats" :class="{ 'dark': darkMode }" class="stats-modal">
+        <PageHero 
+            heading="Stats"
+            subheading="All of your stats from previous games"
+            link="/"
+            linkText="Home"
+        />
+
         <div class="modal-content">
-            <div class="modal-header">
-                <h1>Your Stats</h1>
-                    
-                <Icon 
-                    class="close-button"
-                    name="carbon:close-filled" 
-                    @click="closeModal"
-                />
-            </div>
-            
             <div class="modal-body">
                 <div class="stat-section">
-                    <p v-if="displayName" class="">Hey {{ displayName }}! Check out your stats below!</p>
+                    <div class="pie-chart-container">
+                        <div class="pie-chart" :style="{ background: `conic-gradient(var(--color-1) ${winPercentage}%, transparent ${winPercentage}%)` }">
+                            <div class="pie-chart-inner"></div>
 
-                    <div class="stat-type">
-                        <div class="stat-container">
-                            <span class="stat-value">{{ maxGames }}</span>
+                            <span class="stat-value">{{ winPercentage }}%</span>
                         </div>
-
-                        <p class="stat-label">Games played</p>
                     </div>
-                    
-                    <div class="stat-type">
-                        <div class="pie-chart-container">
-                            <div class="pie-chart" :style="{ background: `conic-gradient(var(--color-easy) ${winPercentage}%, transparent ${winPercentage}%)` }">
-                                <div class="pie-chart-inner"></div>
 
-                                <span class="stat-value">{{ winPercentage }}%</span>
-                            </div>
-                        </div>
+                    <div class="stat-content">
+                        <p class="stat-label">Win Percentage</p>
 
-                        <p class="stat-label">Win percentage</p>
+                        <p class="caption">You have won <strong>{{ winPercentage }}% </strong>of all games you have played.</p>
+
+                        <p class="caption">Out of <strong>{{ maxGames }}</strong> games played, you have won <strong>{{ props.stats.gamesWon }}</strong> of these.</p>
                     </div>
                 </div>
 
@@ -49,6 +40,42 @@
                         <p>{{ stats.gamesLost }}</p>
                     </div>
                 </div>
+
+                <div class="difficulty-results">
+                    <p>Wins by difficulty</p>
+
+                    <div class="bar-chart-container">
+                        <div class="bar-item">
+                            <span class="caption">Game 1 (easy)</span>
+                            <div class="bar" :style="{ width: calculatePercentage(stats.easyGamesWon) + '%' }">
+                                <span class="bar-value">{{ stats.easyGamesWon }}</span>
+                            </div>
+                        </div>
+
+                        <div class="bar-item">
+                            <span class="caption">Game 2 (medium)</span>
+                            <div class="bar" :style="{ width: calculatePercentage(stats.mediumGamesWon) + '%' }">
+                                <span class="bar-value">{{ stats.mediumGamesWon }}</span>
+                            </div>
+                        </div>
+
+                        <div class="bar-item">
+                            <span class="caption">Game 3 (hard)</span>
+                            <div class="bar" :style="{ width: calculatePercentage(stats.hardGamesWon) + '%' }">
+                                <span class="bar-value">{{ stats.hardGamesWon }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prev-results">
+                    <span class="stat-label">Recent results</span>
+
+                    <div class="chips">
+                        <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
+                    </div>
+                </div>
+
 
                 <div class="stat-section">
                     <div v-if="stats.winStreak > 0" class="stat-type minimal">
@@ -91,52 +118,6 @@
                         <p class="stat-label">Avg. guesses per win</p>
                     </div>
                 </div>
-
-                <div class="prev-results">
-                    <span class="stat-label">Recent results</span>
-
-                    <div class="chips">
-                        <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
-                    </div>
-                </div>
-
-                <div class="difficulty-results">
-                    <p>Wins by difficulty</p>
-
-                    <div class="stat-section">
-                        <div class="stat-type minimal">
-                            <div class="stat-container">
-                                <span class="stat-value">{{ stats.easyGamesWon }}</span>
-                            </div>
-
-                            <p class="stat-label difficulty-badge difficulty-easy">Easy</p>
-                        </div>
-
-                        <div class="stat-type minimal">
-                            <div class="stat-container">
-                                <span class="stat-value">{{ stats.mediumGamesWon }}</span>
-                            </div>
-
-                            <p class="stat-label difficulty-badge difficulty-medium">Medium</p>
-                        </div>
-
-                        <div class="stat-type minimal">
-                            <div class="stat-container">
-                                <span class="stat-value">{{ stats.hardGamesWon }}</span>
-                            </div>
-
-                            <p class="stat-label difficulty-badge difficulty-hard">Hard</p>
-                        </div>
-
-                        <div class="stat-type minimal">
-                            <div class="stat-container">
-                                <span class="stat-value">{{ stats.totalPoints }}</span>
-                            </div>
-
-                            <p class="stat-label">Points</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -146,6 +127,7 @@
 import { defineProps, defineEmits, computed, ref, onMounted, nextTick, watch } from 'vue'; // Add watch import
 import { useNuxtApp } from '#app';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import PageHero from '../components/PageHero.vue';
 
 const props = defineProps({
     isOpen: Boolean,
@@ -164,6 +146,17 @@ const isEditingName = ref(false);
 const displayName = ref('');
 const newDisplayName = ref('');
 const nameInput = ref(null);
+
+
+const totalDifficultyWins = computed(() => {
+    return props.stats.easyGamesWon + props.stats.mediumGamesWon + props.stats.hardGamesWon;
+});
+
+const calculatePercentage = (wins) => {
+    if (totalDifficultyWins.value === 0) return 0;
+    return (wins / totalDifficultyWins.value) * 100;
+};
+
 
 // Initial load from localStorage as backup
 onMounted(async () => {
@@ -244,11 +237,10 @@ const lossPercentageSplit = computed(() => {
         align-items: center;
         background-color: var(--background-primary);
         display: flex;
+        flex-direction: column;
         justify-content: center;
         height: 100%;
         left: 0;
-        position: fixed;
-        top: 0;
         width: 100%;
         z-index: 1000;
 
@@ -258,9 +250,7 @@ const lossPercentageSplit = computed(() => {
             flex-direction: column;
             gap: 1rem;
             height: 100%;
-            overflow: scroll;
-            position: absolute;
-            top: 0;
+            margin-top: 1rem;
             max-width: 600px;
             width: 100%;
 
@@ -285,6 +275,47 @@ const lossPercentageSplit = computed(() => {
                     flex-direction: row;
                     flex-wrap: wrap;
                     gap: .5rem;
+
+
+                    .pie-chart-container {
+                        align-items: center;
+                        display: flex;
+                        justify-content: center;
+                        flex: 1;
+                        padding: .5rem;
+                        position: relative;
+
+                        .pie-chart {
+                            aspect-ratio: 1 / 1;
+                            width: 100%;
+                            border-radius: 50%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+
+                            .pie-chart-inner {
+                                position: absolute;
+                                width: 70%;
+                                height: 70%;
+                                background-color: var(--background-primary);
+                                border-radius: 50%;
+                            }
+
+                            .stat-value {
+                                font-size: 2rem;
+                                font-weight: 300;
+                                z-index: 10;
+                            }
+                        }
+                    }
+
+                    .stat-content {
+                        display: flex;
+                        flex: 1;
+                        flex-direction: column;
+                        justify-content: center;
+                        gap: .5rem;
+                    }
 
                     .stat-type {
                         background-color: var(--background-secondary);
@@ -324,38 +355,6 @@ const lossPercentageSplit = computed(() => {
                             }
                         }
 
-                        .pie-chart-container {
-                            align-items: center;
-                            display: flex;
-                            justify-content: center;
-                            padding: .5rem;
-                            position: relative;
-                            width: 100%;
-                        }
-
-                        .pie-chart {
-                            aspect-ratio: 1 / 1;
-                            width: 100%;
-                            border-radius: 50%;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-
-                            .pie-chart-inner {
-                                position: absolute;
-                                width: 65%;
-                                height: 65%;
-                                background-color: var(--background-secondary);
-                                border-radius: 50%;
-                            }
-
-                            .stat-value {
-                                font-size: 2rem;
-                                font-weight: 300;
-                                z-index: 10;
-                            }
-                        }
-
                         p {
                             border-top: 1px solid var(--border);
                             font-size: .75rem;
@@ -366,9 +365,13 @@ const lossPercentageSplit = computed(() => {
 
                 .stat-bar {
                     align-items: center;
+                    background-color: var(--background-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--global-border-radius);
                     display: flex;
                     justify-content: space-between;
                     margin-bottom: .75rem;
+                    padding: 1rem;
 
                     &.center {
                         flex-direction: column;
@@ -392,13 +395,13 @@ const lossPercentageSplit = computed(() => {
                         display: flex;
                         align-items: center;
                         border-radius: var(--global-border-radius-sm);
-                        background-color: var(--danger);
+                        background-color: var(--color-3);
                         overflow: hidden;
                         position: relative;
                         width: 100%;
 
                         .bar-fill {
-                            background-color: var(--color-easy);
+                            background-color: var(--color-2);
                             height: 1.5rem;
                             display: flex;
                             align-items: center;
@@ -415,13 +418,58 @@ const lossPercentageSplit = computed(() => {
                     }
                 }
 
+                .difficulty-results {
+                    margin: 2rem 0;
+                    padding: 0 1rem;
+                    text-align: left; 
+
+                    p {
+                        padding-bottom: 1rem;
+                    }
+
+                    .bar-chart-container {
+                        display: flex;
+                        flex-direction: column;
+                        gap: .5rem;
+
+                        .bar-item {
+                            display: flex;
+                            align-items: center;
+
+                            .caption {
+                                width: 35%; 
+                            }
+
+                            .bar {
+                                background-color: var(--color-1);
+                                border-radius: 0 var(--global-border-radius-sm) var(--global-border-radius-sm) 0;
+                                height: 1rem;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-end;
+                                position: relative;
+
+                                .bar-value {
+                                    color: var(--text-primary);
+                                    font-size: .75rem;
+                                    padding-right: 1rem;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 .prev-results {
                     align-items: center;
+                    background-color: var(--background-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--global-border-radius);
                     display: flex;
                     flex-direction: column;
                     gap: .5rem;
                     justify-content: center;
                     margin: 1rem auto;
+                    padding: 1rem;
 
                     .chips {
                         display: flex;
@@ -434,22 +482,14 @@ const lossPercentageSplit = computed(() => {
                             width: .75rem;
 
                             &.green {
-                                background-color: var(--color-easy);
+                                background-color: var(--color-2);
                             }
 
                             &.red {
-                                background-color: var(--danger);
+                                background-color: var(--color-3);
                             }
                         }
                     }
-                }
-
-                .difficulty-results {
-                    display: flex;
-                    flex-direction: column;
-                    gap: .5rem;
-                    margin-top: 1rem;
-                    text-align: center;
                 }
             }
         }
