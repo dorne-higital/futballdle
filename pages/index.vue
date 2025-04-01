@@ -10,10 +10,6 @@
         :class="{ 'dark': isDarkMode }"
         class="content-container"
     >
-        <!-- <Game 
-            :darkMode="isDarkMode"
-        /> -->
-
         <div v-if="alreadyPlayed" class="game-summaries-container content">
             <p>It looks like you have already played. See your scores for today, and come back tomorrow for more games.</p>
             <div v-for="(summary, index) in [...gameSummaries].reverse()" :key="index" :class="{ 'game-won': summary.won, 'game-lost': !summary.won }" class="prev-games">
@@ -73,29 +69,6 @@
             :darkMode="isDarkMode"
             :currentUserId="userId"
             @close="closeLeaderboardModal"
-        />
-
-        <StatsModal 
-            :darkMode="isDarkMode"
-            :isOpen="isStatsOpen" 
-            :stats="gameStats" 
-            :userId="userId"
-            @close="closeStats" 
-            @nameUpdated="handleNameUpdate"
-        />
-
-        <InfoModal 
-            :darkMode="isDarkMode"
-            :isOpen="isInfoModalOpen" 
-            @close="closeInfoModal" 
-        />
-
-        <SettingsModal 
-            :darkMode="isDarkMode"
-            :isOpen="isSettingsModalOpen" 
-            :userId="userId"
-            @toggleDarkMode="toggleDarkMode"
-            @close="closeSettingsModal" 
         /> -->
     </section>
 </template>
