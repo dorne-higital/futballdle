@@ -85,6 +85,7 @@
     import { useStatsStore } from '~/stores/stats';
     import { useNuxtApp } from '#app';
     import { doc, getDoc } from 'firebase/firestore';
+    import { v4 as uuidv4 } from 'uuid';
 
     const isLoading = ref(true);
     const isStatsOpen = ref(false);
@@ -106,6 +107,10 @@
     const gameStats = computed(() => {
         return statsStore.getStats;
     });
+
+    const generateUUID = () => {
+        return uuidv4();
+    };
 
     const fetchStats = async () => {
         try {
