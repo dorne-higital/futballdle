@@ -137,7 +137,7 @@
 
             <HeadingSeparator text="or" class="subtle"/>
 
-            <nuxt-link class="clue-cta" to="/">
+            <nuxt-link class="clue-cta link" to="/">
                 Home
 
                 <span>
