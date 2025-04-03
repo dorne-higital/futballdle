@@ -1,169 +1,155 @@
 <template>
     <div :class="[{ 'dark': darkMode },currentDifficultyClass]" class="game">
-        <span v-if="!alreadyPlayed && guessesRemaining > 0" class="game-info">
-            <p class="caption">Game {{ currentGame }}</p>
+        <div v-if="loading" class="loading-container">
+            <Loader />
+        </div>
+        <template v-else>
+            <span v-if="!alreadyPlayed && guessesRemaining > 0" class="game-info">
+                <p class="caption">Game {{ currentGame }}</p>
 
-            <p class="caption">Guess {{ currentGuessNumber }} / 6</p>
-        </span>
+                <p class="caption">Guess {{ currentGuessNumber }} / 6</p>
+            </span>
 
-        <p v-else-if="alreadyPlayed" class="opening-comms">You have reached your daily play limit. See the summary below of your games, and check back tomorrow for another try!</p>
+            <p v-else-if="alreadyPlayed" class="opening-comms">You have reached your daily play limit. See the summary below of your games, and check back tomorrow for another try!</p>
 
-        <template v-if="!alreadyPlayed">
-            <div class="guesses-input-container">
-                <div class="guess-container">
-                    <input v-if="!won && !gameOver" v-model="currentGuess" placeholder="Enter player name" :disabled="gameOver" />
-                    <ul v-if="filteredSuggestions.length > 0" class="suggestions">
-                        <li v-for="suggestion in filteredSuggestions" :key="suggestion.name" class="caption player-suggestion" @click="selectSuggestion(suggestion.name)">
-                            {{ suggestion.name }}
+            <template v-if="!alreadyPlayed">
+                <div class="guesses-input-container">
+                    <div class="guess-container">
+                        <input v-if="!won && !gameOver" v-model="currentGuess" placeholder="Enter player name" :disabled="gameOver" />
+                        <ul v-if="filteredSuggestions.length > 0" class="suggestions">
+                            <li v-for="suggestion in filteredSuggestions" :key="suggestion.name" class="caption player-suggestion" @click="selectSuggestion(suggestion.name)">
+                                {{ suggestion.name }}
 
-                            <Icon 
-                                v-if="suggestion.guessed"
-                                class="guessed-indicator"
-                                name="carbon:close-outline"
-                            />
-                        </li>
-                    </ul>
+                                <Icon 
+                                    v-if="suggestion.guessed"
+                                    class="guessed-indicator"
+                                    name="carbon:close-outline"
+                                />
+                            </li>
+                        </ul>
+                    </div>
+
+                    <span 
+                        v-for="(guessObj, index) in guesses" 
+                        :key="index" 
+                        class="previous-guess" 
+                        :class="{
+                            'correct-guess': guessObj.correct,             
+                            'single-guess': guesses.length === 1 
+                        }"
+                    >
+                        {{ guessObj.guess }}
+
+                        <Icon
+                            v-if="guessObj.correct"
+                            class="guessed-indicator"
+                            name="carbon:checkmark"
+                        />
+
+                        <Icon 
+                            v-else
+                            class="guessed-indicator"
+                            name="carbon:close"
+                        />
+                    </span>
                 </div>
 
-                <span 
-                    v-for="(guessObj, index) in guesses" 
-                    :key="index" 
-                    class="previous-guess" 
-                    :class="{
-                        'correct-guess': guessObj.correct,             
-                        'single-guess': guesses.length === 1 
-                    }"
-                >
-                    {{ guessObj.guess }}
+                <div v-if="won" class="clue-container winner">
+                    <span class="label">Winner</span>
 
-                    <Icon
-                        v-if="guessObj.correct"
-                        class="guessed-indicator"
-                        name="carbon:checkmark"
-                    />
+                    <div class="content-row">
+                        <p class="caption">Player</p>
 
-                    <Icon 
-                        v-else
-                        class="guessed-indicator"
-                        name="carbon:close"
-                    />
-                </span>
-            </div>
+                        <p>{{ targetPlayer.name }}</p>
+                    </div>
 
-            <div v-if="won" class="clue-container winner">
-                <span class="label">Winner</span>
+                    <div class="content-row">
+                        <p class="caption">Guesses</p>
 
-                <div class="content-row">
-                    <p class="caption">Player</p>
+                        <p>{{ currentGuessNumber - 1 }} / 6</p>
+                    </div>
 
-                    <p>{{ targetPlayer.name }}</p>
+                    <p class="caption splitter">Nice win - Ready to go again?</p>
+
+                    <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
+
+                    <button v-else class="button secondary full" @click="startNewGame">New Game</button>
                 </div>
 
-                <div class="content-row">
-                    <p class="caption">Guesses</p>
+                <div v-else-if="gameOver && !won" class="clue-container loser">
+                    <span class="label">Loser</span>
 
-                    <p>{{ currentGuessNumber - 1 }} / 6</p>
+                    <div class="content-row">
+                        <p class="caption">Player</p>
+
+                        <p>{{ targetPlayer.name }}</p>
+                    </div>
+
+                    <div class="content-row">
+                        <p class="caption">Guesses</p>
+
+                        <p>Failure</p>
+                    </div>
+
+                    <p class="caption splitter">Unlucky - Try again on the next game</p>
+
+                    <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
+
+                    <button v-else class="button danger full" @click="startNewGame">New Game</button>
                 </div>
 
-                <p class="caption splitter">Nice win - Ready to go again?</p>
+                <div v-else class="clue-container">
+                    <span class="label">Clues</span>
 
-                <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
+                    <div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
+                        <div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
+                            <p v-if="rowIndex * 3 + colIndex >= clues.length" class="clue-icon">{{ rowIndex * 3 + colIndex + 1 }}</p>
 
-                <button v-else class="button secondary full" @click="startNewGame">New Game</button>
-            </div>
-
-            <div v-else-if="gameOver && !won" class="clue-container loser">
-                <span class="label">Loser</span>
-
-                <div class="content-row">
-                    <p class="caption">Player</p>
-
-                    <p>{{ targetPlayer.name }}</p>
-                </div>
-
-                <div class="content-row">
-                    <p class="caption">Guesses</p>
-
-                    <p>Failure</p>
-                </div>
-
-                <p class="caption splitter">Unlucky - Try again on the next game</p>
-
-                <p v-if="gamesRemainingToday === 0">Come back tomorrow for another try!!!</p>
-
-                <button v-else class="button danger full" @click="startNewGame">New Game</button>
-            </div>
-
-            <div v-else class="clue-container">
-                <span class="label">Clues</span>
-
-                <div v-for="(row, rowIndex) in cluesGrid" :key="rowIndex" class="clues-row">
-                    <div v-for="(clue, colIndex) in row" :key="colIndex" class="clue-item">
-                        <p v-if="rowIndex * 3 + colIndex >= clues.length" class="clue-icon">{{ rowIndex * 3 + colIndex + 1 }}</p>
-
-                        <template v-else>
-                            <span class="clue-title">{{ getClueTitle(rowIndex * 3 + colIndex) }}</span>
-                            <span class="clue">{{ clue }}</span>
-                        </template>
+                            <template v-else>
+                                <span class="clue-title">{{ getClueTitle(rowIndex * 3 + colIndex) }}</span>
+                                <span class="clue">{{ clue }}</span>
+                            </template>
+                        </div>
                     </div>
                 </div>
+            </template>
+
+            <div v-if="gameSummaries.length > 0 && alreadyPlayed" class="clue-container" :key="gameSummaries.length">
+                <span class="label">Game Over</span>
+
+                <div v-for="(summary, index) in [...gameSummaries].reverse()" :key="index" class="prev-games">
+                    <p class="caption">Game {{ index + 1 }}</p>
+                    <span class="summary-row">
+                        <p>{{ summary.targetPlayer.name }}</p>
+
+                        <p v-if="summary.won">{{ summary.guesses.length }} / 6</p>
+                        <p v-else>Failed</p>
+                    </span>
+                </div>
+
+                <div class="row">  
+                    <nuxt-link class="button primary full" to="/stats">Stats</nuxt-link>
+
+                    <nuxt-link class="button primary full" to="/leaderboard">Leaderboard</nuxt-link>
+                </div>
+
+                <HeadingSeparator text="or" class="subtle"/>
+
+                <div class="game-over-cta">
+                    <nuxt-link class="link" to="/">
+                        Home
+
+                        <span>
+                            <Icon name="solar:alt-arrow-right-linear"/>
+                        </span>
+                    </nuxt-link>
+                </div>
             </div>
+
+            <GameOverModal :darkMode="darkMode" :isOpen="isGameOverModalOpen" :won="won" :targetPlayer="targetPlayer"
+                :guesses="guesses" :alreadyPlayed="alreadyPlayed" :difficulty="currentDifficulty"
+                @close="closeGameOverModal" @newGame="startNewGame" />
         </template>
-
-        <div v-if="gameSummaries.length > 0 && alreadyPlayed" class="clue-container" :class="[{ 'winner': won }, { 'loser': !won }]" :key="gameSummaries.length">
-            <span v-if="won" class="label">Winner</span>
-            <span v-else class="label">Loser</span>
-
-            <div class="content-row">
-                <p class="caption">Player</p>
-
-                <p>{{ targetPlayer.name }}</p>
-            </div>
-
-            <div class="content-row">
-                <p class="caption">Guesses</p>
-
-                <p v-if="won">{{ currentGuessNumber - 1 }} / 6</p>
-                <p v-else>Failure</p>
-            </div>
-
-            <p class="caption section">Looks like you have played 3 / 3 for the day. Come back tomorrow and play again!</p>
-
-            <div class="row">  
-                <nuxt-link class="button primary full" to="/stats">Stats</nuxt-link>
-
-                <nuxt-link class="button primary full" to="/leaderboard">Leaderboard</nuxt-link>
-            </div>
-
-            <HeadingSeparator text="or" class="subtle"/>
-
-            <nuxt-link class="clue-cta link" to="/">
-                Home
-
-                <span>
-                    <Icon name="solar:alt-arrow-right-linear"/>
-                </span>
-            </nuxt-link>
-                
-            <!-- <div v-for="(summary, index) in [...gameSummaries].reverse()" :key="index" :class="{ 'game-won': summary.won, 'game-lost': !summary.won }" class="prev-games">
-                <p class="title">
-                    <span class="difficulty-badge" :class="getDifficultyClass(index)">{{ getDifficultyLabel(index) }}</span>
-                </p>
-                <span class="summary-row">
-                    <p>Player</p>
-                    <p>{{ summary.targetPlayer.name }}</p>
-                </span>
-                <span class="summary-row">
-                    <p>Guesses</p>
-                    <p v-if="summary.won">{{ summary.guesses.length }} / 6</p>
-                    <p v-else>Failed</p>
-                </span>
-            </div> -->
-        </div>
-
-        <GameOverModal :darkMode="darkMode" :isOpen="isGameOverModalOpen" :won="won" :targetPlayer="targetPlayer"
-            :guesses="guesses" :alreadyPlayed="alreadyPlayed" :difficulty="currentDifficulty"
-            @close="closeGameOverModal" @newGame="startNewGame" />
     </div>
 </template>
 
@@ -176,6 +162,7 @@
 	import { v4 as uuidv4 } from 'uuid';
 
     const { $firestore: db } = useNuxtApp();
+    const loading = ref(true);
 
     const DIFFICULTY = {
         EASY: 1,
@@ -294,16 +281,6 @@
         return DIFFICULTY.HARD;
     };
 
-    // Get difficulty label for display
-    const currentDifficultyLabel = computed(() => {
-        switch (currentDifficulty.value) {
-            case DIFFICULTY.EASY: return 'Easy';
-            case DIFFICULTY.MEDIUM: return 'Medium';
-            case DIFFICULTY.HARD: return 'Hard';
-            default: return 'Unknown';
-        }
-    });
-
     const currentGame = computed(() => {
         switch (currentDifficulty.value) {
             case DIFFICULTY.EASY: return '1';
@@ -323,22 +300,12 @@
         }
     });
 
-    // Helper functions for game summaries
-    const getDifficultyLabel = (index) => {
-        // For showing Easy/Medium/Hard in correct order
-        if (index === 0) return 'Easy';
-        if (index === 1) return 'Medium';
-        return 'Hard';
-
-    };
-
-    const getDifficultyClass = (index) => {
-        if (index === 0) return 'difficulty-easy';
-        if (index === 1) return 'difficulty-medium';
-        return 'difficulty-hard';
-    };
-
     onMounted(async () => {
+        if (process.client) { // Check if running on the client
+            checkDailyPlay();
+            window.addEventListener('keydown', handleDesktopKeyPress);
+        }
+
         if (process.client) { // Check if running on the client
             const storedSummaries = localStorage.getItem('gameSummaries');
             if (storedSummaries) {
@@ -349,11 +316,6 @@
         await playerStore.fetchPlayers();
         await loadStats();
 
-        if (process.client) { // Check if running on the client
-            checkDailyPlay();
-            window.addEventListener('keydown', handleDesktopKeyPress);
-        }
-
         if (!gameOver.value && playerStore.players && playerStore.players.length > 0) {
             currentDifficulty.value = getCurrentDifficulty();
             targetPlayer.value = playerStore.getRandomPlayerByDifficulty(currentDifficulty.value);
@@ -361,6 +323,7 @@
         }
 
         await nextTick();
+        loading.value = false;
     });
 
     onUnmounted(() => {
@@ -381,17 +344,6 @@
             grid[row].push(clues.value[i] || null);
         }
         return grid;
-    });
-
-    const clueIcons = computed(() => {
-        return [
-            'carbon:number-1',
-            'carbon:number-2',
-            'carbon:number-3',
-            'carbon:number-4',
-            'carbon:number-5',
-            'carbon:number-6',
-        ];
     });
 
     const checkDailyPlay = () => {
@@ -994,6 +946,29 @@
             padding: 1rem;
             width: calc(100% - 4rem);
 
+			.prev-games {
+                border-radius: var(--global-border-radius-sm);
+				display: flex;
+				flex-direction: column;
+				gap: .3rem;
+				padding: .5rem;
+				width: 100%;
+
+				.title {
+					align-items: center;
+					display: flex;
+					gap: .5rem;
+					justify-content: center;
+					padding-bottom: .5rem;
+				}
+
+				.summary-row {
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+				}
+			}
+
             &.winner {
                 border: 2px solid var(--color-2);
 
@@ -1037,14 +1012,8 @@
             .row {
                 display: flex;
                 gap: .5rem;
+                margin-top: 1rem;
                 text-align: center;
-                width: 100%;
-            }
-
-            .clue-cta {
-                align-items: center;
-                display: flex;
-                justify-content: center;
                 width: 100%;
             }
 
@@ -1053,7 +1022,16 @@
                 flex-direction: row;
                 justify-content: space-between;
             }
+            .game-over-cta{
+                align-items: center;
+                display: flex;
+                justify-content: center;
+                width: 100%;
 
+                a {
+                    width: fit-content;
+                }
+            }
             .label {
                 position: absolute;
                 top: 0;
@@ -1216,60 +1194,6 @@
 							font-size: .75rem;
 						}
 					}
-				}
-			}
-		}
-
-		.game-summaries {
-			background-color: var(--background-secondary);
-			border: 1px solid var(--border);
-            border-radius: var(--global-border-radius);
-			display: flex;
-			flex-direction: column;
-			gap: .5rem;
-			margin-top: 1rem;
-			padding: .5rem;
-			text-align: center;
-			width: 100%;
-
-			.prev-games {
-                border-radius: var(--global-border-radius-sm);
-				display: flex;
-				flex-direction: column;
-				gap: .3rem;
-				padding: .5rem;
-				width: 100%;
-
-				.title {
-					align-items: center;
-					display: flex;
-					gap: .5rem;
-					justify-content: center;
-					padding-bottom: .5rem;
-				}
-
-				&.game-won {
-					background-color: var(--success);
-					border: 1px solid var(--color-easy);
-
-					.title {
-						border-bottom: 1px solid var(--color-easy);
-					}
-				}
-
-				&.game-lost {
-					background-color: var(--danger);
-					border: 1px solid var(--color-hard);
-
-					.title {
-						border-bottom: 1px solid var(--color-hard);
-					}
-				}
-
-				.summary-row {
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
 				}
 			}
 		}
