@@ -46,23 +46,29 @@
 
                     <div class="bar-chart-container">
                         <div class="bar-item">
-                            <span class="caption">Game 1 (easy)</span>
-                            <div class="bar" :style="{ width: calculatePercentage(stats.easyGamesWon) + '%' }">
-                                <span class="bar-value">{{ stats.easyGamesWon }}</span>
+                            <span class="caption">Game 1</span>
+                            <div class="bar-container">
+                                <div class="bar" :style="{ width: calculatePercentage(stats.easyGamesWon) + '%' }">
+                                    <span class="bar-value">{{ stats.easyGamesWon }}</span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="bar-item">
-                            <span class="caption">Game 2 (medium)</span>
-                            <div class="bar" :style="{ width: calculatePercentage(stats.mediumGamesWon) + '%' }">
-                                <span class="bar-value">{{ stats.mediumGamesWon }}</span>
+                            <span class="caption">Game 2</span>
+                            <div class="bar-container">
+                                <div class="bar" :style="{ width: calculatePercentage(stats.mediumGamesWon) + '%' }">
+                                    <span class="bar-value">{{ stats.mediumGamesWon }}</span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="bar-item">
-                            <span class="caption">Game 3 (hard)</span>
-                            <div class="bar" :style="{ width: calculatePercentage(stats.hardGamesWon) + '%' }">
-                                <span class="bar-value">{{ stats.hardGamesWon }}</span>
+                            <span class="caption">Game 3</span>
+                            <div class="bar-containe">
+                                <div class="bar" :style="{ width: calculatePercentage(stats.hardGamesWon) + '%' }">
+                                    <span class="bar-value">{{ stats.hardGamesWon }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -418,14 +424,19 @@ const lossPercentageSplit = computed(() => {
                     .bar-chart-container {
                         display: flex;
                         flex-direction: column;
-                        gap: .5rem;
 
                         .bar-item {
-                            display: flex;
                             align-items: center;
+                            display: flex;
 
                             .caption {
-                                width: 35%; 
+                                border-right: 3px solid var(--color-1);
+                                padding: .25rem 0;
+                                width: 30%; 
+                            }
+
+                            .bar-container {
+                                width: 70%;
                             }
 
                             .bar {
@@ -434,13 +445,13 @@ const lossPercentageSplit = computed(() => {
                                 height: 1rem;
                                 display: flex;
                                 align-items: center;
-                                justify-content: flex-end;
+                                justify-content: flex-start;
                                 position: relative;
 
                                 .bar-value {
                                     color: var(--text-primary);
                                     font-size: .75rem;
-                                    padding-right: 1rem;
+                                    padding-left: .25rem;
                                 }
                             }
                         }
