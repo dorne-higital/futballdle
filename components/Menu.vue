@@ -68,7 +68,7 @@
 			</div>
 
 			<div class="theme-section">
-				<h6>Theme</h6>
+				<!-- <h6>Theme</h6> -->
 			</div>
 		</div>
 	</section>
