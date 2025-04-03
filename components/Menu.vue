@@ -75,95 +75,101 @@
 </template>
   
 <script setup>
-	import { defineProps, defineEmits } from 'vue';
-	import HeadingSeparator from '../components/HeadingSeparator.vue';
-	import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
-	import { getAuth, deleteUser, onAuthStateChanged } from 'firebase/auth';
+    import { defineProps, defineEmits, watch, onMounted } from 'vue';
+    import HeadingSeparator from '../components/HeadingSeparator.vue';
+    import { doc, updateDoc, getDoc } from 'firebase/firestore';
+    import { getAuth } from 'firebase/auth';
 
-  
-	const props = defineProps({
-		isVisible: Boolean,
-		userId: String,
-		initialDisplayName: String,
-	});
-  
-	const emit = defineEmits(['closeMenu', 'nameUpdated']);
-	const { $firestore: db } = useNuxtApp();
+    const props = defineProps({
+        isVisible: Boolean,
+        userId: String,
+        initialDisplayName: String,
+    });
 
-	const isEditingName = ref(false);
-	const displayName = ref(props.initialDisplayName || '');
-	const newDisplayName = ref('');
-	const nameInput = ref(null);
-	
-	const closeMenu = () => {
-		emit('closeMenu');
-	};
-  
+    const emit = defineEmits(['closeMenu', 'nameUpdated']);
+    const { $firestore: db } = useNuxtApp();
 
-  	// Display Name Logic
-	const startEditName = () => {
-		newDisplayName.value = displayName.value;
-		isEditingName.value = true;
-		nextTick(() => {
-			if (nameInput.value) {
-				nameInput.value.focus();
-			}
-		});
-	};
+    const isEditingName = ref(false);
+    const displayName = ref(props.initialDisplayName || '');
+    const newDisplayName = ref('');
+    const nameInput = ref(null);
 
-	const saveName = async () => {
-		if (!newDisplayName.value.trim()) {
-			cancelEdit();
-			return;
-		}
-		try {
-			const trimmedName = newDisplayName.value.trim();
-			if (props.userId) {
-				console.log("Updating display name for userId:", props.userId);
-				await updateDoc(doc(db, 'users', props.userId), {
-					displayName: trimmedName,
-				});
-				console.log("Display name updated successfully.");
-				displayName.value = trimmedName;
-				isEditingName.value = false;
-				localStorage.setItem('playerDisplayName', trimmedName);
-				emit('nameUpdated', trimmedName);
-			} else {
-				console.error("userId is not defined.");
-			}
-		} catch (error) {
-			console.error('Error updating display name:', error);
-			localStorage.setItem('playerDisplayName', newDisplayName.value.trim());
-			displayName.value = newDisplayName.value.trim();
-			isEditingName.value = false;
-		}
-	};
+    const closeMenu = () => {
+        emit('closeMenu');
+    };
 
-	const cancelEdit = () => {
-		isEditingName.value = false;
-		newDisplayName.value = '';
-	};
+    // Display Name Logic
+    const startEditName = () => {
+        newDisplayName.value = displayName.value;
+        isEditingName.value = true;
+        nextTick(() => {
+            if (nameInput.value) {
+                nameInput.value.focus();
+            }
+        });
+    };
 
-	const retrieveDisplayName = async (userId) => {
-		try {
-			const userDoc = await getDoc(doc(db, 'users', userId));
-			if (userDoc.exists()) {
-			const userData = userDoc.data();
-			const storedDisplayName = userData.displayName;
-			console.log("Retrieved displayName:", storedDisplayName);
-			displayName.value = storedDisplayName;
-			} else {
-			console.log("User document not found.");
-			}
-		} catch (error) {
-			console.error("Error retrieving display name:", error);
-		}
-	};
-	onMounted(() => {
-		if (props.userId) {
-			retrieveDisplayName(props.userId);
-		}
-	});
+    const saveName = async () => {
+        if (!newDisplayName.value.trim()) {
+            cancelEdit();
+            return;
+        }
+        try {
+            const trimmedName = newDisplayName.value.trim();
+            if (props.userId) {
+                console.log("Updating display name for userId:", props.userId);
+                await updateDoc(doc(db, 'users', props.userId), {
+                    displayName: trimmedName,
+                });
+                console.log("Display name updated successfully.");
+                displayName.value = trimmedName;
+                isEditingName.value = false;
+                localStorage.setItem('playerDisplayName', trimmedName);
+                emit('nameUpdated', trimmedName); // Emit the updated name
+            } else {
+                console.error("userId is not defined.");
+            }
+        } catch (error) {
+            console.error('Error updating display name:', error);
+            localStorage.setItem('playerDisplayName', newDisplayName.value.trim());
+            displayName.value = newDisplayName.value.trim();
+            isEditingName.value = false;
+        }
+    };
+
+    const cancelEdit = () => {
+        isEditingName.value = false;
+        newDisplayName.value = '';
+    };
+
+    const retrieveDisplayName = async (userId) => {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const storedDisplayName = userData.displayName;
+                console.log("Retrieved displayName:", storedDisplayName);
+                displayName.value = storedDisplayName;
+            } else {
+                console.log("User document not found.");
+            }
+        } catch (error) {
+            console.error("Error retrieving display name:", error);
+        }
+    };
+
+    onMounted(() => {
+        if (props.userId) {
+            retrieveDisplayName(props.userId);
+        }
+    });
+
+    watch(
+        () => props.initialDisplayName,
+        (newDisplayNameProp) => {
+            displayName.value = newDisplayNameProp || '';
+        }
+    );
 </script>
   
 <style lang="scss" scoped>

@@ -201,15 +201,10 @@ ul, li, span, sup, a {
     }
 
     &.danger {
-        background-color: var(--color-2);
-        color: var(--text-primary);
+        background-color: var(--color-3);
+        color: var(--background-primary);
         font-size: 1rem;
         padding: .5rem;
-
-        &:hover {
-            background-color: var(--color-hard-hover);
-            cursor: pointer;
-        }
     }
 
     &.link {

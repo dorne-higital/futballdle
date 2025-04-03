@@ -49,7 +49,7 @@
             console.log("Header - currentUserId:", currentUserId.value); // Add this line
             console.log("Header - userDisplayName:", userDisplayName.value); // Add this line
         }
-    });
+	});
 	
 	const openMenu = () => {
 		menuOpen.value = true;
