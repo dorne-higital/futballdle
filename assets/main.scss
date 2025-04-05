@@ -183,6 +183,7 @@ ul, li, span, sup, a {
     border-radius: var(--global-border-radius-sm);
 
     &.full {
+        text-align: center;
         width: 100%;
     }
 

@@ -1,42 +1,20 @@
 <template>
     <div v-if="isOpen" :class="{ 'dark': darkMode }" class="game-over-modal">
+        <PageHero 
+			v-if="won"
+            :heading="winMessage"
+			:subheading="'You won ' + difficultyLabel + ' in ' + guesses.length + ' / 6'"
+			theme="win"
+        />
+
+        <PageHero 
+			v-else-if="!won"
+            :heading="loseMessage"
+			:subheading="'You failed ' + difficultyLabel + ' this time'"
+			theme="lose"
+        />
+
         <div class="modal-content">
-            <div 
-				:class="{ 'winner': won, 'loser': !won }"
-				class="modal-header"
-			>
-                <h2 v-if="won">
-                    {{ winMessage }}
-                </h2>
-                <h2 v-else-if="!won">
-                    {{ alreadyPlayedMessage }}
-                </h2>
-
-				<Icon 
-					class="close-button"
-					name="carbon:close-filled" 
-					@click="closeModal"
-				/>
-            </div>
-
-            <div class="guesses">
-				<span 
-					class="difficulty-badge" 
-					:class="difficultyClass"
-				>
-					<p>{{ difficultyLabel }}</p>
-
-					<span>|</span>
-					
-					<p v-if="won">
-						You guessed the player in {{ guesses.length }} guesses.
-					</p>
-					<p v-else-if="targetPlayer">
-						The player was {{ targetPlayer.name }}.
-					</p>
-				</span>
-            </div>
-
             <div class="modal-body">
 				<div class="player-stats" v-if="targetPlayer">
 					<div class="stat-row">
@@ -84,42 +62,52 @@
 							</span>
 							<p>Played</p>
 						</div>
-
-						<div class="stat-item compact">
-							<span>
-								<h1>{{ targetPlayer.matchesStarted }}</h1>
-							</span>
-							<p>Started</p>
-						</div>
-
-						<div class="stat-item compact">
-							<span>
-								<h1>{{ targetPlayer.goalsScored }}</h1>
-							</span>
-							<p>Goals</p>
-						</div>
-
-						<div class="stat-item compact">
-							<span>
-								<h1>{{ targetPlayer.assists }}</h1>
-							</span>
-							<p>Assists</p>
-						</div>
-
-						<div class="stat-item compact yellow">
-							<span>
-								<h1>{{ targetPlayer.yellowCards }}</h1>
-							</span>
-							<p>Yellow's</p>
-						</div>
-
-						<div class="stat-item compact red">
-							<span>
-								<h1>{{ targetPlayer.redCards }}</h1>
-							</span>
-							<p>Red's</p>
-						</div>
 					</div>
+
+					<div class="stat-container">
+						<span class="label">Stats</span>
+
+						<span class="section">
+							<p class="caption">Games Started</p>
+
+							<p>{{ targetPlayer.matchesStarted }}</p>
+						</span>
+						<span class="section">
+							<p class="caption">Goals</p>
+
+							<p>{{ targetPlayer.goalsScored }}</p>
+						</span>
+						<span class="section">
+							<p class="caption">Assists</p>
+
+							<p>{{ targetPlayer.assists }}</p>
+						</span>
+						<span class="section">
+							<p class="caption">xG</p>
+
+							<p>{{ targetPlayer.expectedGoals }}</p>
+						</span>
+
+						<HeadingSeparator text="Cards"/>
+
+						<span class="section">
+							<p class="caption">Yellows</p>
+
+							<p>{{ targetPlayer.yellowCards }}</p>
+						</span>
+						<span class="section">
+							<p class="caption">Reds</p>
+
+							<p>{{ targetPlayer.redCards }}</p>
+						</span>
+					</div>
+
+					<nuxt-link 
+						class="button primary full"
+						@click="closeModal"
+					>
+						Back to game
+					</nuxt-link>
 				</div>
 
 				<p class="small">Stats are accurate to end of Feb 2025, and are applicable to the 24/25 season</p>
@@ -154,33 +142,11 @@
 
 	const difficultyLabel = computed(() => {
 		switch (props.difficulty) {
-			case 1: return 'Easy';
-			case 2: return 'Medium';
-			case 3: return 'Hard';
+			case 1: return 'Game 1';
+			case 2: return 'Game 2';
+			case 3: return 'Game 3';
 			default: return 'Unknown';
 		}
-	});
-
-	const difficultyClass = computed(() => {
-		switch (props.difficulty) {
-			case 1: return 'difficulty-easy';
-			case 2: return 'difficulty-medium';
-			case 3: return 'difficulty-hard';
-			default: return '';
-	}
-	});
-
-	const gamesRemainingToday = computed(() => {
-		const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-		return Math.max(0, 3 - playsToday);
-	});
-
-	const difficultyNextGame = computed(() => {
-		const playsToday = parseInt(localStorage.getItem('playsToday') || '0');
-		
-		if (playsToday === 0) return 'Easy';
-		if (playsToday === 1) return 'Medium';
-		return 'Hard';
 	});
 
 	const winMessage = computed(() => {
@@ -189,10 +155,6 @@
 
 	const loseMessage = computed(() => {
 		return loseMessages[Math.floor(Math.random() * loseMessages.length)];
-	});
-
-	const alreadyPlayedMessage = computed(() => {
-		return alreadyPlayedMessages[Math.floor(Math.random() * alreadyPlayedMessages.length)];
 	});
 
 	const gameSummaries = ref([]);
@@ -270,6 +232,7 @@
 		align-items: center;
 		background-color: var(--background-primary);
 		display: flex;
+		flex-direction: column;
 		height: 100%;
 		justify-content: center;
 		left: 0;
@@ -286,39 +249,9 @@
 			height: 100%;
 			max-width: 600px;
 			overflow: scroll;
+			padding: 1rem 0;
 			position: relative;
 			width: 100%;
-
-			.modal-header {
-				align-items: center;
-				background-color: var(--background-primary);
-				border-bottom: 1px solid var(--background-secondary);
-				box-shadow: 0px 0px 15px 0px var(--background-secondary);
-				display: flex;
-				justify-content: space-between;
-				padding: 1rem;
-				position: sticky;
-				top: 0;
-				z-index: 9999;
-
-				&.winner {
-					background-color: var(--success);
-					border: 1px solid var(--color-easy);
-				}
-
-				&.loser {
-					background-color: var(--danger);
-					border: 1px solid var(--color-hard);
-				}
-			}
-
-			.guesses {
-				width: 100%;
-
-				.difficulty-badge {
-					border-radius: 0;
-				}
-			}
 
 			.modal-body {
 				text-align: left;
@@ -348,15 +281,16 @@
 							border-radius: var(--global-border-radius);
 							display: flex;
 							flex-direction: column;
-							gap: .5rem;
 							padding: .5rem;
 							width: calc(50% - .25rem);
 
 							&.compact {
-								width: calc(25% - .375rem) !important;
+								width: calc(33% - .26rem) !important;
 
 								span {
 									aspect-ratio: auto;
+									display: flex;
+									flex-direction: column;
 								}
 
 								h1 {
@@ -364,30 +298,14 @@
 								}
 							}
 
-							&.yellow {
-								background-color: var(--color-medium);
-								border: 1px solid var(--color-medium-hover);
-
-								p {
-									border-top: 1px solid var(--color-medium-hover);
-								}
-							}
-
-							&.red {
-								background-color: var(--color-hard);
-								border: 1px solid var(--color-hard-hover);
-
-								p {
-									border-top: 1px solid var(--color-hard-hover);
-								}
-							}
-
 							span {
 								align-items: center;
 								aspect-ratio: 1 / 1;
+								border-bottom: 1px solid var(--border);
 								display: flex;
 								justify-content: center;
 								height: calc(100% - 2rem);
+								padding: .5rem .25rem;
 								width: 100%;
 
 								h1 {
@@ -396,11 +314,36 @@
 							}
 
 							p {
-								border-top: 1px solid var(--border);
 								font-size: .75rem;
 								line-height: 2rem;
 								text-align: center;
 							}
+						}
+					}
+
+					.stat-container {
+						border: 1px solid var(--border);
+						border-radius: var(--global-border-radius);
+						margin: 1rem 0;
+						padding: 1rem;
+						position: relative;
+						width: 100%;
+
+						.section {
+							display: flex;
+							flex-direction: row;
+							justify-content: space-between;
+							padding: .25rem 0;
+						}
+						
+						.label {
+							position: absolute;
+							top: 0;
+							left: 50%;
+							transform: translate(-50%, -50%);
+							background-color: var(--background-primary);
+							padding: 0 .75rem;
+							text-transform: uppercase;
 						}
 					}
 				}
