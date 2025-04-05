@@ -77,8 +77,12 @@
                 <div class="prev-results">
                     <span class="stat-label">Recent results</span>
 
-                    <div class="chips">
-                        <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
+                    <div class="content">
+                        <div class="chips">
+                            <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
+                        </div>
+
+                        <p class="caption recent-tag">Most recent ^</p>
                     </div>
                 </div>
 
@@ -455,23 +459,36 @@ const lossPercentageSplit = computed(() => {
                     margin: 1rem auto;
                     padding: 1rem;
 
-                    .chips {
+                    .content {
+                        border-right: 3px solid var(--color-1);
                         display: flex;
+                        flex-direction: column;
                         gap: .5rem;
+                        padding: 0 .5rem;
 
-                        .chip {
-                            border-radius: var(--global-border-radius-sm);
-                            display: inline-block;
-                            height: 1.5rem;
-                            width: .75rem;
+                        .chips {
+                            display: flex;
+                            gap: .5rem;
 
-                            &.green {
-                                background-color: var(--color-2);
+                            .chip {
+                                border-radius: var(--global-border-radius-sm);
+                                display: inline-block;
+                                height: 1.5rem;
+                                width: 1.25rem;
+
+                                &.green {
+                                    background-color: var(--color-2);
+                                }
+
+                                &.red {
+                                    background-color: var(--color-3);
+                                }
                             }
+                        }
 
-                            &.red {
-                                background-color: var(--color-3);
-                            }
+                        .recent-tag {
+                            font-size: .5rem;
+                            text-align: right;
                         }
                     }
                 }
