@@ -48,6 +48,7 @@
 		border-radius: 0 0 var(--global-border-radius) var(--global-border-radius);
 		display: flex;
 		justify-content: space-between;
+		max-width: 600px;
 		padding: 2rem 1rem;
 		text-align: right;
 		width: 100%;

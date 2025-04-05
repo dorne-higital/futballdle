@@ -174,6 +174,7 @@
   
 <style lang="scss" scoped>
 	.menu-overlay {
+		align-items: center;
 		position: fixed;
 		right: -100%;
 		width: 100%;
@@ -193,6 +194,7 @@
 
 		.menu-content {
 			background: var(--color-1);
+			max-width: 600px;
 			width: 100%;  
 
 			.header {
@@ -239,6 +241,9 @@
 		}
 
 		.settings-section {
+			max-width: 600px;
+			width: 100%; 
+			 
 			.user-profile-section {
 				margin-bottom: 1rem;
 				padding: .5rem 0;

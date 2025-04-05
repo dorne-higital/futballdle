@@ -26,6 +26,7 @@
         height: 100dvh;
     }
     .page-content{
+        max-width: 600px;
         width: 100%;
         height: 100%;
     }

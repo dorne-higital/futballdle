@@ -3,16 +3,16 @@
 		:class="{ 'dark': darkMode }"
 		class="header"
 	>
-		<nuxt-link class="heading" to="/">Footballdle</nuxt-link>
+		<div class="header-content">
+			<nuxt-link class="heading" to="/">Footballdle</nuxt-link>
 
-		<div class="icons">
-			<Icon 
-				name="solar:menu-dots-square-outline" 
-				@click="openMenu"
-			/>
+			<div class="icons">
+				<Icon 
+					name="solar:menu-dots-square-outline" 
+					@click="openMenu"
+				/>
+			</div>
 		</div>
-
-
 	</div>
 
 	<Menu
@@ -73,10 +73,17 @@
 		align-items: center;
 		background-color: var(--color-1);
 		display: flex;
-		justify-content: space-between;
+		justify-content: center;
 		padding: 1rem;
 		width: 100%;
 		z-index: 2;
+
+		.header-content {
+			display: flex;
+			justify-content: space-between;
+			max-width: 600px;
+			width: 100%;
+		}
 
 		.heading {
 			color: var(--text-secondary);

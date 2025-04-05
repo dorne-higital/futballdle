@@ -73,10 +73,11 @@
 
 <style lang="scss" scoped>
 	.info-page {
+		align-items: center;
 		display: flex;
 		flex-direction: column;
 		padding: 1rem;
-		width: 100%;
+		max-width: 600px;
 
 		.content {
 			display: flex;

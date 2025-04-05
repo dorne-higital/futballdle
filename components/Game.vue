@@ -807,7 +807,7 @@
 		align-items: center;
 		display: flex;
 		flex-direction: column;
-		max-width: 400px;
+		max-width: 600px;
 		padding: 2rem;
 		width: 100vw;
 
@@ -941,6 +941,7 @@
             border: 1px solid var(--border);
             border-radius: var(--global-border-radius);
             bottom: 1rem;
+            max-width: 600px;
             padding: 1rem;
             width: calc(100% - 4rem);
 
@@ -1080,7 +1081,7 @@
             border-radius: var(--global-border-radius);
 			bottom: 1rem;
 			margin: 0 2rem;
-			max-width: 400px;
+			max-width: 600px;
 			padding: .5rem;
 			position: absolute;
 			text-align: center;
