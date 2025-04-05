@@ -139,9 +139,7 @@
                     <nuxt-link class="link caption" to="/">
                         Home
 
-                        <span>
-                            <Icon name="solar:alt-arrow-right-linear"/>
-                        </span>
+                        <Icon name="solar:alt-arrow-right-linear"/>
                     </nuxt-link>
                 </div>
             </div>
