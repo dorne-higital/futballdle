@@ -65,7 +65,7 @@
 
 			<HeadingSeparator text="Ready to go?" theme="color-1" />
 
-			<nuxt-link class="button primary full">Play Now</nuxt-link>
+			<nuxt-link to="/game" class="button primary full">Play Now</nuxt-link>
 
 		</div>
 	</section>
