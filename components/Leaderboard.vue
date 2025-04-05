@@ -111,7 +111,6 @@
 		
 		.modal-content {
 			background-color: var(--background-primary);
-			box-shadow: 0 4px 8px var(--background-secondary);
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
@@ -119,19 +118,6 @@
             margin-top: 1rem;
 			max-width: 600px;
 			width: 100%;
-
-			.modal-header {
-				align-items: center;
-				background-color: var(--background-primary);
-				border-bottom: 1px solid var(--background-secondary);
-				box-shadow: 0px 0px 15px 0px var(--background-secondary);
-				display: flex;
-				justify-content: space-between;
-				padding: 1rem;
-				position: sticky;
-				top: 0;
-				z-index: 9999;
-			}
 
 			.modal-body {
 				display: flex;

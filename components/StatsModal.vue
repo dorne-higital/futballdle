@@ -65,7 +65,7 @@
 
                         <div class="bar-item">
                             <span class="caption">Game 3</span>
-                            <div class="bar-containe">
+                            <div class="bar-container">
                                 <div class="bar" :style="{ width: calculatePercentage(stats.hardGamesWon) + '%' }">
                                     <span class="bar-value">{{ stats.hardGamesWon }}</span>
                                 </div>
@@ -229,7 +229,6 @@ const lossPercentageSplit = computed(() => {
 <style lang="scss" scoped>
     .stats-modal {
         align-items: center;
-        background-color: var(--background-primary);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -247,19 +246,6 @@ const lossPercentageSplit = computed(() => {
             margin-top: 1rem;
             max-width: 600px;
             width: 100%;
-
-            .modal-header {
-                align-items: center;
-                background-color: var(--background-primary);
-                border-bottom: 1px solid var(--background-secondary);
-                box-shadow: 0px 0px 15px 0px var(--background-secondary);
-                display: flex;
-                justify-content: space-between;
-                padding: 1rem;
-                position: sticky;
-                top: 0;
-                z-index: 9999;
-            }
 
             .modal-body {
                 padding: 0 1rem 1rem;
