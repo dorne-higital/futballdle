@@ -51,10 +51,6 @@
 	const allPlayers = ref([]);
 	const { $firestore: db } = useNuxtApp();
 
-	const closeModal = () => {
-		emit('close');
-	};
-
 	const fetchAllPlayers = async () => {
 		try {
 			const playersQuery = query(collection(db, 'users'));

@@ -1,11 +1,4 @@
 <template>
-    <!-- <div 
-        v-if="isLoading" 
-        class="loader-container"
-    >
-        <Loader />
-    </div> -->
-
     <section 
         :class="{ 'dark': isDarkMode }"
         class="content-container"
@@ -62,37 +55,19 @@
                 <Icon name="solar:alt-arrow-right-linear"/>
             </nuxt-link>
         </div>
-
-        <!-- <Leaderboard
-            :darkMode="isDarkMode"
-            :currentUserId="userId"
-            @close="closeLeaderboardModal"
-        /> -->
     </section>
 </template>
   
 <script setup>
     import { ref, onMounted, computed } from 'vue';
-    import Game from '../components/Game.vue';
-    import Leaderboard from '../components/Leaderboard.vue';
     import HeadingSeparator from '../components/HeadingSeparator.vue';
-    import StatsModal from '../components/StatsModal.vue';
-    import InfoModal from '../components/InfoModal.vue';
-    import SettingsModal from '../components/SettingsModal.vue';
-    import Header from '../components/Header.vue';
-    import Loader from '../components/Loader.vue';
-    import { usePlayerStore } from '~/stores/players';
     import { useStatsStore } from '~/stores/stats';
     import { useNuxtApp } from '#app';
     import { doc, getDoc } from 'firebase/firestore';
     import { v4 as uuidv4 } from 'uuid';
 
     const isLoading = ref(true);
-    const isStatsOpen = ref(false);
-    const isInfoModalOpen = ref(false);
-    const isSettingsModalOpen = ref(false);
     const isDarkMode = ref(false);
-    const playerStore = usePlayerStore();
     const statsStore = useStatsStore();
     const userId = ref('');
     const totalGamesPlayed = ref(0);
@@ -103,10 +78,6 @@
     const gameSummaries = ref([]);
 
     const { $firestore: db } = useNuxtApp();
-    
-    const gameStats = computed(() => {
-        return statsStore.getStats;
-    });
 
     const generateUUID = () => {
         return uuidv4();
@@ -165,7 +136,6 @@
         checkDailyPlay();
     });
 
-
     const checkDailyPlay = () => {
         const today = new Date().toISOString().slice(0, 10);
         const storedLastPlayed = localStorage.getItem('lastPlayed');
@@ -184,41 +154,6 @@
         } else {
             alreadyPlayed.value = false;
         }
-    };
-
-
-    const handleNameUpdate = (newName) => {
-        console.log("User display name updated:", newName);
-    };
-
-    const openStats = () => {
-        isStatsOpen.value = true;
-    };
-
-    const closeStats = () => {
-        isStatsOpen.value = false;
-    };
-
-    const openInfo = () => {
-        isInfoModalOpen.value = !isInfoModalOpen.value;
-    };
-
-    const closeInfoModal = () => {
-        isInfoModalOpen.value = false;
-    };
-
-    const openSettings = () => {
-        isSettingsModalOpen.value = !isSettingsModalOpen.value;
-    };
-
-    const closeSettingsModal = () => {
-        isSettingsModalOpen.value = false;
-    };
-
-    const toggleDarkMode = () => {
-        isDarkMode.value = !isDarkMode.value;
-        console.log("Toggled");
-        localStorage.setItem('darkMode', String(isDarkMode.value));
     };
 </script>
 

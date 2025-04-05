@@ -12,7 +12,7 @@
 
 		<p class="text">Warming up...</p>
 	</div>
-  </template>
+</template>
 
 <style lang="scss" scoped>
 	.loader-container {

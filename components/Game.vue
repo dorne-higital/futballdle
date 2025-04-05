@@ -23,7 +23,7 @@
                                 <Icon 
                                     v-if="suggestion.guessed"
                                     class="guessed-indicator"
-                                    name="carbon:close-outline"
+                                    name="solar:close-square-bold-duotone"
                                 />
                             </li>
                         </ul>
@@ -43,13 +43,13 @@
                         <Icon
                             v-if="guessObj.correct"
                             class="guessed-indicator"
-                            name="carbon:checkmark"
+                            name="solar:check-square-bold"
                         />
 
                         <Icon 
                             v-else
                             class="guessed-indicator"
-                            name="carbon:close"
+                            name="solar:close-square-bold-duotone"
                         />
                     </span>
                 </div>

@@ -122,112 +122,101 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed, ref, onMounted, nextTick, watch } from 'vue'; // Add watch import
-import { useNuxtApp } from '#app';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
-import PageHero from '../components/PageHero.vue';
+    import { defineProps, defineEmits, computed, ref, onMounted, nextTick, watch } from 'vue'; // Add watch import
+    import { useNuxtApp } from '#app';
+    import { doc, updateDoc, getDoc } from 'firebase/firestore';
+    import PageHero from '../components/PageHero.vue';
 
-const props = defineProps({
-    isOpen: Boolean,
-    stats: Object,
-    darkMode: Boolean,
-    userId: String, // Add userId prop to identify the user
-});
+    const props = defineProps({
+        isOpen: Boolean,
+        stats: Object,
+        darkMode: Boolean,
+        userId: String, // Add userId prop to identify the user
+    });
 
-const emit = defineEmits(['close', 'nameUpdated']);
+    const emit = defineEmits(['close', 'nameUpdated']);
 
-// Firebase reference
-const { $firestore: db } = useNuxtApp();
+    // Firebase reference
+    const { $firestore: db } = useNuxtApp();
+    const displayName = ref('');
 
-// Name editing state
-const isEditingName = ref(false);
-const displayName = ref('');
-const newDisplayName = ref('');
-const nameInput = ref(null);
+    const totalDifficultyWins = computed(() => {
+        return props.stats.easyGamesWon + props.stats.mediumGamesWon + props.stats.hardGamesWon;
+    });
 
+    const calculatePercentage = (wins) => {
+        if (totalDifficultyWins.value === 0) return 0;
+        return (wins / totalDifficultyWins.value) * 100;
+    };
 
-const totalDifficultyWins = computed(() => {
-    return props.stats.easyGamesWon + props.stats.mediumGamesWon + props.stats.hardGamesWon;
-});
-
-const calculatePercentage = (wins) => {
-    if (totalDifficultyWins.value === 0) return 0;
-    return (wins / totalDifficultyWins.value) * 100;
-};
-
-
-// Initial load from localStorage as backup
-onMounted(async () => {
-    // First try to load from localStorage as fallback
-    const savedName = localStorage.getItem('playerDisplayName');
-    if (savedName) {
-        displayName.value = savedName;
-    }
-    
-    // Then try to fetch from Firebase if we have a userId
-    if (props.userId) {
-        await fetchDisplayName();
-    }
-});
-
-// Watch for changes to isOpen and userId
-watch(() => [props.isOpen, props.userId], async ([newIsOpen, newUserId]) => {
-    if (newIsOpen && newUserId) {
-        await fetchDisplayName();
-    }
-}, { immediate: true });
-
-const fetchDisplayName = async () => {
-    try {
-        const userDoc = await getDoc(doc(db, "users", props.userId));
-        if (userDoc.exists()) {
-            const name = userDoc.data().displayName || '';
-            if (name) {
-                displayName.value = name;
-                // Also save to localStorage as backup
-                localStorage.setItem('playerDisplayName', name);
-            }
+    // Initial load from localStorage as backup
+    onMounted(async () => {
+        // First try to load from localStorage as fallback
+        const savedName = localStorage.getItem('playerDisplayName');
+        if (savedName) {
+            displayName.value = savedName;
         }
-    } catch (error) {
-        console.error("Error fetching user display name:", error);
-    }
-};
+        
+        // Then try to fetch from Firebase if we have a userId
+        if (props.userId) {
+            await fetchDisplayName();
+        }
+    });
 
-const closeModal = () => {
-    emit('close');
-};
+    // Watch for changes to isOpen and userId
+    watch(() => [props.isOpen, props.userId], async ([newIsOpen, newUserId]) => {
+        if (newIsOpen && newUserId) {
+            await fetchDisplayName();
+        }
+    }, { immediate: true });
 
-// Rest of your computed properties remain the same
-const winPercentage = computed(() => {
-    if (props.stats.gamesPlayed === 0) return 0;
-    return Math.round((props.stats.gamesWon / props.stats.gamesPlayed) * 100);
-});
+    const fetchDisplayName = async () => {
+        try {
+            const userDoc = await getDoc(doc(db, "users", props.userId));
+            if (userDoc.exists()) {
+                const name = userDoc.data().displayName || '';
+                if (name) {
+                    displayName.value = name;
+                    // Also save to localStorage as backup
+                    localStorage.setItem('playerDisplayName', name);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching user display name:", error);
+        }
+    };
 
-const averageGuessesPerWin = computed(() => {
-    if (props.stats.guessesPerWin.length === 0) return 0;
-    const totalGuesses = props.stats.guessesPerWin.reduce((sum, guesses) => sum + guesses, 0);
-    return (totalGuesses / props.stats.guessesPerWin.length).toFixed(1);
-});
+    // Rest of your computed properties remain the same
+    const winPercentage = computed(() => {
+        if (props.stats.gamesPlayed === 0) return 0;
+        return Math.round((props.stats.gamesWon / props.stats.gamesPlayed) * 100);
+    });
 
-const maxGames = computed(() => {
-    return Math.max(props.stats.gamesPlayed, 1);
-});
+    const averageGuessesPerWin = computed(() => {
+        if (props.stats.guessesPerWin.length === 0) return 0;
+        const totalGuesses = props.stats.guessesPerWin.reduce((sum, guesses) => sum + guesses, 0);
+        return (totalGuesses / props.stats.guessesPerWin.length).toFixed(1);
+    });
 
-const maxStreak = computed(() => {
-    return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1);
-});
+    const maxGames = computed(() => {
+        return Math.max(props.stats.gamesPlayed, 1);
+    });
 
-const winPercentageSplit = computed(() => {
-    const total = props.stats.gamesWon + props.stats.gamesLost;
-    if (total === 0) return 0;
-    return (props.stats.gamesWon / total) * 100;
-});
+    const maxStreak = computed(() => {
+        return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1);
+    });
 
-const lossPercentageSplit = computed(() => {
-    const total = props.stats.gamesWon + props.stats.gamesLost;
-    if (total === 0) return 0;
-    return (props.stats.gamesLost / total) * 100;
-});
+    const winPercentageSplit = computed(() => {
+        const total = props.stats.gamesWon + props.stats.gamesLost;
+        if (total === 0) return 0;
+        return (props.stats.gamesWon / total) * 100;
+    });
+
+    const lossPercentageSplit = computed(() => {
+        const total = props.stats.gamesWon + props.stats.gamesLost;
+        if (total === 0) return 0;
+        return (props.stats.gamesLost / total) * 100;
+    });
 </script>
 
 <style lang="scss" scoped>

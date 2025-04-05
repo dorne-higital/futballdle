@@ -60,9 +60,9 @@
 					/>
 
 					<div class="name-buttons">
-						<Icon name="carbon:checkmark" class="save-btn" @click="saveName" />
+						<Icon name="solar:check-square-bold" class="save-btn" @click="saveName" />
 
-						<Icon name="carbon:close" class="cancel-btn" @click="cancelEdit" />
+						<Icon name="solar:close-square-bold-duotone" class="cancel-btn" @click="cancelEdit" />
 					</div>
 				</div>
 			</div>
@@ -243,7 +243,7 @@
 		.settings-section {
 			max-width: 600px;
 			width: 100%; 
-			 
+
 			.user-profile-section {
 				margin-bottom: 1rem;
 				padding: .5rem 0;
