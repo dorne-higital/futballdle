@@ -232,7 +232,6 @@ const lossPercentageSplit = computed(() => {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 100%;
         left: 0;
         width: 100%;
         z-index: 1000;

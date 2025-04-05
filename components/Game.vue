@@ -136,7 +136,7 @@
                 <HeadingSeparator text="or" class="subtle"/>
 
                 <div class="game-over-cta">
-                    <nuxt-link class="link" to="/">
+                    <nuxt-link class="link caption" to="/">
                         Home
 
                         <span>
