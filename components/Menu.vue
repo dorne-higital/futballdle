@@ -5,7 +5,7 @@
 	>
 		<div class="menu-content">
 			<div class="header">
-				<h1>Footballdle</h1>
+				<nuxt-link class="heading" to="/" @click="closeMenu">Footballdle</nuxt-link>
 
 				<Icon class="close-btn" name="solar:close-square-outline" @click="closeMenu" />
 			</div>
@@ -201,6 +201,18 @@
 				flex-direction: row;
 				justify-content: space-between;
 				margin-bottom: 3rem;
+
+				.heading {
+					color: var(--text-secondary);
+					font-family: "Ubuntu", serif;
+					font-weight: 100;
+					font-style: normal;
+					font-size: 2rem;
+
+					@media (max-width: 600px) {
+						font-size: 1.75rem;
+					}
+				}
 
 				.close-btn {
 					height: 1.5rem;
