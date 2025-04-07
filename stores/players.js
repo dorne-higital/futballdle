@@ -1,64 +1,62 @@
 // stores/players.js
-import { defineStore } from 'pinia'; // Import defineStore
+import { defineStore } from 'pinia';
+import { collection, getDocs } from 'firebase/firestore';
+import { ref } from 'vue';
 
-export const usePlayerStore = defineStore('players', {
-	state: () => ({
-	  players: [
-		'SALAH',
-		'JAMES',
-		'FABIO',
-		'VARDY',
-		'BOWEN',
-		'TONEY',
-		'GAKPO',
-	  ],
-	  playerDetails: {
-		SALAH: {
-		  club: 'Liverpool',
-		  position: 'Forward',
-		  fact: 'Holds the record for most goals in a 38-game Premier League season.',
-		},
-		JAMES: {
-		  club: 'Chelsea',
-		  position: 'Defender',
-		  fact: 'Known for his powerful crosses and defensive abilities.',
-		},
-		FABIO: {
-		  club: 'Fulham',
-		  position: 'Midfielder',
-		  fact: 'A talented young midfielder with a bright future.',
-		},
-		VARDY: {
-		  club: 'Leicester City',
-		  position: 'Forward',
-		  fact: 'A prolific goalscorer known for his pace and clinical finishing.',
-		},
-		BOWEN: {
-		  club: 'West Ham United',
-		  position: 'Forward',
-		  fact: 'A versatile forward with excellent dribbling skills.',
-		},
-		TONEY: {
-		  club: 'Brentford',
-		  position: 'Forward',
-		  fact: 'A prolific goalscorer known for his aerial ability.',
-		},
-		GAKPO: {
-		  club: 'Liverpool',
-		  position: 'Forward',
-		  fact: 'A versatile forward with excellent dribbling and shooting abilities.',
-		},
-	  },
-	}),
-	getters: {
-	  getRandomPlayer: (state) => {
-		const today = new Date().toISOString().slice(0, 10);
-		const seed = today.split('-').join('');
-		const randomIndex = seed % state.players.length;
-		return state.players[randomIndex];
-	  },
-	  getPlayerDetails: (state) => (playerName) => {
-		return state.playerDetails[playerName] || {};
-	  },
-	},
-  });
+export const usePlayerStore = defineStore('players', () => {
+    const players = ref([]);
+    const { $firestore } = useNuxtApp();
+
+    async function fetchPlayers() {
+        try {
+            const querySnapshot = await getDocs(collection($firestore, 'players'));
+            players.value = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+        } catch (error) {
+            console.error('Error fetching players:', error);
+        }
+    }
+
+    function getRandomPlayer() {
+        if (players.value.length === 0) {
+            return null;
+        }
+        const randomIndex = Math.floor(Math.random() * players.value.length);
+        return players.value[randomIndex];
+    }
+
+    function getPlayerDetails(playerName) {
+        return players.value.find((player) => player.name === playerName) || {};
+    }
+
+    // New method to get player by difficulty level
+    function getRandomPlayerByDifficulty(difficulty) {
+        if (players.value.length === 0) {
+            return null;
+        }
+        
+        // Filter players by difficulty level
+        const filteredPlayers = players.value.filter(player => 
+            Number(player.difficulty) === Number(difficulty)
+        );
+        
+        // If no players found for this difficulty, fallback to any player
+        if (filteredPlayers.length === 0) {
+            console.warn(`No players found for difficulty ${difficulty}. Using random player.`);
+            return getRandomPlayer();
+        }
+        
+        const randomIndex = Math.floor(Math.random() * filteredPlayers.length);
+        return filteredPlayers[randomIndex];
+    }
+
+    return {
+        players,
+        fetchPlayers,
+        getRandomPlayer,
+        getPlayerDetails,
+        getRandomPlayerByDifficulty,
+    };
+});

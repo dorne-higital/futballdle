@@ -1,177 +1,487 @@
 <template>
-	<div 
-		v-if="isOpen" 
-		:class="{ 'dark': darkMode }"
-		class="stats-modal"
-	>
-		<div class="modal-content">
-			<div class="modal-header">
-				<h3>Your Stats</h3>
-					
-				<Icon 
-					class="close-button"
-					name="carbon:close-filled" 
-					@click="closeModal"
-				/>
-			</div>
+    <div v-if="stats" :class="{ 'dark': darkMode }" class="stats-modal">
+        <PageHero 
+            heading="Stats"
+            subheading="All of your stats from previous games"
+            link="/"
+            linkText="Home"
+        />
 
-			<div class="modal-body">
-				<div class="stat-item">
-					<p>Games Played: {{ stats.gamesPlayed }}</p>
-				</div>
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="stat-section">
+                    <div class="pie-chart-container">
+                        <div class="pie-chart" :style="{ background: `conic-gradient(var(--color-1) ${winPercentage}%, transparent ${winPercentage}%)` }">
+                            <div class="pie-chart-inner"></div>
 
-				<div class="stat-item">
-					<p>Win Percentage: {{ winPercentage }}%</p>
+                            <span class="stat-value">{{ winPercentage }}%</span>
+                        </div>
+                    </div>
 
-					<div class="progress-bar">
-						<div 
-							:style="{ width: winPercentage + '%' }"
-							class="progress" 
-						></div>
-					</div>
-				</div>
+                    <div class="stat-content">
+                        <p class="stat-label">Win Percentage</p>
 
-				<div class="stat-item">
-					<p>Win Streak: {{ stats.winStreak }}</p>
+                        <p class="caption">You have won <strong>{{ winPercentage }}% </strong>of all games you have played.</p>
 
-					<div class="streak-bars">
-						<div 
-							v-for="n in stats.winStreak" 
-							:key="n"
-							class="streak-bar" 
-						></div>
-					</div>
-				</div>
+                        <p class="caption">Out of <strong>{{ maxGames }}</strong> games played, you have won <strong>{{ props.stats.gamesWon }}</strong> of these.</p>
+                    </div>
+                </div>
 
-				<div class="stat-item">
-					<p>Max Win Streak: {{ stats.maxWinStreak }}</p>
-					<div class="streak-bars">
-						<div class="streak-bar max" v-for="n in stats.maxWinStreak" :key="n"></div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="stat-bar center">
+                    <p class="stat-label">Won / Lost</p>
+
+                    <div class="progress-section">
+                        <p>{{ stats.gamesWon }}</p>
+
+                        <div class="bar-container">
+                            <div class="bar-fill" :style="{ width: winPercentageSplit + '%' }"/>
+                        </div>
+
+                        <p>{{ stats.gamesLost }}</p>
+                    </div>
+                </div>
+
+                <div class="difficulty-results">
+                    <p>Wins by difficulty</p>
+
+                    <div class="bar-chart-container">
+                        <div class="bar-item">
+                            <span class="caption">Game 1</span>
+                            <div class="bar-container">
+                                <div class="bar" :style="{ width: calculatePercentage(stats.easyGamesWon) + '%' }">
+                                    <span class="bar-value">{{ stats.easyGamesWon }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar-item">
+                            <span class="caption">Game 2</span>
+                            <div class="bar-container">
+                                <div class="bar" :style="{ width: calculatePercentage(stats.mediumGamesWon) + '%' }">
+                                    <span class="bar-value">{{ stats.mediumGamesWon }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar-item">
+                            <span class="caption">Game 3</span>
+                            <div class="bar-container">
+                                <div class="bar" :style="{ width: calculatePercentage(stats.hardGamesWon) + '%' }">
+                                    <span class="bar-value">{{ stats.hardGamesWon }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prev-results">
+                    <span class="stat-label">Recent results</span>
+
+                    <div class="content">
+                        <div class="chips">
+                            <span v-for="(result, index) in stats.lastTenResults" :key="index" class="chip" :class="{ green: result === 'win', red: result === 'lose' }"></span>
+                        </div>
+
+                        <p class="caption recent-tag">Most recent ^</p>
+                    </div>
+                </div>
+
+
+                <div class="stat-section">
+                    <div class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ averageGuessesPerWin }}</span>
+                        </div>
+
+                        <p class="stat-label">Avg. guesses per win</p>
+                    </div>
+
+                    <div class="stat-type minimal">
+                        <div v-if="stats.winStreak > 0" class="stat-container">
+                            <span class="stat-value">+ {{ stats.winStreak }}</span>
+                        </div>
+
+                        <div v-else class="stat-container">
+                            <span class="stat-value">- {{ stats.lossStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Current Streak</p>
+                    </div>
+
+                    <div class="stat-type minimal">
+                        <div class="stat-container">
+                            <span class="stat-value">{{ stats.maxWinStreak }}</span>
+                        </div>
+
+                        <p class="stat-label">Biggest win streak</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
-  
+
 <script setup>
-	import { defineProps, defineEmits, computed } from 'vue';
+    import { defineProps, defineEmits, computed, ref, onMounted, nextTick, watch } from 'vue'; // Add watch import
+    import { useNuxtApp } from '#app';
+    import { doc, updateDoc, getDoc } from 'firebase/firestore';
+    import PageHero from '../components/PageHero.vue';
 
-	const isDarkMode = ref(false);
-	
-	const props = defineProps({
-		isOpen: Boolean,
-		stats: Object,
-        darkMode: {
-            type: Boolean,
-            default: false,
-        },
-	});
+    const props = defineProps({
+        isOpen: Boolean,
+        stats: Object,
+        darkMode: Boolean,
+        userId: String, // Add userId prop to identify the user
+    });
 
-	const emit = defineEmits(['close']);
+    const emit = defineEmits(['close', 'nameUpdated']);
 
-	const closeModal = () => {
-		emit('close');
-	};
+    // Firebase reference
+    const { $firestore: db } = useNuxtApp();
+    const displayName = ref('');
 
-	onMounted(() => {
-		const storedDarkMode = localStorage.getItem('darkMode');
-		if (storedDarkMode === 'true') {
-			isDarkMode.value = true;
-		}
-	});
+    const totalDifficultyWins = computed(() => {
+        return props.stats.easyGamesWon + props.stats.mediumGamesWon + props.stats.hardGamesWon;
+    });
 
-	const winPercentage = computed(() => {
-		if (props.stats.gamesPlayed === 0) return 0;
-		return Math.round((props.stats.gamesWon / props.stats.gamesPlayed) * 100);
-	});
+    const calculatePercentage = (wins) => {
+        if (totalDifficultyWins.value === 0) return 0;
+        return (wins / totalDifficultyWins.value) * 100;
+    };
+
+    // Initial load from localStorage as backup
+    onMounted(async () => {
+        // First try to load from localStorage as fallback
+        const savedName = localStorage.getItem('playerDisplayName');
+        if (savedName) {
+            displayName.value = savedName;
+        }
+        
+        // Then try to fetch from Firebase if we have a userId
+        if (props.userId) {
+            await fetchDisplayName();
+        }
+    });
+
+    // Watch for changes to isOpen and userId
+    watch(() => [props.isOpen, props.userId], async ([newIsOpen, newUserId]) => {
+        if (newIsOpen && newUserId) {
+            await fetchDisplayName();
+        }
+    }, { immediate: true });
+
+    const fetchDisplayName = async () => {
+        try {
+            const userDoc = await getDoc(doc(db, "users", props.userId));
+            if (userDoc.exists()) {
+                const name = userDoc.data().displayName || '';
+                if (name) {
+                    displayName.value = name;
+                    // Also save to localStorage as backup
+                    localStorage.setItem('playerDisplayName', name);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching user display name:", error);
+        }
+    };
+
+    // Rest of your computed properties remain the same
+    const winPercentage = computed(() => {
+        if (props.stats.gamesPlayed === 0) return 0;
+        return Math.round((props.stats.gamesWon / props.stats.gamesPlayed) * 100);
+    });
+
+    const averageGuessesPerWin = computed(() => {
+        if (props.stats.guessesPerWin.length === 0) return 0;
+        const totalGuesses = props.stats.guessesPerWin.reduce((sum, guesses) => sum + guesses, 0);
+        return (totalGuesses / props.stats.guessesPerWin.length).toFixed(1);
+    });
+
+    const maxGames = computed(() => {
+        return Math.max(props.stats.gamesPlayed, 1);
+    });
+
+    const maxStreak = computed(() => {
+        return Math.max(props.stats.maxWinStreak, props.stats.maxLossStreak, 1);
+    });
+
+    const winPercentageSplit = computed(() => {
+        const total = props.stats.gamesWon + props.stats.gamesLost;
+        if (total === 0) return 0;
+        return (props.stats.gamesWon / total) * 100;
+    });
+
+    const lossPercentageSplit = computed(() => {
+        const total = props.stats.gamesWon + props.stats.gamesLost;
+        if (total === 0) return 0;
+        return (props.stats.gamesLost / total) * 100;
+    });
 </script>
-  
+
 <style lang="scss" scoped>
-	.stats-modal {
-		align-items: center;
-		background-color: rgba(0, 0, 0, 0.5);
-		display: flex;
-		height: 100%;
-		justify-content: center;
-		left: 0;
-		position: fixed;
-		top: 0;
-		width: 100%;
-		z-index: 1000;
+    .stats-modal {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
 
-		&.dark {
-			background-color: rgba(50, 50, 50, 0.5);
+        .modal-content {
+            background-color: var(--background-primary);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 100%;
+            margin-top: 1rem;
+            max-width: 600px;
+            width: 100%;
 
-			.modal-content {
-				background-color: #1f1f1f;
+            .modal-body {
+                padding: 0 1rem 1rem;
 
-				.modal-header{
-					.close-button {
-						color: #aeaeae;
-					}
-				}
-			}
-		}
-	
-		.modal-content {
-			background-color: white;
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-			padding: 1.25rem;
-			width: 100%;
-	
-			.modal-header {
-				align-items: center;
-				display: flex;
-				justify-content: space-between;
-		
-				.close-button {
-					border: none;
-					color: #292929;
-					cursor: pointer;
-					font-size: 1.75rem;
-				}
-			}
-	
-			.modal-body {
-				display: flex;
-				flex-direction: column;
-				gap: .5rem;
-		
-				.progress-bar {
-					background-color: #ff8181;
-					border-radius: 0;
-					height: 1rem;
-					margin-top: 0.5rem;
-					width: 100%;
-		
-					.progress {
-						background-color: #4caf50;
-						border-radius: 0.25rem;
-						height: 100%;
-					}
-				}
-		
-				.streak-bars {
-					display: flex;
-					margin-top: 0.5rem;
-			
-					.streak-bar {
-						background-color: #4caf50;
-						border-radius: 0.25rem;
-						height: 1rem;
-						margin-right: 0.25rem;
-						width: 0.5rem;
-			
-						&.max {
-							background-color: #2196f3;
-						}
-					}
-				}
-			}
-		}
-	}
-  </style>
+                .stat-section {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    gap: .5rem;
+
+
+                    .pie-chart-container {
+                        align-items: center;
+                        display: flex;
+                        justify-content: center;
+                        flex: 1;
+                        padding: .5rem;
+                        position: relative;
+
+                        .pie-chart {
+                            aspect-ratio: 1 / 1;
+                            width: 100%;
+                            border-radius: 50%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+
+                            .pie-chart-inner {
+                                position: absolute;
+                                width: 70%;
+                                height: 70%;
+                                background-color: var(--background-primary);
+                                border-radius: 50%;
+                            }
+
+                            .stat-value {
+                                font-size: 2rem;
+                                font-weight: 300;
+                                z-index: 10;
+                            }
+                        }
+                    }
+
+                    .stat-content {
+                        display: flex;
+                        flex: 1;
+                        flex-direction: column;
+                        justify-content: center;
+                        gap: .5rem;
+                    }
+
+                    .stat-type {
+                        background-color: var(--background-secondary);
+                        border: 1px solid var(--border);
+                        border-radius: var(--global-border-radius);
+                        padding: .5rem;
+                        text-align: center;
+                        width: calc(50% - .25rem);
+
+                        &.minimal {
+                            padding: 0;
+                            width: calc(33% - .26rem);
+
+                            .stat-value {
+                                font-size: 2rem !important;
+                            }
+
+                            .stat-label {
+                                padding: .5rem;
+                            }
+
+                            .difficulty-badge {
+                                border-radius: 0 0 var(--global-border-radius) var(--global-border-radius);
+                            }
+                        }
+
+                        .stat-container {
+                            align-items: center;
+                            aspect-ratio: 1 / 1;
+                            display: flex;
+                            justify-content: center;
+                            width: 100%;
+
+                            .stat-value {
+                                font-size: 3rem;
+                                font-weight: 300;
+                            }
+                        }
+
+                        p {
+                            border-top: 1px solid var(--border);
+                            font-size: .75rem;
+                            padding-top: .5rem;
+                        }
+                    }
+                }
+
+                .stat-bar {
+                    align-items: center;
+                    background-color: var(--background-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--global-border-radius);
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: .75rem;
+                    padding: 1rem;
+
+                    &.center {
+                        flex-direction: column;
+                        margin-top: .75rem;
+                    }
+
+                    .stat-label {
+                        margin-right: 1rem;
+                    }
+
+                    .progress-section {
+                        display: flex;
+                        flex-direction: row;
+                        gap: .5rem;
+                        margin-top: .5rem;
+                        width: 100%;
+                    }
+
+                    .bar-container {
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        border-radius: var(--global-border-radius-sm);
+                        background-color: var(--color-3);
+                        overflow: hidden;
+                        position: relative;
+                        width: 100%;
+
+                        .bar-fill {
+                            background-color: var(--color-2);
+                            height: 1.5rem;
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-start;
+                            position: relative;
+                            z-index: 1;
+
+                            .stat-value {
+                                color: var(--text-primary);
+                                font-weight: bold;
+                                padding-left: 8px;
+                            }
+                        }
+                    }
+                }
+
+                .difficulty-results {
+                    margin: 2rem 0;
+                    padding: 0 1rem;
+                    text-align: left; 
+
+                    p {
+                        padding-bottom: 1rem;
+                    }
+
+                    .bar-chart-container {
+                        display: flex;
+                        flex-direction: column;
+
+                        .bar-item {
+                            align-items: center;
+                            display: flex;
+
+                            .caption {
+                                border-right: 3px solid var(--color-1);
+                                padding: .25rem 0;
+                                width: 30%; 
+                            }
+
+                            .bar-container {
+                                width: 70%;
+                            }
+
+                            .bar {
+                                background-color: var(--color-1);
+                                border-radius: 0 var(--global-border-radius-sm) var(--global-border-radius-sm) 0;
+                                height: 1rem;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-start;
+                                position: relative;
+
+                                .bar-value {
+                                    color: var(--text-primary);
+                                    font-size: .75rem;
+                                    padding-left: .25rem;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .prev-results {
+                    align-items: center;
+                    background-color: var(--background-secondary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--global-border-radius);
+                    display: flex;
+                    flex-direction: column;
+                    gap: .5rem;
+                    justify-content: center;
+                    margin: 1rem auto;
+                    padding: 1rem;
+
+                    .content {
+                        border-right: 3px solid var(--color-1);
+                        display: flex;
+                        flex-direction: column;
+                        gap: .5rem;
+                        padding: 0 .5rem;
+
+                        .chips {
+                            display: flex;
+                            gap: .5rem;
+
+                            .chip {
+                                border-radius: var(--global-border-radius-sm);
+                                display: inline-block;
+                                height: 1.5rem;
+                                width: 1.25rem;
+
+                                &.green {
+                                    background-color: var(--color-2);
+                                }
+
+                                &.red {
+                                    background-color: var(--color-3);
+                                }
+                            }
+                        }
+
+                        .recent-tag {
+                            font-size: .5rem;
+                            text-align: right;
+                        }
+                    }
+                }
+            }
+        }
+    }
+</style>

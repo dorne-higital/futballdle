@@ -1,0 +1,56 @@
+[
+	{
+		"name": "Salah",
+		"age": 31,
+		"nationality": "Egypt",
+		"careerClubGoals": 230,
+		"position": "Forward",
+		"league": "Premier League",
+		"club": "Liverpool"
+	},
+	{
+		"name": "James",
+		"age": 23,
+		"nationality": "England",
+		"careerClubGoals": 10,
+		"position": "Defender",
+		"league": "Premier League",
+		"club": "Chelsea"
+	},
+	{
+		"name": "Vardy",
+		"age": 36,
+		"nationality": "England",
+		"careerClubGoals": 170,
+		"position": "Forward",
+		"league": "Premier League",
+		"club": "Leicester City"
+	},
+	{
+		"name": "Bowen",
+		"age": 26,
+		"nationality": "England",
+		"careerClubGoals": 80,
+		"position": "Forward",
+		"league": "Premier League",
+		"club": "West Ham United"
+	},
+	{
+		"name": "Toney",
+		"age": 27,
+		"nationality": "England",
+		"careerClubGoals": 150,
+		"position": "Forward",
+		"league": "Premier League",
+		"club": "Brentford"
+	},
+	{
+		"name": "Gakpo",
+		"age": 24,
+		"nationality": "Netherlands",
+		"careerClubGoals": 60,
+		"position": "Forward",
+		"league": "Premier League",
+		"club": "Liverpool"
+	}
+]

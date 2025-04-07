@@ -3,36 +3,31 @@
 		:class="{ 'dark': darkMode }"
 		class="header"
 	>
-		<h1>Footballdle</h1>
+		<div class="header-content">
+			<nuxt-link class="heading" to="/">Footballdle</nuxt-link>
 
-		<div class="icons">
-			<Icon 
-				name="carbon:settings-adjust" 
-				@click="openStats"
-			/>
-
-			<Icon 
-				name="carbon:information" 
-				@click="openInfo"
-			/>
-
-			<Icon 
-				v-if="isDarkMode"
-				name="carbon:sun" 
-				@click="toggleDarkMode"
-			/>
-
-			<Icon 
-				v-else
-				name="carbon:moon" 
-				@click="toggleDarkMode"
-			/>
+			<div class="icons">
+				<Icon 
+					name="solar:menu-dots-square-outline" 
+					@click="openMenu"
+				/>
+			</div>
 		</div>
 	</div>
+
+	<Menu
+		:isVisible="menuOpen"
+		:userId="currentUserId"
+		:initialDisplayName="userDisplayName"
+		@closeMenu="closeMenu"
+		@nameUpdated="handleNameUpdate"
+		@navigate="handleNavigation"
+	/>
 </template>
   
 <script setup>
 	import { defineProps, defineEmits } from 'vue';
+	import Menu from '@/components/Menu.vue';
   
 	const props = defineProps({
         darkMode: {
@@ -41,50 +36,77 @@
         },
 	});
 
-	const emit = defineEmits(['openStats', 'openInfo', 'toggleDarkMode']);
+	const menuOpen = ref(false);
+	const currentUserId = ref(null);
+	const userDisplayName = ref(null);
+	
+	const emit = defineEmits(['openLeaderboard', 'openStats', 'openInfo', 'openSettings', 'toggleDarkMode']);
 
-	const openStats = () => {
-		emit('openStats');
+    onMounted(() => {
+        if (process.client) {
+            currentUserId.value = localStorage.getItem('userId');
+            userDisplayName.value = localStorage.getItem('playerDisplayName');
+            console.log("Header - currentUserId:", currentUserId.value); // Add this line
+            console.log("Header - userDisplayName:", userDisplayName.value); // Add this line
+        }
+	});
+	
+	const openMenu = () => {
+		menuOpen.value = true;
 	};
 
-	const openInfo = () => {
-		emit('openInfo');
+	const closeMenu = () => {
+		menuOpen.value = false;
 	};
 
-	const toggleDarkMode = () => {
-		emit('toggleDarkMode');
+	const handleNavigation = (section) => {
+		console.log(`Navigating to: ${section}`);
+	};
+
+	const handleNameUpdate = (newName) => {
+		userDisplayName.value = newName;
 	};
 </script>
 
 <style lang="scss" scoped>
 	.header {
 		align-items: center;
-		box-shadow: 0px 0px 15px 0px #d8d8d8;
+		background-color: var(--color-1);
 		display: flex;
-		justify-content: space-between;
+		justify-content: center;
 		padding: 1rem;
 		width: 100%;
 		z-index: 2;
 
-		&.dark {
-			box-shadow: 0px 0px 15px 0px #595959;
+		.header-content {
+			display: flex;
+			justify-content: space-between;
+			max-width: 600px;
+			width: 100%;
 		}
-	}
 
-	.icons {
-		display: flex;
-		gap: .8rem;
-		padding: 0.2rem 0.4rem;
-	}
+		.heading {
+			color: var(--text-secondary);
+			font-family: "Ubuntu", serif;
+			font-weight: 100;
+			font-style: normal;
+			font-size: 2rem;
 
-	.icon {
-		background: none;
-		border: none;
-		font-size: 24px;
-		cursor: pointer;
-	}
+			@media (max-width: 600px) {
+				font-size: 1.75rem;
+			}
+		}
 
-	.icons span {
-		font-size: 1.2rem;
+		.icons {
+			display: flex;
+			gap: .8rem;
+			padding: .2rem .4rem;
+
+			.iconify {
+				color: var(--text-primary);
+				height: 1.5rem;
+				width: 1.5rem;
+			}
+		}
 	}
 </style>
